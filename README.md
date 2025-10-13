@@ -1,1 +1,2 @@
-#TravelMate_Gr24
+# TravelMate_Gr24
+Aplikacion për Udhëtime &amp; Eksplorim
