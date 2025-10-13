@@ -1,11 +1,12 @@
+import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Text>Welcome to TravelMate on App 🌍</Text>
+      <Link href={"/"}>Go to index</Link>
     </View>
   );
 }
@@ -15,6 +16,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
+    color: "#000",
     justifyContent: 'center',
   },
 });
