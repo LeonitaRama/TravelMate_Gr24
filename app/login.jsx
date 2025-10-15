@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context"; 
 import {
   View,
   Text,
@@ -6,13 +7,14 @@ import {
   TouchableOpacity,
   ImageBackground,
   StyleSheet,
-  SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; 
+import { useRouter } from "expo-router";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter(); 
 
   const handleLogin = () => {
     if (!username || !password) {
@@ -29,7 +31,7 @@ export default function Login() {
       resizeMode="cover"
     >
       <SafeAreaView style={styles.overlay}>
-        <Text style={styles.title}>Travel Mate</Text>
+        <Text style={styles.title}>LogIn</Text>
 
         {/* Username */}
         <View style={styles.inputWrapper}>
@@ -62,7 +64,7 @@ export default function Login() {
         </TouchableOpacity>
 
         {/* Sign Up link */}
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/signup")}>
           <Text style={styles.signupText}>SIGN UP</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -125,4 +127,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
 
