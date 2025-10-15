@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { SafeAreaView, Text, TextInput, Button, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context"; 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ImageBackground,
+  StyleSheet,
+} from "react-native";
 import { useRouter } from "expo-router";
 
 export default function Signup() {
@@ -15,22 +23,113 @@ export default function Signup() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
-      <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry style={styles.input} />
-      <TextInput placeholder="Confirm Password" value={confirm} onChangeText={setConfirm} secureTextEntry style={styles.input} />
-      <Button title="Sign Up" onPress={handleSignup} />
-      <Text style={styles.link} onPress={() => router.push("/login")}>
-        Already have an account? Login
-      </Text>
-    </SafeAreaView>
+    <ImageBackground
+      source={require("../assets/signup.jpg")} 
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={styles.overlay}>
+        <Text style={styles.title}>SignUp</Text>
+
+        {/* Email */}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            placeholder="Email"
+            placeholderTextColor="#fff"
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
+
+        {/* Password */}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor="#fff"
+            style={styles.input}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
+
+        {/* Confirm Password */}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            placeholder="Confirm Password"
+            placeholderTextColor="#fff"
+            style={styles.input}
+            secureTextEntry
+            value={confirm}
+            onChangeText={setConfirm}
+          />
+        </View>
+
+        {/* Button */}
+        <TouchableOpacity style={styles.button} onPress={handleSignup}>
+          <Text style={styles.buttonText}>SIGN UP</Text>
+        </TouchableOpacity>
+
+        {/* Login link */}
+        <TouchableOpacity onPress={() => router.push("/login")}>
+          <Text style={styles.signupText}>Already have an account? Login</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
-  input: { borderWidth: 1, borderColor: "#ccc", padding: 10, marginBottom: 15, borderRadius: 5 },
-  link: { color: "blue", marginTop: 15, textAlign: "center" },
+  background: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 30,
+  },
+  title: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 40,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 30,
+    width: "100%",
+    paddingHorizontal: 15,
+    marginBottom: 15,
+  },
+  input: {
+    flex: 1,
+    color: "#fff",
+    height: 45,
+  },
+  button: {
+    backgroundColor: "#3b82f6",
+    borderRadius: 30,
+    paddingVertical: 12,
+    width: "100%",
+    alignItems: "center",
+    marginTop: 15,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  signupText: {
+    color: "#fff",
+    fontSize: 14,
+    marginTop: 20,
+    textDecorationLine: "underline",
+  },
 });
+
