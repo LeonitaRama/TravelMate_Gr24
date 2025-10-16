@@ -1,22 +1,11 @@
 import { Link } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { View, Text } from 'react-native';
 
-export default function App() {
+export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text>Welcome to TravelMate on App 🌍</Text>
-      <Link href={"/"}>Go to index</Link>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Welcome to TravelMate 🌍</Text>
+      <Link href="/details">Go to Destination Details</Link>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    color: "#000",
-    justifyContent: 'center',
-  },
-});
