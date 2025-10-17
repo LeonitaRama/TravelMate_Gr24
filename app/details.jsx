@@ -1,15 +1,24 @@
 import React, {useState} from "react";
 import { View, Text, Image,ScrollView} from "react-native";
 import { FlatList } from "react-native";
+import { TextInput } from "react-native";
 export default function Details(){
-  const DestinationsItem=({image,desc})=>(
+  const DestinationsItem=({image,desc})=>{
+    const [review, setReview] = useState("");
+return(
  <View style={{ width: "48%", marginBottom: 20 }}>
   <Image source={{ uri: image }} style={{ width: 150, height: 150 }} />
    <Text style={{ marginTop: 10, fontSize: 16, textAlign: "center", width: 150 }}>{desc}
 
    </Text>
+   <TextInput style={{borderWidth:1,borderColor:"gray", borderRadius: 8,marginTop: 8, padding: 5, width: 150,fontSize: 14,}}
+   placeholder="Write a review"
+   value={review}
+   onChangeText={setReview}
+   />
   </View>
-    )
+);
+  };
  const [destinations, setDestinations] = useState([
     { id: "1", image: "https://content.r9cdn.net/rimg/dimg/e2/9f/a0069cbb-city-7228-16bdc8cb53f.jpg", desc: "Budva, a beautiful coastal city in Montenegro known for its beaches and historic old town." },
     { id: "2", image: "https://d2rdhxfof4qmbb.cloudfront.net/wp-content/uploads/20180807165922/Zermatt.jpg", desc: "Car-free town famous for skiing, hiking, and stunning views of the Matterhorn." },
