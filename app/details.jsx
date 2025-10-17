@@ -7,16 +7,17 @@ export default function Details(){
     const [review, setReview] = useState("");
 return(
  <View style={{marginBottom: 20,alignItems: "center" }}>
-  <Image source={{ uri: image }} style={{ width: 150, height: 150 }} />
-
+  <Image source={{ uri: image }} style={{width: 150, height: 170,alignItems: "center",}} />
+ <View style={{ flex: 1, justifyContent: "center" }}>
       <Text style={{ marginTop: 10, textAlign: "center", fontWeight: "bold" }}>
         {name}  
       </Text>
 
    <Text style={{ marginTop: 5, textAlign: "center", width: 150,fontStyle:"italic"}}>{desc}
    </Text>
+   </View>
 
-   <TextInput style={{borderWidth:1,borderColor:"gray", borderRadius: 8,marginTop: 8, padding: 5,width:150}}
+   <TextInput style={{borderWidth:1,borderColor:"gray", borderRadius: 8,marginTop: 8, padding: 5, width: "100%"}}
    placeholder="Write a review"
    value={review}
    onChangeText={setReview}
