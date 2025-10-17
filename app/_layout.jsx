@@ -1,13 +1,30 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { ThemeProvider, ThemeContext } from "../context/ThemeContext";
+import { useContext } from "react";
 
 export default function Layout() {
+  // Rrethimi i Tabs me ThemeProvider
+  return (
+    <ThemeProvider>
+      <TabsWrapper />
+    </ThemeProvider>
+  );
+}
+
+// Ky komponent brenda përdor darkMode për tabs
+function TabsWrapper() {
+  const { darkMode } = useContext(ThemeContext);
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: "#0080ff",
-        tabBarInactiveTintColor: "gray",
+        tabBarInactiveTintColor: darkMode ? "#aaa" : "gray",
+        tabBarStyle: {
+          backgroundColor: darkMode ? "#222" : "#fff",
+        },
       }}
     >
       <Tabs.Screen
@@ -28,7 +45,6 @@ export default function Layout() {
           ),
         }}
       />
-      {/* WISHLIST */}
       <Tabs.Screen
         name="wishlist"
         options={{
