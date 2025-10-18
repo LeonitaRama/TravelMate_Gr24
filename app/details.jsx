@@ -1,9 +1,11 @@
 import React, {useState} from "react";
-import { View, Text, Image,ScrollView} from "react-native";
+import { View, Text, Image} from "react-native";
 import { FlatList } from "react-native";
 import { TextInput } from "react-native";
+import {Link} from "expo-router"
 export default function Details(){
-  const DestinationsItem=({image,desc,name})=>{
+     const [searchText, setSearchText] = useState("");
+    const DestinationsItem=({image,desc,name})=>{
     const [review, setReview] = useState("");
 return(
  <View style={{marginBottom: 20,alignItems: "center" }}>
@@ -22,8 +24,19 @@ return(
    value={review}
    onChangeText={setReview}
    />
+
+   <Link href="/location" style={{ color: "blue", textDecorationLine: "underline" }}>
+    View in Map
+  </Link>
+  <Link href="/tickets" style={{ color: "green", textDecorationLine: "underline", fontWeight: "bold" }}>
+    Get Tickets
+  </Link>
+
   </View>
+
+  
 );
+
   };
  const [destinations, setDestinations] = useState([
     { id: "1",name:"Budva, Montenegro", image:require("../assets/Explore-Destinations/budva.jpg"), desc: "A beautiful coastal city in Montenegro known for its beaches and historic old town." },
@@ -40,6 +53,13 @@ return(
         <Text style={{fontSize:24,textAlign:"center",fontWeight:"bold",marginTop:5,marginBottom:15,textDecorationLine: "underline"}}>
        Explore Destinations
         </Text>
+
+ <TextInput
+        placeholder="Search destination"
+        value={searchText}
+        onChangeText={setSearchText}
+        style={{ borderWidth: 1, borderColor: "gray", borderRadius: 8, padding: 5, marginBottom: 15 }}
+      />
 
 <FlatList
 data={destinations}
