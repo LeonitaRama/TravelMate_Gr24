@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context"; 
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -16,22 +17,30 @@ export default function Signup() {
   const [confirm, setConfirm] = useState("");
   const router = useRouter();
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!email || !password) return alert("Please fill all fields");
     if (password !== confirm) return alert("Passwords do not match");
-    alert("Signed up!");
+
+    try {
+      // Ruajmë login state
+      await AsyncStorage.setItem("isAuthenticated", "true");
+
+      // Navigojmë në home
+      router.replace("/home"); // ose "/(tabs)" në varësi të strukturës
+    } catch (error) {
+      console.log("Error saving signup state:", error);
+    }
   };
 
   return (
     <ImageBackground
-      source={require("../assets/signup.jpg")} 
+      source={require("../assets/signup.jpg")}
       style={styles.background}
       resizeMode="cover"
     >
       <SafeAreaView style={styles.overlay}>
-        <Text style={styles.title}>SignUp</Text>
+        <Text style={styles.title}>Sign Up</Text>
 
-        {/* Email */}
         <View style={styles.inputWrapper}>
           <TextInput
             placeholder="Email"
@@ -42,7 +51,6 @@ export default function Signup() {
           />
         </View>
 
-        {/* Password */}
         <View style={styles.inputWrapper}>
           <TextInput
             placeholder="Password"
@@ -54,7 +62,6 @@ export default function Signup() {
           />
         </View>
 
-        {/* Confirm Password */}
         <View style={styles.inputWrapper}>
           <TextInput
             placeholder="Confirm Password"
@@ -66,12 +73,10 @@ export default function Signup() {
           />
         </View>
 
-        {/* Button */}
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
           <Text style={styles.buttonText}>SIGN UP</Text>
         </TouchableOpacity>
 
-        {/* Login link */}
         <TouchableOpacity onPress={() => router.push("/login")}>
           <Text style={styles.signupText}>Already have an account? Login</Text>
         </TouchableOpacity>
@@ -81,10 +86,7 @@ export default function Signup() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    justifyContent: "center",
-  },
+  background: { flex: 1, justifyContent: "center" },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.3)",
@@ -92,12 +94,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 30,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 40,
-  },
+  title: { fontSize: 36, fontWeight: "bold", color: "white", marginBottom: 40 },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -107,11 +104,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 15,
   },
-  input: {
-    flex: 1,
-    color: "#fff",
-    height: 45,
-  },
+  input: { flex: 1, color: "#fff", height: 45 },
   button: {
     backgroundColor: "#3b82f6",
     borderRadius: 30,
@@ -120,11 +113,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 15,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   signupText: {
     color: "#fff",
     fontSize: 14,
@@ -132,4 +121,6 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
+
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context"; 
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -8,34 +8,48 @@ import {
   ImageBackground,
   StyleSheet,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; 
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter(); 
+  const router = useRouter();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!username || !password) {
       alert("Please enter username and password");
       return;
     }
-    alert("Logged in!");
+
+    try {
+      // Ruajmë login state
+      await AsyncStorage.setItem("isAuthenticated", "true");
+
+      // Navigojmë në home
+      router.replace("/home");
+    } catch (error) {
+      console.log("Error saving login state:", error);
+    }
   };
 
   return (
     <ImageBackground
-      source={require("../assets/login.jpg")} 
+      source={require("../assets/login.jpg")}
       style={styles.background}
       resizeMode="cover"
     >
       <SafeAreaView style={styles.overlay}>
-        <Text style={styles.title}>LogIn</Text>
+        <Text style={styles.title}>Log In</Text>
 
-        {/* Username */}
         <View style={styles.inputWrapper}>
-          <Ionicons name="person-outline" size={20} color="#fff" style={styles.icon} />
+          <Ionicons
+            name="person-outline"
+            size={20}
+            color="#fff"
+            style={styles.icon}
+          />
           <TextInput
             placeholder="Username"
             placeholderTextColor="#fff"
@@ -45,9 +59,13 @@ export default function Login() {
           />
         </View>
 
-        {/* Password */}
         <View style={styles.inputWrapper}>
-          <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.icon} />
+          <Ionicons
+            name="lock-closed-outline"
+            size={20}
+            color="#fff"
+            style={styles.icon}
+          />
           <TextInput
             placeholder="Password"
             placeholderTextColor="#fff"
@@ -58,12 +76,10 @@ export default function Login() {
           />
         </View>
 
-        {/* Button */}
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
 
-        {/* Sign Up link */}
         <TouchableOpacity onPress={() => router.push("/signup")}>
           <Text style={styles.signupText}>SIGN UP</Text>
         </TouchableOpacity>
@@ -73,10 +89,7 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    justifyContent: "center",
-  },
+  background: { flex: 1, justifyContent: "center" },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.3)",
@@ -84,12 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 30,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "white",
-    marginBottom: 60,
-  },
+  title: { fontSize: 36, fontWeight: "bold", color: "white", marginBottom: 60 },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -99,14 +107,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 15,
   },
-  icon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    color: "#fff",
-    height: 45,
-  },
+  icon: { marginRight: 10 },
+  input: { flex: 1, color: "#fff", height: 45 },
   button: {
     backgroundColor: "#3b82f6",
     borderRadius: 30,
@@ -115,11 +117,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 15,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   signupText: {
     color: "#fff",
     fontSize: 14,
@@ -127,5 +125,6 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
 
 
