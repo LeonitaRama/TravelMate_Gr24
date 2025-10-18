@@ -403,7 +403,7 @@ contactItem: {
   marginVertical: 3,
 },
 footer: {
-  backgroundColor: '#1e293b', // ngjyrë e errët blu
+  backgroundColor: '#1e293b',
   paddingVertical: 15,
   paddingHorizontal: 20,
   flexDirection: 'row',
