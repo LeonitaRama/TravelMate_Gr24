@@ -13,7 +13,7 @@ const PersonalInfo = () => {
 const router = useRouter();
 const handleSave = () => {
     alert(`Saved: \nName: ${fullName}\nBio: ${bio}\nEmail: ${email}\nPhone: ${phone}`);
-router.push('/Profile');  
+router.push('/profile/Profile');  
 };
 
     return (
