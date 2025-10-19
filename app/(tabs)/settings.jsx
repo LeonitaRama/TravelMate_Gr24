@@ -3,7 +3,7 @@ import {
   View, Text, TouchableOpacity, StyleSheet, Switch, Modal, Pressable, ScrollView, Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemeContext } from "../../context/ThemeContext"; // vendos path sipas strukturës
+import { ThemeContext } from "../../context/ThemeContext"; 
 import { useRouter } from "expo-router";
 
 export default function SettingsScreen() {
@@ -20,7 +20,7 @@ export default function SettingsScreen() {
     if (option === "Log Out") {
       Alert.alert("Logged Out", "You have been logged out.");
     } else if (option === "Edit Profile") {
-      router.push("/Profile"); // <-- NAVIGATE TO PROFILE
+      router.push("/profile"); 
     } else {
       Alert.alert(`${option} clicked`);
     }

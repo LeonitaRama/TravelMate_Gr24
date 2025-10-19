@@ -1,7 +1,7 @@
 import React from "react";
 import { Stack } from "expo-router";
 import { StyleSheet, View, Image, TouchableOpacity, Text } from "react-native";
-import { ThemeProvider } from "../context/ThemeContext";
+import { ThemeProvider } from "../../context/ThemeContext";
 
 export default function RootLayout() {
   return (
