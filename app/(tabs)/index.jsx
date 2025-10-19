@@ -177,7 +177,8 @@ export default function HomeScreen() {
       />
     ))}
   </ScrollView>
-</View>  </View>
+</View>  
+</View> 
   <View style={styles.textCard}>
   <Text style={styles.textCardTitle}>CALL TO ACTION</Text>
   <Text style={styles.textCardTitle}>READY FOR UNFORGETTABLE TRAVEL. REMEMBER US!</Text>
