@@ -20,7 +20,7 @@ export default function SettingsScreen() {
     if (option === "Log Out") {
       Alert.alert("Logged Out", "You have been logged out.");
     } else if (option === "Edit Profile") {
-      router.push("../profile/Profile"); 
+      router.push("/profile/Profile"); 
     } else {
       Alert.alert(`${option} clicked`);
     }
@@ -49,7 +49,7 @@ export default function SettingsScreen() {
       ]}
     >
       <Text
-        style={[styles.header, { color: darkMode ? "#fff" : "#007bff" }]}
+        style={[styles.header, { color: darkMode ? "#fff" : "#555" }]}
       >
         ⚙️ Settings
       </Text>
@@ -57,7 +57,7 @@ export default function SettingsScreen() {
       {settingsOptions.map((item, index) => {
         const textColor = darkMode ? "#fff" : "#333";
         const bgColor = darkMode ? "#333" : "#f9f9f9";
-        const iconColor = "#007bff";
+        const iconColor = "#6b63ff73";
 
         if (item.title === "Notifications") {
           return (
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   modalText: { fontSize: 18, textAlign: "center" },
   modalClose: {
     marginTop: 15,
-    backgroundColor: "#007bff",
+    backgroundColor: "#6b63ff73",
     borderRadius: 10,
     paddingVertical: 10,
     alignItems: "center",
