@@ -10,12 +10,19 @@ const Profile = () => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
-
+            <View style={styles.headerTop}>
+                <Link href="/" asChild>
+                    <TouchableOpacity activeOpacity={0.7}>
+                        <Ionicons style={{margin: 10}}name="chevron-back" size={30} color="black" />
+                    </TouchableOpacity>
+                </Link>
+                <Text style={styles.headerTitle}></Text>
+            </View>
                 <StatusBar barStyle="light-content" />
                 <View style={styles.header}>
                     <View style={styles.imageContainer}>
                         <Image
-                            source={{ uri: 'https://via.placeholder.com/150' }}
+                            source={{ uri: 'https://loremfaces.net/96/id/.jpg' }}
                             style={styles.image}
                         />
                         <FontAwesome6
@@ -105,9 +112,9 @@ const styles = StyleSheet.create({
     },
       headerTop: {
         flexDirection: 'row',
+        backgroundColor: "#6b63ff73",
         alignItems: 'center',
         gap: 10,
-        marginBottom: 30,
     },
     headerTitle: {
         fontSize: 20,
@@ -131,7 +138,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-
     image: {
         width: 150,
         height: 150,
@@ -141,7 +147,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#ffffff",
         elevation: 4
     },
-
     addIcon: {
         position: 'absolute',
         bottom: 5,
@@ -188,7 +193,6 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 3,
     },
-
     infoLeft: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -220,6 +224,5 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.7,
         shadowRadius: 3,
-
     },
 });
