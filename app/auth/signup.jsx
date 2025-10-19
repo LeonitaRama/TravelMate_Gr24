@@ -26,7 +26,7 @@ export default function Signup() {
       await AsyncStorage.setItem("isAuthenticated", "true");
 
      
-      router.replace("/HomeScreen.jsx"); 
+      router.replace("/index.jsx"); 
     } catch (error) {
       console.log("Error saving signup state:", error);
     }
@@ -77,7 +77,7 @@ export default function Signup() {
           <Text style={styles.buttonText}>SIGN UP</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/login")}>
+        <TouchableOpacity onPress={() => router.push("/auth/login")}>
           <Text style={styles.signupText}>Already have an account? Login</Text>
         </TouchableOpacity>
       </SafeAreaView>

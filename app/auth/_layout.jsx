@@ -14,7 +14,7 @@ export default function RootLayout() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => router.push("../auth/login")}
+            onPress={() => router.push("/auth/login")}
           >
             <Text style={styles.loginText}>Login</Text>
             <View style={styles.underline} />

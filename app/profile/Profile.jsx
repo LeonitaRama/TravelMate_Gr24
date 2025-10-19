@@ -37,7 +37,7 @@ const Profile = () => {
                     <Text style={styles.name}>Welcome User</Text>
                     <Text style={styles.phone}>Bio</Text>
                 </View>
-                <Link href="../profile/PersonalInfo" asChild>
+                <Link href="/profile/PersonalInfo" asChild>
                     <TouchableOpacity
                         activeOpacity={0.5}
                         style={styles.AccountInfo}
@@ -50,7 +50,7 @@ const Profile = () => {
                         <Feather style={styles.icon} name="chevron-right" size={24} color="black" />
                     </TouchableOpacity>
                 </Link>
-                <Link href="../profile/Reviews" asChild>
+                <Link href="/profile/Reviews" asChild>
                     <TouchableOpacity activeOpacity={0.5} style={styles.AccountInfo}>
                         <View style={styles.infoLeft}>
                             <Ionicons style={styles.icon} name="star-outline" size={24} color="black" />
@@ -60,7 +60,7 @@ const Profile = () => {
                         <Feather name="chevron-right" size={24} color="black" />
                     </TouchableOpacity>
                 </Link>
-                <Link href="../(tabs)/wishlist" asChild>
+                <Link href="/(tabs)/wishlist" asChild>
                     <TouchableOpacity style={styles.AccountInfo}>
                         <View style={styles.infoLeft}>
                             <Ionicons style={styles.infoLeft} name="heart-outline" size={24} color="black" />
@@ -70,7 +70,7 @@ const Profile = () => {
                         <Feather name="chevron-right" size={24} color="black" />
                     </TouchableOpacity>
                 </Link>
-                <Link href="../profile/Photos" asChild>
+                <Link href="/profile/Photos" asChild>
                     <TouchableOpacity style={styles.AccountInfo}>
                         <View style={styles.infoLeft}>
                             <Ionicons style={styles.infoLeft} name="images-outline" size={24} color="black" />
