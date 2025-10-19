@@ -20,7 +20,7 @@ router.push('/profile/Profile');
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={styles.header}>
-                    <Link href="../Profile">
+                    <Link href="/profile/Profile">
                         <Ionicons name="chevron-back" size={26} color="black" />
                     </Link>
                     <Text style={styles.headerTitle}>Personal Information</Text>
