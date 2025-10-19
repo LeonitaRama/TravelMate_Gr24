@@ -28,7 +28,7 @@ export default function Login() {
       await AsyncStorage.setItem("isAuthenticated", "true");
 
     
-      router.replace("/(tabs)/index");
+      router.replace("/");
     } catch (error) {
       console.log("Error saving login state:", error);
     }

@@ -26,7 +26,7 @@ export default function Signup() {
       await AsyncStorage.setItem("isAuthenticated", "true");
 
      
-      router.replace("/index.jsx"); 
+      router.replace("/"); 
     } catch (error) {
       console.log("Error saving signup state:", error);
     }
