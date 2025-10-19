@@ -1,6 +1,7 @@
 import React from "react";
 import { Stack } from "expo-router";
 import { StyleSheet, View, Image, TouchableOpacity, Text, Platform, StatusBar } from "react-native";
+import { useRouter } from "expo-router";
 import { ThemeProvider } from "../../context/ThemeContext";
 
 export default function RootLayout() {
@@ -13,7 +14,7 @@ export default function RootLayout() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => router.push("/login")}
+            onPress={() => router.push("../auth/login")}
           >
             <Text style={styles.loginText}>Login</Text>
             <View style={styles.underline} />

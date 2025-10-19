@@ -20,7 +20,7 @@ export default function SettingsScreen() {
     if (option === "Log Out") {
       Alert.alert("Logged Out", "You have been logged out.");
     } else if (option === "Edit Profile") {
-      router.push("/profile"); 
+      router.push("../profile/Profile"); 
     } else {
       Alert.alert(`${option} clicked`);
     }

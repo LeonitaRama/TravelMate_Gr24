@@ -28,7 +28,7 @@ export default function Login() {
       await AsyncStorage.setItem("isAuthenticated", "true");
 
     
-      router.replace("/index.jsx");
+      router.replace("../(tabs)/index");
     } catch (error) {
       console.log("Error saving login state:", error);
     }
@@ -80,7 +80,7 @@ export default function Login() {
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/signup")}>
+        <TouchableOpacity onPress={() => router.push("../auth/signup")}>
           <Text style={styles.signupText}>Already have an account? SIGN UP</Text>
         </TouchableOpacity>
       </SafeAreaView>
