@@ -1,27 +1,30 @@
 import React from "react";
-import { Stack } from "expo-router";
-import { StyleSheet, View, Image, TouchableOpacity, Text, Platform, StatusBar } from "react-native";
+import { Stack, usePathname } from "expo-router";
+import { StyleSheet, View, TouchableOpacity, Text, Platform, StatusBar } from "react-native";
 import { useRouter } from "expo-router";
 import { ThemeProvider } from "../context/ThemeContext";
 
 export default function RootLayout() {
   const router = useRouter();
+  const pathname = usePathname(); 
+
+  const showLoginHeader = pathname === "/" || pathname.startsWith("/explore");
 
   return (
     <ThemeProvider>
       <View style={styles.container}>
-        
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => router.push("/auth/login")}
-          >
-            <Text style={styles.loginText}>Login</Text>
-            <View style={styles.underline} />
-          </TouchableOpacity>
-        </View>
+        {showLoginHeader && (
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => router.push("/auth/login")}
+            >
+              <Text style={styles.loginText}>Login</Text>
+              <View style={styles.underline} />
+            </TouchableOpacity>
+          </View>
+        )}
 
-        
         <Stack screenOptions={{ headerShown: false }} />
       </View>
     </ThemeProvider>
@@ -38,10 +41,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "flex-start",
-    paddingHorizontal: 16,
+    paddingHorizontal: 13,
   },
   loginButton: {
-    marginTop: 30,
+    marginTop: 37,
     paddingVertical: 6,
   },
   loginText: {
