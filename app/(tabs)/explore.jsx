@@ -62,7 +62,9 @@ return(
       />
 
 <FlatList
-data={destinations}
+data={destinations.filter(item => 
+    item.name.toLowerCase().includes(searchText.toLowerCase())
+  )}
 keyExtractor={(item)=>item.id}
 numColumns={2}
 columnWrapperStyle={{justifyContent:"space-between"}}
