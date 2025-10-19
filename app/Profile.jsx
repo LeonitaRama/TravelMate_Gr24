@@ -9,7 +9,8 @@ import { Link } from 'expo-router';
 const Profile = () => {
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView>
+            <ScrollView contentContainerStyle={styles.scroll}>
+
                 <StatusBar barStyle="light-content" />
                 <View style={styles.header}>
                     <View style={styles.imageContainer}>
@@ -62,7 +63,7 @@ const Profile = () => {
                         <Feather name="chevron-right" size={24} color="black" />
                     </TouchableOpacity>
                 </Link>
-                   <Link href="/Photos" asChild>
+                <Link href="/Photos" asChild>
                     <TouchableOpacity style={styles.AccountInfo}>
                         <View style={styles.infoLeft}>
                             <Ionicons style={styles.infoLeft} name="images-outline" size={24} color="black" />
@@ -101,6 +102,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 100,
         overflow: 'visible',
+    },
+      headerTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginBottom: 30,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: '700',
     },
     image: {
         width: 150,
@@ -202,7 +213,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10,
         elevation: 6,
-        padding: 30,
+        padding: 25,
+        paddingHorizontal: 100,
         backgroundColor: '#deb9ff',
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },

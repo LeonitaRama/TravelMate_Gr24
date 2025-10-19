@@ -1,17 +1,10 @@
 import React, { useState, useContext } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Switch,
-  Modal,
-  Pressable,
-  ScrollView,
-  Alert,
+  View, Text, TouchableOpacity, StyleSheet, Switch, Modal, Pressable, ScrollView, Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemeContext } from "../context/ThemeContext"; // vendos path sipas strukturës
+import { ThemeContext } from "../../context/ThemeContext"; // vendos path sipas strukturës
+import { useRouter } from "expo-router";
 
 export default function SettingsScreen() {
   const { darkMode, setDarkMode } = useContext(ThemeContext);
@@ -19,11 +12,15 @@ export default function SettingsScreen() {
   const [language, setLanguage] = useState("English");
   const [modalVisible, setModalVisible] = useState(false);
 
+  const router = useRouter();
+
   const languages = ["English", "Albanian", "German"];
 
   const handlePress = (option) => {
     if (option === "Log Out") {
       Alert.alert("Logged Out", "You have been logged out.");
+    } else if (option === "Edit Profile") {
+      router.push("/Profile"); // <-- NAVIGATE TO PROFILE
     } else {
       Alert.alert(`${option} clicked`);
     }

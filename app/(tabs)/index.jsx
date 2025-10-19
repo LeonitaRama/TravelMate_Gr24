@@ -23,16 +23,16 @@ export default function HomeScreen() {
   const scrollX = useRef(new Animated.Value(0)).current;
 
   const destinations = [
-    { id: '1', name: 'Paris', img: require('../assets/Paris.jpg'), category: 'City', description: 'City of Lights, famous for the Eiffel Tower, cafes, and art museums.', rating: 4.8 },
-    { id: '2', name: 'Tokyo', img: require('../assets/tokyo.jpg'), category: 'City', description: 'Vibrant city blending tradition and technology, famous for sushi and temples.', rating: 4.7 },
-    { id: '3', name: 'New York', img: require('../assets/NYC.jpg'), category: 'City', description: 'The Big Apple, known for Times Square, Broadway, and iconic skyline.', rating: 4.9 },
-    { id: '4', name: 'Bali', img: require('../assets/bali.jpg'), category: 'Beach', description: 'Tropical paradise with sandy beaches, lush jungles, and vibrant culture.', rating: 4.8 },
-    { id: '5', name: 'Sydney', img: require('../assets/sydney.jpg'), category: 'City', description: 'Iconic harbor city with stunning beaches and the famous Sydney Opera House.', rating: 4.7 },
-    { id: '6', name: 'Maldives', img: require('../assets/Maldives.jpg'), category: 'Beach', description: 'Crystal clear waters, white sand beaches, and luxurious resorts.', rating: 4.9 },
-    { id: '7', name: 'Nepal', img: require('../assets/Nepal.jpg'), category: 'Adventure', description: 'Mountain trekking, Himalayan views, and thrilling adventure activities.', rating: 4.9 },
-    { id: '8', name: 'Amazon Rainforest', img: require('../assets/AmazonRainforest.jpg'), category: 'Adventure', description: 'Explore the largest rainforest in the world, wildlife, and river cruises.', rating: 4.8 },
-    { id: '9', name: 'Iceland', img: require('../assets/iceland.jpg'), category: 'Adventure', description: 'Glaciers, volcanoes, geysers, and northern lights experiences.', rating: 4.9 },
-    { id: '10', name: 'Rome', img: require('../assets/rome.jpg'), category: 'City', description: 'Ancient city with Colosseum, Vatican, and rich cultural heritage.', rating: 4.8 },
+    { id: '1', name: 'Paris', img: require('../../assets/Paris.jpg'), category: 'City', description: 'City of Lights, famous for the Eiffel Tower, cafes, and art museums.', rating: 4.8 },
+    { id: '2', name: 'Tokyo', img: require('../../assets/tokyo.jpg'), category: 'City', description: 'Vibrant city blending tradition and technology, famous for sushi and temples.', rating: 4.7 },
+    { id: '3', name: 'New York', img: require('../../assets/NYC.jpg'), category: 'City', description: 'The Big Apple, known for Times Square, Broadway, and iconic skyline.', rating: 4.9 },
+    { id: '4', name: 'Bali', img: require('../../assets/bali.jpg'), category: 'Beach', description: 'Tropical paradise with sandy beaches, lush jungles, and vibrant culture.', rating: 4.8 },
+    { id: '5', name: 'Sydney', img: require('../../assets/sydney.jpg'), category: 'City', description: 'Iconic harbor city with stunning beaches and the famous Sydney Opera House.', rating: 4.7 },
+    { id: '6', name: 'Maldives', img: require('../../assets/Maldives.jpg'), category: 'Beach', description: 'Crystal clear waters, white sand beaches, and luxurious resorts.', rating: 4.9 },
+    { id: '7', name: 'Nepal', img: require('../../assets/Nepal.jpg'), category: 'Adventure', description: 'Mountain trekking, Himalayan views, and thrilling adventure activities.', rating: 4.9 },
+    { id: '8', name: 'Amazon Rainforest', img: require('../../assets/AmazonRainforest.jpg'), category: 'Adventure', description: 'Explore the largest rainforest in the world, wildlife, and river cruises.', rating: 4.8 },
+    { id: '9', name: 'Iceland', img: require('../../assets/iceland.jpg'), category: 'Adventure', description: 'Glaciers, volcanoes, geysers, and northern lights experiences.', rating: 4.9 },
+    { id: '10', name: 'Rome', img: require('../../assets/rome.jpg'), category: 'City', description: 'Ancient city with Colosseum, Vatican, and rich cultural heritage.', rating: 4.8 },
   ];
 
   const categories = [
@@ -42,11 +42,11 @@ export default function HomeScreen() {
   ];
 
   const photos = [
-    require('../assets/gallery-1.jpg'),
-    require('../assets/gallery-2.jpg'),
-    require('../assets/gallery-3.jpg'),
-    require('../assets/gallery-4.jpg'),
-    require('../assets/gallery-5.jpg'),
+    require('../../assets/gallery-1.jpg'),
+    require('../../assets/gallery-2.jpg'),
+    require('../../assets/gallery-3.jpg'),
+    require('../../assets/gallery-4.jpg'),
+    require('../../assets/gallery-5.jpg'),
   ];
 
   const filteredDestinations = destinations.filter(dest => {
@@ -100,7 +100,7 @@ export default function HomeScreen() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
       <ImageBackground
-        source={require('../assets/egypt.jpg')}
+        source={require('../../assets/egypt.jpg')}
         style={styles.headerBackground}
         resizeMode="cover"
       >

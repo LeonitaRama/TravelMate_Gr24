@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const Reviews = () => {
     return (
-        <SafeAreaView style={styles.container}>
+         <SafeAreaView style={styles.container}>
+                    <ScrollView contentContainerStyle={styles.scroll}>
             <View style={styles.header}>
                 <Link href="../Profile">
                     <Ionicons name="chevron-back" size={26} color="black" />
@@ -15,6 +16,7 @@ const Reviews = () => {
             <View style={styles.center}>
                 <Text style={styles.text}>No reviews yet</Text>
             </View>
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -29,7 +31,7 @@ const styles = StyleSheet.create({
     scroll: {
         padding: 20,
     },
-   header: {
+    header: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 10,

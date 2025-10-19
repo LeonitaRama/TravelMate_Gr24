@@ -1,11 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View,ScrollView } from 'react-native';
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 const Photos = () => {
     return (
-        <SafeAreaView style={styles.container}>
+<SafeAreaView style={styles.container}>
+                    <ScrollView contentContainerStyle={styles.scroll}>
             <View style={styles.header}>
                 <Link href="../Profile">
                     <Ionicons name="chevron-back" size={26} color="black" />
@@ -18,6 +19,7 @@ const Photos = () => {
                 <Text style={styles.text}>No photos taken yet</Text>
                 <Ionicons name="images-outline" size={48} color="#888" style={{ marginBottom: 12 }} />
             </View>
+            </ScrollView>
         </SafeAreaView>
     );
 };

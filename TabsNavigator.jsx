@@ -4,9 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { ThemeContext } from "./context/ThemeContext";
 
 // Screens
-import HomeScreen from "./app/home";
-import WishlistScreen from "./app/wishlist";
-import SettingsScreen from "./app/settings";
+import HomeScreen from "./home";
+import WishlistScreen from "./app/(tabs)/wishlist";
+import SettingsScreen from "./app/(tabs)/settings";
 
 const Tab = createBottomTabNavigator();
 
