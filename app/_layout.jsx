@@ -1,52 +1,66 @@
 import React from "react";
-import { Stack } from "expo-router";
-import { StyleSheet, View, Image, TouchableOpacity, Text } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Text,
+  Platform,
+  StatusBar,
+} from "react-native";
 import { ThemeProvider } from "../context/ThemeContext";
 
 export default function RootLayout() {
+  const router = useRouter();
+
   return (
     <ThemeProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* Këto janë rrugët jashtë tabs */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" />
-        <Stack.Screen name="login" />
-        <Stack.Screen name="Profile" />
-        <Stack.Screen name="Reviews" />
-        <Stack.Screen name="Photos" />
-        <Stack.Screen name="PersonalInfo" />
-        <Stack.Screen name="DestinationDetails" />
-      </Stack>
+      <View style={styles.container}>
+        
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => router.push("/login")}
+          >
+            <Text style={styles.loginText}>Login</Text>
+            <View style={styles.underline} />
+          </TouchableOpacity>
+        </View>
+
+        
+        <Stack screenOptions={{ headerShown: false }} />
+      </View>
     </ThemeProvider>
   );
 }
+
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight - 10 : 0,
+  },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
     paddingHorizontal: 16,
-    paddingTop: 40,
-    paddingBottom: 10,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
   },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  loginButton: {
+    marginTop: 30,
+    paddingVertical: 6,
   },
-  logo: {
-    width: 32,
-    height: 32,
-    marginRight: 8,
+  loginText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
   },
-  logoText: {
+  underline: {
+    height: 2,
+    backgroundColor: "#000",
+    width: "100%",
+    marginTop: 2,
+  },
+});
 
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#3b82f6',
-  }
-}
 
-);
