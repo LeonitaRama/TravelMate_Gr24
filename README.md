@@ -32,3 +32,10 @@ ose
 ```bash
 npx expo start --tunnel
 ```
+---
+Projekti është zhvilluar nga 
+- Rinesa Bejic
+- Liridona Kurrumeli
+- Rona Kukaj
+- Vlore Thaqi
+- Leonita Rama
