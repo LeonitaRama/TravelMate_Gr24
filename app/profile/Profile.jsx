@@ -11,7 +11,7 @@ const Profile = () => {
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
             <View style={styles.headerTop}>
-                <Link href="/" asChild>
+                <Link href="/settings" asChild>
                     <TouchableOpacity activeOpacity={0.7}>
                         <Ionicons style={{margin: 10}}name="chevron-back" size={30} color="black" />
                     </TouchableOpacity>

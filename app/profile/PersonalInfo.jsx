@@ -13,14 +13,14 @@ const PersonalInfo = () => {
 const router = useRouter();
 const handleSave = () => {
     alert(`Saved: \nName: ${fullName}\nBio: ${bio}\nEmail: ${email}\nPhone: ${phone}`);
-router.push('/Profile');  
+router.push('/profile/Profile');  
 };
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={styles.header}>
-                    <Link href="../Profile">
+                    <Link href="/profile/Profile">
                         <Ionicons name="chevron-back" size={26} color="black" />
                     </Link>
                     <Text style={styles.headerTitle}>Personal Information</Text>
