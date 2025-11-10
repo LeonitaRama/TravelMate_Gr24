@@ -1,21 +1,43 @@
 import React, {useState} from "react";
-import { View, Text, Image} from "react-native";
+import { View, Text, Image,Button} from "react-native";
 import { FlatList } from "react-native";
 import { TextInput } from "react-native";
 import {Link} from "expo-router"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Details(){
      const [searchText, setSearchText] = useState("");
-    const DestinationsItem=({image,desc,name})=>{
+
+
+   const addToFavorites = async (destination, review) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('@favorites');
+    let favorites = jsonValue != null ? JSON.parse(jsonValue) : [];
+
+    const exists = favorites.some(fav => fav.id === destination.id);
+    if (!exists) {
+    
+      favorites.push({ ...destination, review });
+      await AsyncStorage.setItem('@favorites', JSON.stringify(favorites));
+      alert(`${destination.name} added to Wishlist!`);
+    } else {
+      alert(`${destination.name} is already in your Wishlist.`);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+    const DestinationsItem=({item})=>{
     const [review, setReview] = useState("");
 return(
  <View style={{marginBottom: 20,alignItems: "center" }}>
-  <Image source={image } style={{width: 150, height: 170,alignItems: "center",}} />
+  <Image source={item.image } style={{width: 150, height: 170,alignItems: "center",}} />
  <View style={{ flex: 1, justifyContent: "center" }}>
       <Text style={{ marginTop: 10, textAlign: "center", fontWeight: "bold" }}>
-        {name}  
+        {item.name}  
       </Text>
 
-   <Text style={{ marginTop: 5, textAlign: "center", width: 150,fontStyle:"italic"}}>{desc}
+   <Text style={{ marginTop: 5, textAlign: "center", width: 150,fontStyle:"italic"}}>{item.desc}
    </Text>
    </View>
 
@@ -24,6 +46,8 @@ return(
    value={review}
    onChangeText={setReview}
    />
+
+<Button title="Add to Favorites" onPress={() => addToFavorites(item, review)} /> 
 
    <Link href="/location" style={{ color: "blue", textDecorationLine: "underline" }}>
     View in Map
@@ -68,7 +92,7 @@ data={destinations.filter(item =>
 keyExtractor={(item)=>item.id}
 numColumns={2}
 columnWrapperStyle={{justifyContent:"space-between"}}
-renderItem={({ item }) => <DestinationsItem image={item.image} name={item.name} desc={item.desc} />}
+renderItem={({ item }) => <DestinationsItem item={item} />}
 
 />
         
