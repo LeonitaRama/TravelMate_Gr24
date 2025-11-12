@@ -7,30 +7,57 @@ import {
   TouchableOpacity,
   ImageBackground,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (!username || !password) {
-      alert("Please enter username and password");
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter email and password");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters");
       return;
     }
 
     try {
-      
-      await AsyncStorage.setItem("isAuthenticated", "true");
+      // Provo login
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    
-      router.replace("/");
+      await AsyncStorage.setItem("isAuthenticated", "true");
+      Alert.alert("Success", `Login successful: ${user.email}`);
+      router.replace("/"); // ridrejton në home
     } catch (error) {
-      console.log("Error saving login state:", error);
+      if (error.code === "auth/user-not-found") {
+        // Auto-signup nëse email nuk ekziston
+        try {
+          const newUser = await createUserWithEmailAndPassword(auth, email, password);
+          await AsyncStorage.setItem("isAuthenticated", "true");
+          Alert.alert("Success", `Account created and logged in: ${newUser.user.email}`);
+          router.replace("/");
+        } catch (signupError) {
+          console.log("Auto-signup failed:", signupError);
+          Alert.alert("Signup failed", signupError.message);
+        }
+      } else if (error.code === "auth/wrong-password") {
+        Alert.alert("Error", "Wrong password");
+      } else if (error.code === "auth/invalid-email") {
+        Alert.alert("Error", "Invalid email");
+      } else {
+        Alert.alert("Login failed", error.message);
+      }
     }
   };
 
@@ -51,11 +78,13 @@ export default function Login() {
             style={styles.icon}
           />
           <TextInput
-            placeholder="Username"
+            placeholder="Email"
             placeholderTextColor="#fff"
             style={styles.input}
-            value={username}
-            onChangeText={setUsername}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
 
@@ -81,7 +110,7 @@ export default function Login() {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push("/auth/signup")}>
-          <Text style={styles.signupText}>Already have an account? SIGN UP</Text>
+          <Text style={styles.signupText}>Don't have an account? SIGN UP</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </ImageBackground>
@@ -124,4 +153,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textDecorationLine: "underline",
   },
-}); 
+});
+
+
+
+
+ 

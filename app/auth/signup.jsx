@@ -7,9 +7,12 @@ import {
   TouchableOpacity,
   ImageBackground,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -18,17 +21,40 @@ export default function Signup() {
   const router = useRouter();
 
   const handleSignup = async () => {
-    if (!email || !password) return alert("Please fill all fields");
-    if (password !== confirm) return alert("Passwords do not match");
+    if (!email || !password || !confirm) {
+      Alert.alert("Error", "Please fill all fields");
+      return;
+    }
+
+    if (password !== confirm) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters");
+      return;
+    }
 
     try {
-     
-      await AsyncStorage.setItem("isAuthenticated", "true");
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-     
+      await AsyncStorage.setItem("isAuthenticated", "true");
+      Alert.alert("Success", `Signup successful: ${user.email}`);
       router.replace("/"); 
     } catch (error) {
-      console.log("Error saving signup state:", error);
+      console.log("Signup error:", error);
+
+      if (error.code === "auth/email-already-in-use") {
+        Alert.alert("Error", "Email already in use. Please login instead.");
+      } else if (error.code === "auth/invalid-email") {
+        Alert.alert("Error", "Invalid email");
+      } else if (error.code === "auth/weak-password") {
+        Alert.alert("Error", "Password too weak (min 6 characters)");
+      } else {
+        Alert.alert("Signup failed", error.message);
+      }
     }
   };
 
@@ -48,6 +74,8 @@ export default function Signup() {
             style={styles.input}
             value={email}
             onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
 
@@ -121,3 +149,6 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
+
+
