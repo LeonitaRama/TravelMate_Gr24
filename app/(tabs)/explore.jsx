@@ -1,9 +1,15 @@
 import React, {useState} from "react";
 import { View, Text, Image,Button} from "react-native";
 import { FlatList } from "react-native";
+ import { TouchableOpacity } from "react-native";
+
 import { TextInput } from "react-native";
 import {Link} from "expo-router"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { db } from "../../firebase/firebaseConfigExplore";
+import { collection, addDoc } from "firebase/firestore";
+
 export default function Details(){
      const [searchText, setSearchText] = useState("");
 
@@ -22,10 +28,38 @@ export default function Details(){
     } else {
       alert(`${destination.name} is already in your Wishlist.`);
     }
+
+     console.log("Review saved in Firestore ✅");
   } catch (e) {
-    console.log(e);
+    console.log("Error adding favorite:",e);
+
   }
 };
+
+
+const sendReview = async (destination, review, setReview) => {
+  if (!review.trim()) {
+    alert("Please write a review before sending!");
+    return;
+  }
+
+  try {
+   await addDoc(collection(db, "reviews"), {
+  destinationId: destination.id,
+  name: destination.name,
+  review: review,
+  description: destination.desc,
+  timestamp: new Date(),
+    });
+    alert("Review sent ✅");
+    console.log("Review saved in Firestore ✅");
+    setReview(""); // pastron input-in pas dërgimit
+  } catch (e) {
+    console.log("Error sending review:", e);
+  }
+};
+
+
 
     const DestinationsItem=({item})=>{
     const [review, setReview] = useState("");
@@ -41,11 +75,42 @@ return(
    </Text>
    </View>
 
-   <TextInput style={{borderWidth:1,borderColor:"gray", borderRadius: 8,marginTop: 8, padding: 5, width: "100%"}}
-   placeholder="Write a review"
-   value={review}
-   onChangeText={setReview}
-   />
+   <View
+  style={{
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    width: "100%",
+  }}
+>
+  <TextInput
+    style={{
+      borderWidth: 1,
+      borderColor: "gray",
+      borderRadius: 8,
+      padding: 5,
+      flex: 1,
+      backgroundColor: "white",
+    }}
+    placeholder="Write a review"
+    value={review}
+    onChangeText={setReview}
+  />
+
+  <TouchableOpacity
+    onPress={() => sendReview(item, review, setReview)}
+    style={{
+      marginLeft: 6,
+      backgroundColor: "#4CAF50",
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 6,
+    }}
+  >
+    <Text style={{ color: "white", fontWeight: "bold" }}>📩</Text>
+  </TouchableOpacity>
+</View>
+
 
 <Button title="Add to Favorites" onPress={() => addToFavorites(item, review)} /> 
 
