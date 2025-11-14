@@ -1,26 +1,57 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { Image, StyleSheet, Text, View, StatusBar, FlatList, TouchableOpacity, ScrollView } from 'react-native'
+import { Image, StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from "expo-router";
 import ProfileOption from './ProfileOption';
+import { auth } from "../firebaseConfig";
+import { signOut } from "firebase/auth";
 
 
 const Profile = () => {
 
-    
-
     const router = useRouter();
+    const [currentUser, setCurrentUser] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            if (user) {
+                setCurrentUser(user);
+            } else {
+                router.replace("/auth/login");
+            }
+        });
+
+        return unsubscribe;
+    }, []);
+
+    const handleLogout = async () => {
+        await signOut(auth);
+        router.replace("/auth/login");
+    };
+
+    
+    if (!currentUser) {
+        return (
+            <SafeAreaView style={styles.loadingContainer}>
+                <Text style={{ fontSize: 20 }}>Loading...</Text>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
                 <View style={styles.header}>
 
-                {/* //fix this to save the  image of user logged in if logs in with facebook */}
+                    {/* //fix this to save the  image of user logged in if logs in with facebook */}
                     <View style={styles.imageContainer}>
-                        <Image
-                            source={{ uri: 'https://loremfaces.net/96/id/.jpg' }}
+                            <Image
+                            source={{
+                                uri: currentUser.photoURL
+                                    ? currentUser.photoURL
+                                    : "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                            }}
                             style={styles.image}
                         />
                         <FontAwesome6
@@ -33,19 +64,21 @@ const Profile = () => {
                 </View>
 
                 <View style={styles.info}>
-                    <Text style={styles.name}>Welcome User</Text>
-                    <Text style={styles.phone}>Bio</Text>
+                    <Text style={styles.name}>
+                        {currentUser.displayName ? currentUser.displayName : "Welcome User"}
+                        </Text>
+                    <Text style={styles.phone}>{currentUser.email}</Text>
                 </View>
 
                 <ProfileOption title="Personal Information" iconName="person-outline" headerTitle="Personal Information" target="/(profile)/personalInfo" />
                 <ProfileOption title="Reviews" iconName="star-outline" headerTitle="Reviews" target="/(profile)/reviews" />
                 <ProfileOption title="Wishlist" iconName="heart-outline" headerTitle="Wishlist" target="/(tabs)/wishlist" />
                 <ProfileOption title="Photos" iconName="images-outline" headerTitle="Photos" target="/(profile)/photos" />
-                </ScrollView>
+            </ScrollView>
 
-                {/* fix logout button */}
+            {/* fix logout button */}
             <TouchableOpacity style={styles.logoutButton}
-                activeOpacity={0.6} >
+                activeOpacity={0.6} onPress={handleLogout}>
                 <Text style={styles.logoutBtnText}>Logout</Text>
             </TouchableOpacity>
         </SafeAreaView>
