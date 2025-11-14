@@ -10,22 +10,19 @@ const PersonalInfo = () => {
     const [bio, setBio] = useState('Traveler | Explorer | Dreamer');
     const [email, setEmail] = useState('example@email.com');
     const [phone, setPhone] = useState('+383 44 000 000');
-const router = useRouter();
-const handleSave = () => {
-    alert(`Saved: \nName: ${fullName}\nBio: ${bio}\nEmail: ${email}\nPhone: ${phone}`);
-router.push('/profile/Profile');  
-};
+
+    const router = useRouter();
+    const handleSave = () => {
+        alert(`Saved: \nName: ${fullName}\nBio: ${bio}\nEmail: ${email}\nPhone: ${phone}`);
+        router.push('/(profile)/profile');
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scroll}>
-                <View style={styles.header}>
-                    <Link href="/profile/Profile">
-                        <Ionicons name="chevron-back" size={26} color="black" />
-                    </Link>
-                    <Text style={styles.headerTitle}>Personal Information</Text>
-                </View>
 
+
+                {/* //fix this add modal when saved changes to confirm the data were saved */}
                 <View style={styles.forma}>
                     <Text style={styles.label}>Full Name</Text>
                     <TextInput

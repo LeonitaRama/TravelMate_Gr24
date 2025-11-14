@@ -1,27 +1,23 @@
-import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-const Reviews = () => {
+
+const Photos = () => {
     return (
-         <SafeAreaView style={styles.container}>
-                    <ScrollView contentContainerStyle={styles.scroll}>
-            <View style={styles.header}>
-                <Link href="/profile/Profile">
-                    <Ionicons name="chevron-back" size={26} color="black" />
-                </Link>
-                <Text style={styles.headerTitle}>My reviews</Text>
-            </View>
-            <View style={styles.center}>
-                <Text style={styles.text}>No reviews yet</Text>
-            </View>
+        <SafeAreaView style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scroll}>
+                <View style={styles.center}>
+
+                    <Text style={styles.text}>No photos taken yet</Text>
+                    <Ionicons name="images-outline" size={48} color="#888" style={{ marginBottom: 12 }} />
+                </View>
             </ScrollView>
         </SafeAreaView>
     );
 };
 
-export default Reviews;
+export default Photos;
 
 const styles = StyleSheet.create({
     container: {
@@ -44,11 +40,9 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 20,
         color: '#666',
-    },
-    center: {
+    }, center: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
 });
-
