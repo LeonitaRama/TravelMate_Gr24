@@ -122,11 +122,11 @@ export default function HomeScreen() {
           },
         ]}
       />
-        <Text style={[styles.title, { color: theme.text, borderColor: theme.text }]}>
+        <Text style={styles.title}>
     Welcome to TravelMate 🌍
   </Text>
 
-  <Text style={[styles.subtitle, { color: theme.text }]}>
+  <Text style={styles.subtitle}>
     Find your next adventure!
   </Text>
 
@@ -327,11 +327,14 @@ const styles = StyleSheet.create({
     padding: 15,                     
     borderWidth: 1,                
     borderRadius: 12, 
+    color:"#fff",
+    borderColor:"#fff",
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 15,
+    color:"#fff"
   },
   search: {
     borderRadius: 10,
