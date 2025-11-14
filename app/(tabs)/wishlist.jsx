@@ -7,7 +7,14 @@ import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 export default function WishlistScreen() {
   const [favorites, setFavorites] = useState([]);
    const { darkMode } = useContext(ThemeContext);
-  const theme = darkMode ? darkTheme : lightTheme;
+ 
+   const theme = darkMode ? darkTheme : lightTheme;
+function fixImageSource(image) {
+  if (typeof image === "number") {
+    return image;
+  }
+  return { uri: image };
+}
 
 
   useEffect(() => {
@@ -25,10 +32,10 @@ export default function WishlistScreen() {
 
   const renderItem = ({ item }) => (
     <View style={styles.item}>
-      <Image source={item.image} style={{ width: 150, height: 150 }} />
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.desc}>{item.desc}</Text>
-      {item.review ? <Text style={styles.review}>Review: {item.review}</Text> : null}
+      <Image source={fixImageSource(item.image)} style={{ width: 150, height: 150 }} />
+      <Text style={[styles.name, {color:theme.text}]}>{item.name}</Text>
+      <Text style={[styles.desc, {color:theme.textSecondary}]}>{item.desc}</Text>
+      {item.review ? <Text style={[styles.review, {color:"green"}]}>{item.review}</Text> : null}
     </View>
   );
 
@@ -50,16 +57,17 @@ export default function WishlistScreen() {
       )}
     </View>
     
+    
   );
   
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 20},
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 15 },
-  subtitle: { fontSize: 16, color: "gray" },
+  subtitle: { fontSize: 16 },
   item: { marginBottom: 20, alignItems: "center" },
   name: { fontWeight: "bold", fontSize: 16, marginTop: 5 },
   desc: { fontStyle: "italic", textAlign: "center", marginTop: 5, width: 200 },
-  review: { marginTop: 5, color: "green", fontWeight: "bold" },
+  review: { marginTop: 5, fontWeight: "bold" },
 });

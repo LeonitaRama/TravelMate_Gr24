@@ -1,17 +1,19 @@
-import React, {useState} from "react";
+import React, {useState,useContext} from "react";
 import { View, Text, Image,Button} from "react-native";
 import { FlatList } from "react-native";
  import { TouchableOpacity } from "react-native";
-
+import { ThemeContext, ThemeProvider } from "../../context/ThemeContext";
 import { TextInput } from "react-native";
 import {Link} from "expo-router"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { db } from "../../firebase/firebaseConfigExplore";
 import { collection, addDoc } from "firebase/firestore";
+import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 
 export default function Details(){
      const [searchText, setSearchText] = useState("");
+     const { darkMode } = useContext(ThemeContext);
+     const theme = darkMode ? darkTheme : lightTheme;
 
 
    const addToFavorites = async (destination, review) => {
@@ -64,14 +66,14 @@ const sendReview = async (destination, review, setReview) => {
     const DestinationsItem=({item})=>{
     const [review, setReview] = useState("");
 return(
- <View style={{marginBottom: 20,alignItems: "center" }}>
+ <View style={{marginBottom: 20,alignItems: "center", backgroundcolor:theme.card, }}>
   <Image source={item.image } style={{width: 150, height: 170,alignItems: "center",}} />
  <View style={{ flex: 1, justifyContent: "center" }}>
-      <Text style={{ marginTop: 10, textAlign: "center", fontWeight: "bold" }}>
+      <Text style={{ marginTop: 10, textAlign: "center", fontWeight: "bold", color:theme.text }}>
         {item.name}  
       </Text>
 
-   <Text style={{ marginTop: 5, textAlign: "center", width: 150,fontStyle:"italic"}}>{item.desc}
+   <Text style={{ marginTop: 5, textAlign: "center", width: 150,fontStyle:"italic", color:theme.textSecondary}}>{item.desc}
    </Text>
    </View>
 
@@ -86,6 +88,9 @@ return(
   <TextInput
     style={{
       borderWidth: 1,
+      borderColor: theme.border,
+      backgroundColor:theme.inputBackground,
+      color:theme.text,
       borderColor: "gray",
       borderRadius: 8,
       padding: 5,
@@ -93,6 +98,7 @@ return(
       backgroundColor: "white",
     }}
     placeholder="Write a review"
+    placeholderTextColor={theme.placeholder}
     value={review}
     onChangeText={setReview}
   />
@@ -101,23 +107,37 @@ return(
     onPress={() => sendReview(item, review, setReview)}
     style={{
       marginLeft: 6,
-      backgroundColor: "#4CAF50",
+      backgroundColor: "theme.button",
       paddingHorizontal: 10,
       paddingVertical: 6,
       borderRadius: 6,
     }}
   >
-    <Text style={{ color: "white", fontWeight: "bold" }}>📩</Text>
+    <Text style={{ color: theme.buttonText, fontWeight: "bold" }}>📩</Text>
   </TouchableOpacity>
 </View>
 
 
-<Button title="Add to Favorites" onPress={() => addToFavorites(item, review)} /> 
+<TouchableOpacity 
+  onPress={() => addToFavorites(item, review)}
+  style={{
+    backgroundColor: theme.button,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    alignItems: "center"
+  }}
+>
+  <Text style={{ color: theme.buttonText, fontWeight: "bold" }}>
+    Add to Favorites
+  </Text>
+</TouchableOpacity>
 
-   <Link href="/location" style={{ color: "blue", textDecorationLine: "underline" }}>
+   <Link href="/location" style={{ color: theme.link, textDecorationLine: "underline" }}>
     View in Map
   </Link>
-  <Link href="/tickets" style={{ color: "green", textDecorationLine: "underline", fontWeight: "bold" }}>
+  <Link href="/tickets" style={{ color: theme.link2, textDecorationLine: "underline", fontWeight: "bold" }}>
     Get Tickets
   </Link>
 
@@ -138,16 +158,17 @@ return(
     { id: "8", name:"Rugova Canyon, Kosovo",image:require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty."  },
   ]);
       return(
-      <View  style={{ padding: 30 , flex: 1,backgroundColor: "#bcc5d7ff"}}>
-        <Text style={{fontSize:24,textAlign:"center",fontWeight:"bold",marginTop:5,marginBottom:15,textDecorationLine: "underline"}}>
+      <View  style={{ padding: 30 , flex: 1,backgroundColor:theme.background}}>
+        <Text style={{fontSize:24,textAlign:"center",fontWeight:"bold",marginTop:5,marginBottom:15,textDecorationLine: "underline", color:theme.text}}>
        Explore Destinations
         </Text>
 
  <TextInput
         placeholder="Search destination"
+        placeholderTextColor={theme.placeholder}
         value={searchText}
         onChangeText={setSearchText}
-        style={{ borderWidth: 1, borderColor: "gray", borderRadius: 8, padding: 5, marginBottom: 15 }}
+        style={{ borderWidth: 1, borderColor:theme.border,backgroundColor: theme.background, borderRadius: 8, padding: 5, marginBottom: 15 }}
       />
 
 <FlatList

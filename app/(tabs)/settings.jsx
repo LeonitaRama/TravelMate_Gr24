@@ -3,15 +3,16 @@ import {
   View, Text, TouchableOpacity, StyleSheet, Switch, Modal, Pressable, ScrollView, Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemeContext } from "../../context/ThemeContext"; 
+import { ThemeContext} from "../../context/ThemeContext"; 
 import { useRouter } from "expo-router";
+import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 
 export default function SettingsScreen() {
   const { darkMode, setDarkMode } = useContext(ThemeContext);
   const [notifications, setNotifications] = useState(true);
   const [language, setLanguage] = useState("English");
   const [modalVisible, setModalVisible] = useState(false);
-
+  const theme = darkMode ? darkTheme : lightTheme;
   const router = useRouter();
 
   const languages = ["English", "Albanian", "German"];
@@ -45,25 +46,24 @@ export default function SettingsScreen() {
     <ScrollView
       style={[
         styles.container,
-        { backgroundColor: darkMode ? "#222" : "#fff" },
-      ]}
+        { backgroundColor:theme.background }]}
     >
       <Text
-        style={[styles.header, { color: darkMode ? "#fff" : "#555" }]}
+        style={[styles.header, { color: theme.text}]}
       >
         ⚙️ Settings
       </Text>
 
       {settingsOptions.map((item, index) => {
-        const textColor = darkMode ? "#fff" : "#333";
-        const bgColor = darkMode ? "#333" : "#f9f9f9";
-        const iconColor = "#6b63ff73";
+        const bgColor = theme.card;
+        const textColor = theme.text;
+        const iconColor = theme.icon;
 
         if (item.title === "Notifications") {
           return (
             <View
               key={index}
-              style={[styles.option, { backgroundColor: bgColor }]}
+              style={[styles.option, { backgroundColor: theme.card }]}
             >
               <View style={styles.iconContainer}>
                 <Ionicons name={item.icon} size={22} color={iconColor} />
@@ -93,7 +93,7 @@ export default function SettingsScreen() {
               <Text
                 style={[
                   styles.languageText,
-                  { color: darkMode ? "#ccc" : "#555" },
+                  { color: theme.text },
                 ]}
               >
                 {language}
@@ -143,14 +143,14 @@ export default function SettingsScreen() {
         onRequestClose={closeModal}
       >
         <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
+          <View style={[styles.modalContainer,{backgroundColor: theme.card}]}>
             {languages.map((lang, index) => (
               <Pressable
                 key={index}
                 style={styles.modalOption}
                 onPress={() => selectLanguage(lang)}
               >
-                <Text style={styles.modalText}>{lang}</Text>
+                <Text style={[styles.modalText,{color:theme.text}]}>{lang}</Text>
               </Pressable>
             ))}
             <Pressable style={styles.modalClose} onPress={closeModal}>
@@ -204,7 +204,6 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: "80%",
-    backgroundColor: "#fff",
     borderRadius: 15,
     padding: 20,
   },

@@ -95,8 +95,8 @@ export default function HomeScreen() {
         <Text style={styles.rating}>
           {'★'.repeat(Math.floor(item.rating)) + '☆'.repeat(5 - Math.floor(item.rating))}
         </Text>
-        <TouchableOpacity onPress={() => handleSeeMore(item)} style={styles.seeMoreBtn}>
-          <Text style={styles.seeMoreText}>See More</Text>
+        <TouchableOpacity onPress={() => handleSeeMore(item)} style={[ { backgroundColor: theme.button }, styles.seeMoreBtn,]}>
+          <Text style={[styles.seeMoreText, { color: theme.buttonText }]}>See More</Text>
         </TouchableOpacity>
       </Animated.View>
     );
@@ -219,8 +219,8 @@ export default function HomeScreen() {
                   "☆".repeat(5 - Math.floor(item.rating))}
               </Text>
 
-              <TouchableOpacity style={styles.seeMoreBtn} onPress={() => handleSeeMore(item)}>
-                <Text style={styles.seeMoreText}>See More</Text>
+              <TouchableOpacity style={[styles.seeMoreBtn, {backgroundColor:theme.button}]} onPress={() => handleSeeMore(item)}>
+                <Text style={[styles.seeMoreText, {color:theme.buttonText}]}>See More</Text>
               </TouchableOpacity>
             </Animated.View>
           );
@@ -388,16 +388,19 @@ const styles = StyleSheet.create({
     marginBottom: 5 
   },
   seeMoreBtn: { 
-    marginTop: 5,
+  marginTop: 3,
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  borderRadius: 6,
+  alignSelf: 'center',
   },
   seeMoreText: { 
     fontWeight: '600', 
     textAlign: 'center',
-    backgroundColor: '#1e40af', 
     padding: 8, 
     color: '#fff',  
     borderRadius: 5,
-    
+  
   },
   photoCard: {
     marginTop: 15,
