@@ -1,8 +1,8 @@
+import { db2 as db } from '../../firebase/firebaseConfig'; // <-- db2 përdoret për Explore
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { db } from '../../firebase/firebaseConfigExplore';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 const Reviews = () => {
     const [reviews, setReviews] = useState([]);

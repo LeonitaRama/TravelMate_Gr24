@@ -1,10 +1,12 @@
 import React, {useState,useContext} from "react";
 import { View, Text, Image,Button,TouchableOpacity, TextInput, FlatList, ScrollView} from "react-native";
 import { ThemeContext, ThemeProvider } from "../../context/ThemeContext";
-import { db } from "../../firebase/firebaseConfigExplore";
+import { db2 as db } from "../../firebase/firebaseConfig";
 import { collection, addDoc } from "firebase/firestore";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { Link } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function Details() {
   const [searchText, setSearchText] = useState("");
