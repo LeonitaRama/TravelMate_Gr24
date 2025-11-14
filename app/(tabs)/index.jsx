@@ -1,5 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { ImageBackground } from 'react-native';
+import { ThemeContext, ThemeProvider } from "../../context/ThemeContext";
+import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import {
   View,
   Text,
@@ -21,6 +23,9 @@ export default function HomeScreen() {
   const [query, setQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const { darkMode } = useContext(ThemeContext);
+  const theme = darkMode ? darkTheme : lightTheme;
+  
 
   const destinations = [
     { id: '1', name: 'Paris', img: require('../../assets/Paris.jpg'), category: 'City', description: 'City of Lights, famous for the Eiffel Tower, cafes, and art museums.', rating: 4.8 },
@@ -96,28 +101,53 @@ export default function HomeScreen() {
       </Animated.View>
     );
   };
+  
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <ScrollView contentContainerStyle={styles.scrollContent}
+     style={{ backgroundColor: theme.background }}
+     >
       <ImageBackground
         source={require('../../assets/egypt.jpg')}
         style={styles.headerBackground}
         resizeMode="cover"
       >
-        <View style={styles.overlay} />
-        <Text style={styles.title}>Welcome to TravelMate 🌍</Text>
-        <Text style={styles.subtitle}>Find your next adventure!</Text>
+       <View
+        style={[
+          styles.overlay,
+          {
+            backgroundColor: darkMode
+              ? "rgba(0,0,0,0.4)" 
+              : "rgba(255,255,255,0.2)",
+          },
+        ]}
+      />
+        <Text style={[styles.title, { color: theme.text, borderColor: theme.text }]}>
+    Welcome to TravelMate 🌍
+  </Text>
 
-        <TextInput
-          style={styles.search}
-          placeholder="Search destinations..."
-          value={query}
-          onChangeText={setQuery}
-        />
-      </ImageBackground>
+  <Text style={[styles.subtitle, { color: theme.text }]}>
+    Find your next adventure!
+  </Text>
+
+  <TextInput
+    style={[
+      styles.search,
+      {
+        backgroundColor: theme.inputBackground,
+        color: theme.text,
+        borderColor: theme.border,
+      },
+    ]}
+    placeholder="Search destinations..."
+    placeholderTextColor={theme.placeholder}
+    value={query}
+    onChangeText={setQuery}
+  />
+</ImageBackground>
 
       <View style={styles.contentSection}>
-        <Text style={styles.sectionTitle}>Categories</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>Categories</Text>
         <FlatList
           data={categories}
           horizontal
@@ -127,17 +157,17 @@ export default function HomeScreen() {
             <TouchableOpacity
               style={[
                 styles.categoryCard,
-                { backgroundColor: item.name === selectedCategory ? '#000' : item.color },
+                { backgroundColor: item.name === selectedCategory ? theme.accent : theme.card, borderWidth:1, borderColor:theme.border,},
               ]}
               onPress={() => handleCategoryPress(item.name)}
             >
-              <Text style={styles.categoryText}>{item.emoji} {item.name}</Text>
+              <Text style={[styles.categoryText,{ color: theme.text }]}>{item.emoji} {item.name}</Text>
             </TouchableOpacity>
           )}
         />
 
-        <Text style={styles.sectionTitle}>Popular destination</Text>
-        <Text style={{ color: '#676767ff', fontSize: 16, textAlign: 'left' }}>
+        <Text style={[styles.sectionTitle, {color:theme.text}]}>Popular destination</Text>
+        <Text style={{ color: theme.textSecondary, fontSize: 16, textAlign: 'left' }}>
           We have crafted different tours to offer the perfect experience
           for each of Explore World’s travelers. Browse our tour types or learn more about what experience is right for you.
         </Text>
@@ -154,16 +184,57 @@ export default function HomeScreen() {
             [{ nativeEvent: { contentOffset: { x: scrollX } } }],
             { useNativeDriver: true }
           )}
-          renderItem={renderCarouselItem}
-        />
+          renderItem={({ item, index }) => {
+          const inputRange = [
+            (index - 1) * width * 0.7,
+            index * width * 0.7,
+            (index + 1) * width * 0.7,
+          ];
 
-        <Text style={styles.sectionTitle}>Photo's From Travellers</Text>
-        <Text style={{ color: '#676767ff', fontSize: 16, textAlign: 'left' }}>
+          const scale = scrollX.interpolate({
+            inputRange,
+            outputRange: [0.9, 1, 0.9],
+            extrapolate: "clamp",
+          });
+          
+          return (
+            <Animated.View
+              style={[
+                styles.card,
+                {
+                  transform: [{ scale }],
+                  backgroundColor: theme.card,
+                },
+              ]}
+            >
+              <Image source={item.img} style={styles.cardImage} />
+
+              <Text style={[styles.cardText, { color: theme.text }]}>{item.name}</Text>
+              <Text style={[styles.categoryLabel, { color: theme.textSecondary }]}>
+                {item.category}
+              </Text>
+
+              <Text style={styles.rating}>
+                {"★".repeat(Math.floor(item.rating)) +
+                  "☆".repeat(5 - Math.floor(item.rating))}
+              </Text>
+
+              <TouchableOpacity style={styles.seeMoreBtn} onPress={() => handleSeeMore(item)}>
+                <Text style={styles.seeMoreText}>See More</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        }}
+      />
+
+
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>Photo's From Travellers</Text>
+        <Text style={{ color: theme.textSecondary, fontSize: 16, textAlign: 'left' }}>
           It seems to me that some people want to make this announcement, but only the
           first ones, and no one else. The appearance of the praisers. Let it be ornamented with elasticity, fit.
         </Text>
 
-        <View style={[styles.photoCard, { maxHeight: 500 }]}>
+        <View style={[styles.photoCard, { maxHeight: 500 , backgroundColor: theme.card,}]}>
         <ScrollView 
         showsVerticalScrollIndicator={true}
         contentContainerStyle={{ paddingVertical: 10 }}
@@ -175,25 +246,27 @@ export default function HomeScreen() {
         style={[styles.photo, { marginBottom: 10 }]} 
         resizeMode="cover"
       />
+      
     ))}
+    
   </ScrollView>
 </View>  
 </View> 
-  <View style={styles.textCard}>
-  <Text style={styles.textCardTitle}>CALL TO ACTION</Text>
-  <Text style={styles.textCardTitle}>READY FOR UNFORGETTABLE TRAVEL. REMEMBER US!</Text>
+  <View style={[styles.textCard, { backgroundColor: theme.card }]}>
+  <Text style={[styles.textCardTitle, { color: theme.text }]}>CALL TO ACTION</Text>
+  <Text style={[styles.textCardContent, { color: theme.text}]}>READY FOR UNFORGETTABLE TRAVEL. REMEMBER US!</Text>
   <ScrollView style={{ maxHeight: 150 }}>
-    <Text style={styles.textCardContent}>
+    <Text style={[styles.textCardContent ,{color: theme.textSecondary}]}>
       It seems to me that some people want to make this announcement, but only the first ones, and no one else. 
    The appearance of the praisers. Let it be ornamented with elasticity, fit.
     </Text>
   </ScrollView>
 </View>
 
-<View style={styles.infoCard}>
-  <Text style={styles.infoCardTitle}>About TravelMate</Text>
+<View style={[styles.infoCard, { backgroundColor: theme.card }]}>
+  <Text style={[styles.infoCardTitle, { color: theme.text }]}>About TravelMate</Text>
   <ScrollView style={{ maxHeight: 120 }}>
-    <Text style={styles.infoCardContent}>
+    <Text style={[styles.infoCardContent,{ color: theme.textSecondary }]}>
       TravelMate is your trusted companion in exploring the world. 
       We help you find breathtaking destinations, plan unforgettable adventures, 
       and connect with travelers around the globe. Start your journey today!
@@ -202,16 +275,16 @@ export default function HomeScreen() {
   
 
   <View style={styles.contactSection}>
-    <Text style={styles.infoCardTitle}>Contact Us!</Text>
-    <Text style={styles.infoCardContent}>Feel free to contact and reach us !!</Text>
-    <Text style={styles.contactItem}>📞  +01 (123) 4567 90</Text>
-    <Text style={styles.contactItem}>✉️  info.TravelMate.com</Text>
-    <Text style={styles.contactItem}>📍  Rruga “Agim Ramadani”, Prishtinë, Kosovë</Text>
+    <Text style={[styles.infoCardTitle,{color: theme.text}]}>Contact Us!</Text>
+    <Text style={[styles.infoCardContent, {color: theme.text}]}>Feel free to contact and reach us !!</Text>
+    <Text style={[styles.contactItem,{ color: theme.text }]}>📞  +01 (123) 4567 90</Text>
+    <Text style={[styles.contactItem, { color: theme.text }]}>✉️  info.TravelMate.com</Text>
+    <Text style={[styles.contactItem,{ color: theme.text }]}>📍  Rruga “Agim Ramadani”, Prishtinë, Kosovë</Text>
   </View>
 </View>
-<View style={styles.footer}>
-  <Text style={styles.footerText}>©2025 TravelMate.All rights reserved</Text>
-  <View style={styles.footerLinks}>
+<View style={[styles.footer,{ backgroundColor: theme.footer, borderTopColor:theme.footer,}]}>
+  <Text style={[styles.footerText,{ color: theme.textSecondary }]}>©2025 TravelMate.All rights reserved</Text>
+  <View style={[styles.footerLinks,{ color: theme.text }]}>
     <Text style={styles.link}>Privacy Policy</Text>
     <Text style={styles.separator}> | </Text>
     <Text style={styles.link}>Terms & Conditions</Text>
@@ -232,12 +305,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc', 
     padding: 16 
   },
   scrollContent: {
     flexGrow: 1,
-    backgroundColor: '#f8fafc',
   },
   headerBackground: {
     padding: 16,
@@ -246,27 +317,26 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+
   },
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: 'bold',
     marginTop: 10,
     textAlign: 'center',
-    color: '#fff',
+    padding: 15,                     
+    borderWidth: 1,                
+    borderRadius: 12, 
   },
   subtitle: {
     fontSize: 16,
-    color: '#f1f5f9',
     textAlign: 'center',
     marginBottom: 15,
   },
   search: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
     width: '90%',
     marginTop: 10,
     marginBottom: 20,
@@ -287,12 +357,11 @@ const styles = StyleSheet.create({
     marginRight: 10 
   },
   categoryText: { 
-    color: '#fff', 
+  
     fontWeight: '600' 
   },
   card: { 
     marginRight: 10, 
-    backgroundColor: '#fff', 
     borderRadius: 10, 
     overflow: 'hidden',
     width: width * 0.7, 
@@ -310,7 +379,6 @@ const styles = StyleSheet.create({
   },
   categoryLabel: { 
     fontSize: 12, 
-    color: '#403f3fff', 
     marginBottom: 5 
   },
   rating: { 
@@ -320,19 +388,19 @@ const styles = StyleSheet.create({
     marginBottom: 5 
   },
   seeMoreBtn: { 
-    marginTop: 5 
+    marginTop: 5,
   },
   seeMoreText: { 
-    color: '#fff', 
     fontWeight: '600', 
     textAlign: 'center',
     backgroundColor: '#1e40af', 
     padding: 8, 
-    borderRadius: 5 
+    color: '#fff',  
+    borderRadius: 5,
+    
   },
   photoCard: {
     marginTop: 15,
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
     shadowColor: '#000',
@@ -362,16 +430,13 @@ textCardTitle: {
   fontSize: 18,
   fontWeight: '700',
   marginBottom: 8,
-  color: '#ffffffff',
 },
 
 textCardContent: {
   fontSize: 16,
-  color: '#ffffffff',
   lineHeight: 22,
 },
 infoCard: {
-  backgroundColor: '#1c2b36',
   borderRadius: 0,
   padding: 15,
   marginVertical: 0,
@@ -380,7 +445,6 @@ infoCard: {
 infoCardTitle: {
   fontSize: 18,
   fontWeight: 'bold',
-  color: '#fff',
   marginBottom: 5,
   borderBottomWidth: 1,
   borderBottomColor: '#3b4b58',
@@ -389,7 +453,6 @@ infoCardTitle: {
 
 infoCardContent: {
   fontSize: 14,
-  color: '#d0d0d0',
   lineHeight: 20,
   marginBottom: 10,
 },
@@ -400,22 +463,18 @@ contactSection: {
 
 contactItem: {
   fontSize: 14,
-  color: '#fff',
   marginVertical: 3,
 },
 footer: {
-  backgroundColor: '#1e293b',
   paddingVertical: 15,
   paddingHorizontal: 20,
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
   borderTopWidth: 1,
-  borderTopColor: '#334155',
   marginTop: 0
 },
 footerText: {
-  color: '#f1f5f9',
   fontSize: 12,
 },
 footerLinks: {
@@ -423,11 +482,9 @@ footerLinks: {
   alignItems: 'center',
 },
 link: {
-  color: '#f8fafc',
   fontSize: 12,
 },
 separator: {
-  color: '#94a3b8',
   marginHorizontal: 5,
 },
 

@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, Text, FlatList, Image, StyleSheet } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemeContext } from "../../context/ThemeContext";
+import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 
 export default function WishlistScreen() {
   const [favorites, setFavorites] = useState([]);
+   const { darkMode } = useContext(ThemeContext);
+  const theme = darkMode ? darkTheme : lightTheme;
 
 
   useEffect(() => {
@@ -29,10 +33,12 @@ export default function WishlistScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>❤️ Wishlist</Text>
+    
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.title, { color: theme.text }]}>❤️ Wishlist</Text>
       {favorites.length === 0 ? (
-        <Text style={styles.subtitle}>Your saved trips will appear here.</Text>
+        <Text style={[styles.subtitle, { color: theme.text }]}>Your saved trips will appear here.</Text>
+  
       ) : (
         <FlatList
           data={favorites}
@@ -40,9 +46,12 @@ export default function WishlistScreen() {
           renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 30 }}
         />
+        
       )}
     </View>
+    
   );
+  
 }
 
 const styles = StyleSheet.create({
