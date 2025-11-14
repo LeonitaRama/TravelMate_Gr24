@@ -20,8 +20,8 @@ export default function SettingsScreen() {
   const handlePress = (option) => {
     if (option === "Log Out") {
       Alert.alert("Logged Out", "You have been logged out.");
-    } else if (option === "Edit Profile") {
-      router.push("/profile/Profile"); 
+    } else if (option === "View Profile") {
+      router.push("/profile"); 
     } else {
       Alert.alert(`${option} clicked`);
     }
@@ -35,7 +35,7 @@ export default function SettingsScreen() {
   };
 
   const settingsOptions = [
-    { title: "Edit Profile", icon: "person-outline" },
+    { title: "View Profile", icon: "person-outline" },
     { title: "Notifications", icon: "notifications-outline" },
     { title: "Change Language", icon: "globe-outline" },
     { title: "Dark Mode", icon: "moon-outline" },
