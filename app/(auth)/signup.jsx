@@ -56,7 +56,7 @@ export default function Signup() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("isAuthenticated", "true");
       Alert.alert("Success", `Account created: ${userCredential.user.email}`);
-      router.replace("/"); 
+      router.replace("/login"); 
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         Alert.alert("Error", "Email is already in use");
