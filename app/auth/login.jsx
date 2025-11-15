@@ -1,3 +1,4 @@
+// app/auth/Login.jsx
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -20,24 +21,47 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleLogin = async () => {
+  // Funksion për validim inputesh
+  const validateInputs = () => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter email and password");
-      return;
+      return false;
     }
 
+    // Validim email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Please enter a valid email");
+      return false;
+    }
+
+    // Password minimum 6 karaktere
     if (password.length < 6) {
       Alert.alert("Error", "Password must be at least 6 characters");
-      return;
+      return false;
     }
+
+    // Opsionale: mund të kërkosh një numër ose shkronjë të madhe
+    // if (!/(?=.*[A-Z])/.test(password)) {
+    //   Alert.alert("Error", "Password must include at least one uppercase letter");
+    //   return false;
+    // }
+    // if (!/(?=.*[0-9])/.test(password)) {
+    //   Alert.alert("Error", "Password must include at least one number");
+    //   return false;
+    // }
+
+    return true;
+  };
+
+  const handleLogin = async () => {
+    if (!validateInputs()) return;
 
     try {
       // Provo login
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
       await AsyncStorage.setItem("isAuthenticated", "true");
-      Alert.alert("Success", `Login successful: ${user.email}`);
+      Alert.alert("Success", `Login successful: ${userCredential.user.email}`);
       router.replace("/"); // ridrejton në home
     } catch (error) {
       if (error.code === "auth/user-not-found") {
@@ -48,7 +72,6 @@ export default function Login() {
           Alert.alert("Success", `Account created and logged in: ${newUser.user.email}`);
           router.replace("/");
         } catch (signupError) {
-          console.log("Auto-signup failed:", signupError);
           Alert.alert("Signup failed", signupError.message);
         }
       } else if (error.code === "auth/wrong-password") {
@@ -154,8 +177,3 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
-
-
-
-
- 

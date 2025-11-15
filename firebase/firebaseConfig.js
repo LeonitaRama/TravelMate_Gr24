@@ -21,8 +21,6 @@ const app1 = !getApps().some(app => app.name === 'app1')
 export const auth1 = getAuth(app1);
 export const db1 = getFirestore(app1);
 
-// Shtojmë GitHub provider për login
-export const githubProvider = new GithubAuthProvider();
 
 // ================== Firebase App 2 ==================
 // Ky app përdoret për Explore / reviews
