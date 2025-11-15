@@ -1,10 +1,11 @@
 // firebaseConfig.js
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GithubAuthProvider } from "firebase/auth";
+import { initializeAuth, getReactNativePersistence, getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
-// ================== Firebase App 1 ==================
-// Ky app përdoret për login/signup
+// ================== Firebase Config ==================
 const firebaseConfig1 = {
   apiKey: "AIzaSyB7Wk5ebmL22kThHcIHt6bUNNL5B4o6wqQ",
   authDomain: "loginsignupauth-bd332.firebaseapp.com",
@@ -14,12 +15,23 @@ const firebaseConfig1 = {
   appId: "1:235621972828:web:fb409fd9ccbfdfb319df99"
 };
 
-const app1 = !getApps().some(app => app.name === 'app1') 
-    ? initializeApp(firebaseConfig1, 'app1') 
-    : getApp('app1');
+// ================== Initialize App ==================
+const app1 = getApps().length ? getApp('app1') : initializeApp(firebaseConfig1, 'app1');
 
-export const auth1 = getAuth(app1);
+// ================== Initialize Auth ==================
+export const auth1 = Platform.OS === 'web'
+  ? getAuth(app1) // Web
+  : initializeAuth(app1, { persistence: getReactNativePersistence(AsyncStorage) }); // React Native
+
+// ================== Firestore ==================
 export const db1 = getFirestore(app1);
+
+
+
+
+
+
+
 
 
 // ================== Firebase App 2 ==================
