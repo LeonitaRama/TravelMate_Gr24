@@ -1,8 +1,10 @@
 import { db2 as db } from '../../firebase/firebaseConfig'; 
 import { collection, getDocs, query, orderBy, deleteDoc, updateDoc, doc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemeContext } from '../../context/ThemeContext';
+import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 
 const Reviews = () => {
     const [reviews, setReviews] = useState([]);
@@ -10,6 +12,8 @@ const Reviews = () => {
     const [error, setError] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [editingText, setEditingText] = useState('');
+    const { darkMode } = useContext(ThemeContext);
+    const theme = darkMode ? darkTheme : lightTheme;
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -78,18 +82,18 @@ const Reviews = () => {
     const renderReview = (item) => {
         const dateString = item.timestamp ? new Date(item.timestamp.seconds * 1000).toLocaleString() : '';
         return (
-            <View key={item.id} style={styles.reviewCard}>
-                <Text style={styles.title}>{item.name}</Text>
+            <View key={item.id} style={[styles.reviewCard, {backgroundColor:theme.card}]}>
+                <Text style={[styles.title, {color:theme.text}]}>{item.name}</Text>
 
                 {editingId === item.id ? (
                     <>
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, {color:theme.text}]}
                             value={editingText}
                             onChangeText={setEditingText}
                         />
                         <TouchableOpacity onPress={() => handleUpdate(item.id)} style={styles.button}>
-                            <Text style={styles.buttonText}>Save</Text>
+                            <Text style={[styles.buttonText, {color:theme.button}]}>Save</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => { setEditingId(null); setEditingText(''); }}
@@ -105,7 +109,7 @@ const Reviews = () => {
                         <View style={{ flexDirection: 'row', marginTop: 5 }}>
                             <TouchableOpacity
                                 onPress={() => { setEditingId(item.id); setEditingText(item.review); }}
-                                style={[styles.button, { marginRight: 5 }]}
+                                style={[styles.button, { marginRight: 5 }, {backgroundColor:theme.button}]}
                             >
                                 <Text style={styles.buttonText}>Edit</Text>
                             </TouchableOpacity>
@@ -124,8 +128,8 @@ const Reviews = () => {
 
     if (loading) {
         return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.center}>
+            <SafeAreaView style={[styles.container, {backgroundColor:theme.background}]}>
+                <View style={[styles.center, {backgroundColor:theme.background}]}>
                     <Text>Loading reviews...</Text>
                 </View>
             </SafeAreaView>
@@ -134,8 +138,8 @@ const Reviews = () => {
 
     if (error) {
         return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.center}>
+            <SafeAreaView style={[styles.container, {backgroundColor:theme.background}]}>
+                <View style={[styles.center, {backgroundColor:theme.background}]}>
                     <Text>{error}</Text>
                 </View>
             </SafeAreaView>
@@ -143,10 +147,10 @@ const Reviews = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scroll}>
+        <SafeAreaView style={[styles.container, {backgroundColor:theme.background}]}>
+            <ScrollView contentContainerStyle={[styles.scroll, {backgroundColor:theme.background}]}>
                 {reviews.length === 0 ? (
-                    <View style={styles.center}>
+                    <View style={[styles.center, {backgroundColor:theme.background}]}>
                         <Text style={styles.text}>No reviews yet</Text>
                     </View>
                 ) : (
@@ -160,7 +164,7 @@ const Reviews = () => {
 export default Reviews;
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#f8f8ff" },
+    container: { flex: 1 },
     scroll: { padding: 20 },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     reviewCard: {

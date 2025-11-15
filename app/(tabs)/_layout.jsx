@@ -1,33 +1,23 @@
-import React, { createContext, useState, useContext } from "react";
-import { Tabs, usePathname } from "expo-router";
-import { StyleSheet, View, TouchableOpacity, Text, Platform, StatusBar } from "react-native";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { ThemeContext, ThemeProvider } from "../../context/ThemeContext";
+import { Tabs, useRouter, usePathname } from "expo-router";
+import { useContext } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Platform, StatusBar } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-export default function RootLayout() {
-  return (
-    <ThemeProvider>
-      <LayoutContent />
-    </ThemeProvider>
-  );
-}
+import { ThemeContext } from "../../context/ThemeContext";
+import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 
-function LayoutContent() {
+export default function TabsLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const { darkMode } = useContext(ThemeContext);
 
-  // Defino theme plotësisht
-  const theme = darkMode
-    ? { background: "#121212", text: "#ffffff", tabBar: "#1c1c1c", tabIconActive: "#00bfff", tabIconInactive: "#888888" }
-    : { background: "#ffffff", text: "#333333", tabBar: "#f5f5f5", tabIconActive: "#0080ff", tabIconInactive: "#999999" };
+  const theme = darkMode ? darkTheme : lightTheme;
 
   const showLoginHeader = pathname === "/" || pathname === "/explore";
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Header me Login button */}
+      
       {showLoginHeader && (
         <View style={[styles.header, { backgroundColor: theme.background }]}>
           <TouchableOpacity
@@ -40,15 +30,14 @@ function LayoutContent() {
         </View>
       )}
 
-      {/* Tabs system */}
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: theme.tabIconActive,
-          tabBarInactiveTintColor: theme.tabIconInactive,
+          tabBarActiveTintColor: theme.accent,
+          tabBarInactiveTintColor: theme.textSecondary,
           tabBarStyle: {
-            backgroundColor: theme.tabBar,
-            borderTopColor: darkMode ? "#333333" : "#ddd", // border i ndryshëm për dark mode
+            backgroundColor: theme.card,
+            borderTopColor: darkMode ? "#333" : "#ddd",
           },
         }}
       >
@@ -61,6 +50,7 @@ function LayoutContent() {
             ),
           }}
         />
+
         <Tabs.Screen
           name="explore"
           options={{
@@ -70,6 +60,7 @@ function LayoutContent() {
             ),
           }}
         />
+
         <Tabs.Screen
           name="wishlist"
           options={{
@@ -79,6 +70,7 @@ function LayoutContent() {
             ),
           }}
         />
+
         <Tabs.Screen
           name="settings"
           options={{
@@ -88,6 +80,7 @@ function LayoutContent() {
             ),
           }}
         />
+
       </Tabs>
     </View>
   );
@@ -101,7 +94,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "flex-start",
-    alignItems: "flex-start",
     paddingHorizontal: 13,
     paddingVertical: 10,
   },

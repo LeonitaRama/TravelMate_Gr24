@@ -5,6 +5,7 @@ export const lightTheme = {
   header: "#ffffff",
   input: "#f2f2f2",
   card: "#f5f5f5",
+icon: "#6b63ff73",
   footer: "#f1f1f1",
 
   inputBackground: "#ffffff",
@@ -29,6 +30,7 @@ export const darkTheme = {
 
   card: "#1e1e1e",
   footer: "#171717",
+  
   
 
   inputBackground: "#222222",

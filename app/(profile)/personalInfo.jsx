@@ -3,7 +3,9 @@ import { ScrollView, StyleSheet, Text, View, TextInput, TouchableOpacity } from 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Link, useRouter } from 'expo-router'
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { ThemeContext } from '../../context/ThemeContext';
+import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 
 const PersonalInfo = () => {
     const [fullName, setFullName] = useState('Leonita Rama');
@@ -12,39 +14,42 @@ const PersonalInfo = () => {
     const [phone, setPhone] = useState('+383 44 000 000');
 
     const router = useRouter();
+    const { darkMode } = useContext(ThemeContext);
+    const theme = darkMode ? darkTheme : lightTheme;
+    
     const handleSave = () => {
         alert(`Saved: \nName: ${fullName}\nBio: ${bio}\nEmail: ${email}\nPhone: ${phone}`);
         router.push('/(profile)/profile');
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scroll}>
+        <SafeAreaView style={[styles.container, {backgroundColor:theme.background}]}>
+            <ScrollView contentContainerStyle={[styles.scroll, {backgroundColor:theme.background}]}>
 
 
                 {/* //fix this add modal when saved changes to confirm the data were saved */}
-                <View style={styles.forma}>
-                    <Text style={styles.label}>Full Name</Text>
+                <View style={[styles.forma, {backgroundColor:theme.background}]}>
+                    <Text style={[styles.label, {color:theme.text}]}>Full Name</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, {backgroundColor:theme.card}]}
                         placeholder="Your name"
                     />
-                    <Text style={styles.label}>Bio</Text>
+                    <Text style={[styles.label, {color:theme.text}]}>Bio</Text>
                     <TextInput
-                        style={[styles.input, { height: 90 }]}
+                        style={[styles.input, { height: 90 }, {backgroundColor:theme.card}]}
                         placeholder="Write something about you..."
                         multiline
                     />
-                    <Text style={styles.label}>Email</Text>
+                    <Text style={[styles.label, {color:theme.text}]}>Email</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, {backgroundColor:theme.card}]}
                         placeholder="example@email.com"
                         keyboardType="email-address"
                     />
 
-                    <Text style={styles.label}>Phone Number</Text>
+                    <Text style={[styles.label, {color:theme.text}]}>Phone Number</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, {backgroundColor:theme.card}]}
                         placeholder="+383 44 000 000"
                         keyboardType="phone-pad" />
                     <View style={styles.pickerWrapper}>

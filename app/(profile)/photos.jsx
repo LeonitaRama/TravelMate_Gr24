@@ -1,15 +1,19 @@
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemeContext } from '../../context/ThemeContext';
+import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 
 const Photos = () => {
+    const { darkMode } = useContext(ThemeContext);
+    const theme = darkMode ? darkTheme : lightTheme;
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scroll}>
-                <View style={styles.center}>
+        <SafeAreaView style={[styles.container, {backgroundColor:theme.background}]}>
+            <ScrollView contentContainerStyle={[styles.scroll, {backgroundColor:theme.background}]}>
+                <View style={[styles.center, {backgroundColor:theme.background}]}>
 
-                    <Text style={styles.text}>No photos taken yet</Text>
+                    <Text style={[styles.text, {color:theme.textSecondary}]}>No photos taken yet</Text>
                     <Ionicons name="images-outline" size={48} color="#888" style={{ marginBottom: 12 }} />
                 </View>
             </ScrollView>
@@ -22,7 +26,7 @@ export default Photos;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f8f8ff",
+    
     },
     scroll: {
         padding: 20,
