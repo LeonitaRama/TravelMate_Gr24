@@ -1,4 +1,3 @@
-// app/auth/Signup.jsx
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -35,13 +34,13 @@ export default function Signup() {
       return false;
     }
 
-    // Password minimum 6 karaktere
+ 
     if (password.length < 6) {
       Alert.alert("Error", "Password must be at least 6 characters");
       return false;
     }
 
-    // Password dhe confirm password duhet të përputhen
+
     if (password !== confirmPassword) {
       Alert.alert("Error", "Passwords do not match");
       return false;
@@ -57,7 +56,7 @@ export default function Signup() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("isAuthenticated", "true");
       Alert.alert("Success", `Account created: ${userCredential.user.email}`);
-      router.replace("/"); // ridrejton në home
+      router.replace("/"); 
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         Alert.alert("Error", "Email is already in use");

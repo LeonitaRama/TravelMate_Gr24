@@ -1,4 +1,3 @@
-// app/auth/Login.jsx
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -21,35 +20,26 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  // Funksion për validim inputesh
+
   const validateInputs = () => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter email and password");
       return false;
     }
 
-    // Validim email
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Alert.alert("Error", "Please enter a valid email");
       return false;
     }
 
-    // Password minimum 6 karaktere
     if (password.length < 6) {
       Alert.alert("Error", "Password must be at least 6 characters");
       return false;
     }
 
-    // Opsionale: mund të kërkosh një numër ose shkronjë të madhe
-    // if (!/(?=.*[A-Z])/.test(password)) {
-    //   Alert.alert("Error", "Password must include at least one uppercase letter");
-    //   return false;
-    // }
-    // if (!/(?=.*[0-9])/.test(password)) {
-    //   Alert.alert("Error", "Password must include at least one number");
-    //   return false;
-    // }
+  
 
     return true;
   };
@@ -58,14 +48,14 @@ export default function Login() {
     if (!validateInputs()) return;
 
     try {
-      // Provo login
+
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("isAuthenticated", "true");
       Alert.alert("Success", `Login successful: ${userCredential.user.email}`);
-      router.replace("/"); // ridrejton në home
+      router.replace("/"); 
     } catch (error) {
       if (error.code === "auth/user-not-found") {
-        // Auto-signup nëse email nuk ekziston
+       
         try {
           const newUser = await createUserWithEmailAndPassword(auth, email, password);
           await AsyncStorage.setItem("isAuthenticated", "true");
