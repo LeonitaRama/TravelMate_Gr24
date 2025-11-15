@@ -17,7 +17,7 @@ import {
   ScrollView as RNScrollView
 } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get ('window');
 
 export default function HomeScreen() {
   const [query, setQuery] = useState('');
