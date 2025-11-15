@@ -1,4 +1,3 @@
-// firebaseConfig.js
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GithubAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
