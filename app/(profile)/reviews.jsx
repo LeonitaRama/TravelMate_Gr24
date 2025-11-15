@@ -1,4 +1,4 @@
-import { db2 as db } from '../../firebase/firebaseConfig'; // db2 përdoret për Explore
+import { db2 as db } from '../../firebase/firebaseConfig'; 
 import { collection, getDocs, query, orderBy, deleteDoc, updateDoc, doc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
@@ -11,7 +11,6 @@ const Reviews = () => {
     const [editingId, setEditingId] = useState(null);
     const [editingText, setEditingText] = useState('');
 
-    // Fetch reviews nga Firestore
     useEffect(() => {
         const fetchReviews = async () => {
             try {
@@ -33,12 +32,12 @@ const Reviews = () => {
         fetchReviews();
     }, []);
 
-    // Delete review nga Firestore
+   
     const deleteReview = async (id) => {
         try {
             const reviewRef = doc(db, 'reviews', id);
             await deleteDoc(reviewRef);
-            // Hiq review nga state menjëherë
+            
             setReviews(prev => prev.filter(r => r.id !== id));
             Alert.alert("Review deleted successfully");
             console.log("Deleted review with ID:", id);
@@ -48,7 +47,7 @@ const Reviews = () => {
         }
     };
 
-    // Confirm para delete
+    
     const handleDelete = (id) => {
         Alert.alert(
             "Delete Review",
@@ -60,7 +59,7 @@ const Reviews = () => {
         );
     };
 
-    // Update review
+    
     const handleUpdate = async (id) => {
         if (!editingText.trim()) return Alert.alert("Review cannot be empty");
         try {
