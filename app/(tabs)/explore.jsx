@@ -77,6 +77,8 @@ export default function Details() {
           backgroundColor: theme.card,
           borderRadius: 10,
           padding: 10,
+          flexDirection: "column",
+        justifyContent: "space-between", 
           alignItems: "center",
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 2 },
@@ -85,6 +87,7 @@ export default function Details() {
           elevation: 5, 
         }}
       >
+         <View style={{ width: "100%" }}>
         <Image
           source={item.image}
           style={{ width: "100%", height: 150, borderRadius: 10 }}
@@ -133,6 +136,7 @@ export default function Details() {
           <TouchableOpacity
             onPress={() => sendReview(item, review, setReview)}
             style={{
+              
               marginLeft: 6,
               paddingHorizontal: 12,
               paddingVertical: 8,
@@ -148,32 +152,37 @@ export default function Details() {
 
         <TouchableOpacity
           onPress={() => openInMap(item.lat, item.lng)}   
-          style={{ marginTop: 10 }}
+          style={{  marginBottom: 10}}
         >
           <Text
             style={{
               color: theme.link,
               textDecorationLine: "underline",
               textAlign: "center",
-              marginBottom: 5,
+             
             }}
           >
             View in Map
           </Text>
         </TouchableOpacity>
-
-          <Link
-            href="/tickets"
-            style={{
-              color: theme.link2,
-              textDecorationLine: "underline",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            Get Tickets
-          </Link>
         </View>
+
+     <TouchableOpacity
+  onPress={() => addToFavorites(item)}
+  style={{
+   
+    backgroundColor: theme.button,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignItems: "center",    
+  }}
+>
+  <Text style={{ color: theme.buttonText, fontWeight: "bold" }}>
+    ❤️ Add to Wishlist
+  </Text>
+</TouchableOpacity>
+</View>
     );
   };
 
