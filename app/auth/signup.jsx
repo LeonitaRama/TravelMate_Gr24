@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -17,41 +18,50 @@ import { auth1 as auth } from '../../firebase/firebaseConfig';
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
 
-  const handleSignup = async () => {
-    if (!email || !password || !confirm) {
+  const validateInputs = () => {
+    if (!email || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill all fields");
-      return;
+      return false;
     }
 
-    if (password !== confirm) {
-      Alert.alert("Error", "Passwords do not match");
-      return;
+    // Validim email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Please enter a valid email");
+      return false;
     }
 
+ 
     if (password.length < 6) {
       Alert.alert("Error", "Password must be at least 6 characters");
-      return;
+      return false;
     }
+
+
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSignup = async () => {
+    if (!validateInputs()) return;
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
       await AsyncStorage.setItem("isAuthenticated", "true");
-      Alert.alert("Success", `Signup successful: ${user.email}`);
+      Alert.alert("Success", `Account created: ${userCredential.user.email}`);
       router.replace("/"); 
     } catch (error) {
-      console.log("Signup error:", error);
-
       if (error.code === "auth/email-already-in-use") {
-        Alert.alert("Error", "Email already in use. Please login instead.");
+        Alert.alert("Error", "Email is already in use");
       } else if (error.code === "auth/invalid-email") {
         Alert.alert("Error", "Invalid email");
-      } else if (error.code === "auth/weak-password") {
-        Alert.alert("Error", "Password too weak (min 6 characters)");
       } else {
         Alert.alert("Signup failed", error.message);
       }
@@ -68,6 +78,7 @@ export default function Signup() {
         <Text style={styles.title}>Sign Up</Text>
 
         <View style={styles.inputWrapper}>
+          <Ionicons name="person-outline" size={20} color="#fff" style={styles.icon} />
           <TextInput
             placeholder="Email"
             placeholderTextColor="#fff"
@@ -80,6 +91,7 @@ export default function Signup() {
         </View>
 
         <View style={styles.inputWrapper}>
+          <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.icon} />
           <TextInput
             placeholder="Password"
             placeholderTextColor="#fff"
@@ -91,13 +103,14 @@ export default function Signup() {
         </View>
 
         <View style={styles.inputWrapper}>
+          <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.icon} />
           <TextInput
             placeholder="Confirm Password"
             placeholderTextColor="#fff"
             style={styles.input}
             secureTextEntry
-            value={confirm}
-            onChangeText={setConfirm}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
           />
         </View>
 
@@ -106,7 +119,7 @@ export default function Signup() {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push("/auth/login")}>
-          <Text style={styles.signupText}>Already have an account? Login</Text>
+          <Text style={styles.signupText}>Already have an account? LOGIN</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </ImageBackground>
@@ -122,7 +135,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 30,
   },
-  title: { fontSize: 36, fontWeight: "bold", color: "white", marginBottom: 40 },
+  title: { fontSize: 36, fontWeight: "bold", color: "white", marginBottom: 60 },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -132,6 +145,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 15,
   },
+  icon: { marginRight: 10 },
   input: { flex: 1, color: "#fff", height: 45 },
   button: {
     backgroundColor: "#3b82f6",
@@ -149,6 +163,8 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
+
 
 
 

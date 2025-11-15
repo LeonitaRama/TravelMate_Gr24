@@ -20,35 +20,48 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleLogin = async () => {
+
+  const validateInputs = () => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter email and password");
-      return;
+      return false;
+    }
+
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Please enter a valid email");
+      return false;
     }
 
     if (password.length < 6) {
       Alert.alert("Error", "Password must be at least 6 characters");
-      return;
+      return false;
     }
 
-    try {
-      // Provo login
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+  
 
+    return true;
+  };
+
+  const handleLogin = async () => {
+    if (!validateInputs()) return;
+
+    try {
+
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("isAuthenticated", "true");
-      Alert.alert("Success", `Login successful: ${user.email}`);
-      router.replace("/"); // ridrejton në home
+      Alert.alert("Success", `Login successful: ${userCredential.user.email}`);
+      router.replace("/"); 
     } catch (error) {
       if (error.code === "auth/user-not-found") {
-        // Auto-signup nëse email nuk ekziston
+       
         try {
           const newUser = await createUserWithEmailAndPassword(auth, email, password);
           await AsyncStorage.setItem("isAuthenticated", "true");
           Alert.alert("Success", `Account created and logged in: ${newUser.user.email}`);
           router.replace("/");
         } catch (signupError) {
-          console.log("Auto-signup failed:", signupError);
           Alert.alert("Signup failed", signupError.message);
         }
       } else if (error.code === "auth/wrong-password") {
@@ -154,8 +167,3 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
-
-
-
-
- 
