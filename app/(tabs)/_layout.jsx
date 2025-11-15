@@ -32,7 +32,7 @@ function LayoutContent() {
         <View style={[styles.header, { backgroundColor: theme.background }]}>
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => router.push("/auth/login")}
+            onPress={() => router.push("/login")}
           >
             <Text style={[styles.loginText, { color: theme.text }]}>Login</Text>
             <View style={[styles.underline, { backgroundColor: theme.text }]} />
