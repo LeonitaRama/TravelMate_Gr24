@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
@@ -8,8 +8,8 @@ import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 
 const ProfileOption = ({ title, iconName, target, iconLib = "Ionicons" }) => {
     const router = useRouter();
-     const { darkMode } = useContext(ThemeContext);
-     const theme = darkMode ? darkTheme : lightTheme;
+    const { darkMode, setDarkMode } = useContext(ThemeContext);
+    const theme = darkMode ? darkTheme : lightTheme;
 
     const IconComponent =
         iconLib === "Ionicons" ? Ionicons :
@@ -22,13 +22,13 @@ const ProfileOption = ({ title, iconName, target, iconLib = "Ionicons" }) => {
     };
 
     return (
-        <TouchableOpacity style={[styles.AccountInfo, {backgroundColor: theme.border}]} activeOpacity={0.6}
+        <TouchableOpacity style={[styles.AccountInfo, { backgroundColor: theme.card }]} activeOpacity={0.6}
             onPress={handlePress}>
-            <View style={[styles.infoLeft, {backgroundColor: theme.border}]}>
+            <View style={[styles.infoLeft, { backgroundColor: theme.card }]}>
                 <IconComponent name={iconName} size={24} color={theme.icon} />
-                <Text style={[styles.sectionTitle, {color: theme.text}]}>{title}</Text>
+                <Text style={[styles.sectionTitle, { color: theme.text }]}>{title}</Text>
             </View>
-            <Feather name="chevron-right" size={24} color="black" />
+            <Feather name="chevron-right" size={24} color="#999" />
         </TouchableOpacity>
     )
 }

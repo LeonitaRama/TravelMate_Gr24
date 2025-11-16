@@ -6,14 +6,14 @@ export const lightTheme = {
   input: "#f2f2f2",
   card: "#f5f5f5",
 icon: "#6b63ff73",
-  footer: "#f1f1f1",
+  footer: "#d3d3d376",
 
   inputBackground: "#ffffff",
   placeholder: "#888888",
 
   border: "#dddddd",
-  accent: "#0077ff",
-  button: "#0080ff",
+  accent: "#a0c9f7ff",
+  button: "#83b6f1ff",
   buttonText: "#ffffff",
   link: "blue",
   link2: "green",

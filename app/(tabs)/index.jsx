@@ -16,6 +16,8 @@ import {
   Animated,
   ScrollView as RNScrollView
 } from 'react-native';
+import WhyChooseUs from "../(components)/WhyChooseUs.jsx";
+
 
 const { width } = Dimensions.get ('window');
 
@@ -251,6 +253,7 @@ export default function HomeScreen() {
     
   </ScrollView>
 </View>  
+<WhyChooseUs />
 </View> 
   <View style={[styles.textCard, { backgroundColor: theme.card }]}>
   <Text style={[styles.textCardTitle, { color: theme.text }]}>CALL TO ACTION</Text>
@@ -317,7 +320,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-
   },
   title: {
     fontSize: 24,
@@ -478,7 +480,8 @@ footer: {
   justifyContent: 'space-between',
   alignItems: 'center',
   borderTopWidth: 1,
-  marginTop: 0
+  marginTop: 0,
+  backgroundColor: '#747373ff'
 },
 footerText: {
   fontSize: 12,
@@ -493,7 +496,5 @@ link: {
 separator: {
   marginHorizontal: 5,
 },
-
-
 
 });
