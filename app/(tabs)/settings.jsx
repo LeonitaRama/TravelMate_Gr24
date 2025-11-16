@@ -18,14 +18,21 @@ export default function SettingsScreen() {
   const languages = ["English", "Albanian", "German"];
 
   const handlePress = (option) => {
-    if (option === "Log Out") {
-      Alert.alert("Logged Out", "You have been logged out.");
-    } else if (option === "View Profile") {
-      router.push("/profile"); 
-    } else {
-      Alert.alert(`${option} clicked`);
-    }
-  };
+  if (option === "Log Out") {
+    router.replace("/login"); 
+  } 
+  else if (option === "Log Out") {
+  AsyncStorage.removeItem("isAuthenticated"); 
+  router.replace("/login"); 
+}
+  else if (option === "View Profile") {
+    router.push("/profile");
+  } 
+  else {
+    Alert.alert(`${option} clicked`);
+
+  }
+};
 
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
