@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext } from 'react';
 import { ImageBackground } from 'react-native';
-import { ThemeContext, ThemeProvider } from "../../context/ThemeContext";
-import { lightTheme, darkTheme } from "../../context/ThemeStyles";
+import { ThemeContext, ThemeProvider } from "../../context/ThemeContext.jsx";
+import { lightTheme, darkTheme } from "../../context/ThemeStyles.jsx";
 import {
   View,
   Text,

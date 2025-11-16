@@ -98,27 +98,27 @@ export default function Details() {
   };
 
   const DestinationsItem = ({ item }) => {
-    const [review, setReview] = useState("");
+  const [review, setReview] = useState("");
 
-    return (
-      <View
-        style={{
-          flex: 1,
-          margin: 5,
-          backgroundColor: theme.card,
-          borderRadius: 10,
-          padding: 10,
-          flexDirection: "column",
-        justifyContent: "space-between", 
-          alignItems: "center",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.2,
-          shadowRadius: 5,
-          elevation: 5, 
-        }}
-      >
-         <View style={{ width: "100%" }}>
+  return (
+    <View
+      style={{
+        flex: 1,
+        margin: 5,
+        backgroundColor: theme.card,
+        borderRadius: 10,
+        padding: 10,
+        minHeight: 380, // siguron një lartësi minimale
+        justifyContent: "space-between",
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 5,
+      }}
+    >
+      <View style={{ width: "100%" }}>
         <Image
           source={item.image}
           style={{ width: "100%", height: 150, borderRadius: 10 }}
@@ -135,6 +135,7 @@ export default function Details() {
         >
           {item.name}
         </Text>
+
         <Text
           style={{
             fontStyle: "italic",
@@ -142,11 +143,11 @@ export default function Details() {
             textAlign: "center",
             marginVertical: 5,
           }}
+          numberOfLines={3} // limiton tekstin në 3 rreshta
         >
           {item.desc}
         </Text>
 
-       
         <View style={{ flexDirection: "row", width: "100%", marginTop: 5 }}>
           <TextInput
             style={{
@@ -167,7 +168,6 @@ export default function Details() {
           <TouchableOpacity
             onPress={() => sendReview(item, review, setReview)}
             style={{
-              
               marginLeft: 6,
               paddingHorizontal: 12,
               paddingVertical: 8,
@@ -182,41 +182,41 @@ export default function Details() {
         </View>
 
         <TouchableOpacity
-          onPress={() => openInMap(item.lat, item.lng)}   
-          style={{  marginBottom: 10}}
+          onPress={() => openInMap(item.lat, item.lng)}
+          style={{ marginTop: 8, marginBottom: 10 }}
         >
           <Text
             style={{
               color: theme.link,
               textDecorationLine: "underline",
               textAlign: "center",
-             
             }}
           >
               {t("details.map.view")}
           </Text>
         </TouchableOpacity>
-        </View>
+      </View>
 
-     <TouchableOpacity
-  onPress={() => addToFavorites(item)}
-  style={{
-   
-    backgroundColor: theme.button,
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    alignItems: "center",    
-  }}
->
-  <Text style={{ color: theme.buttonText, fontWeight: "bold" }}>
-      {t("details.wishlist.add")}
-  </Text>
-</TouchableOpacity>
-</View>
-    );
-  };
+      <TouchableOpacity
+        onPress={() => addToFavorites(item)}
+        style={{
+          backgroundColor: theme.button,
+          paddingVertical: 8,
+          paddingHorizontal: 15,
+          borderRadius: 8,
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <Text style={{ color: theme.buttonText, fontWeight: "bold", textAlign: "center" }}>
+          ❤️ Add to Wishlist
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
+       
   const [destinations, setDestinations] = useState([
     {
       id: "1",
