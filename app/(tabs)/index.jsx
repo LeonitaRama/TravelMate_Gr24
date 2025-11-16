@@ -16,6 +16,8 @@ import {
   Animated,
   ScrollView as RNScrollView
 } from 'react-native';
+import WhyChooseUs from "../components/WhyChooseUs";
+
 
 const { width } = Dimensions.get ('window');
 
@@ -251,6 +253,7 @@ export default function HomeScreen() {
     
   </ScrollView>
 </View>  
+<WhyChooseUs />
 </View> 
   <View style={[styles.textCard, { backgroundColor: theme.card }]}>
   <Text style={[styles.textCardTitle, { color: theme.text }]}>CALL TO ACTION</Text>
