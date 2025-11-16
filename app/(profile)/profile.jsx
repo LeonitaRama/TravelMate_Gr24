@@ -103,7 +103,7 @@ const Profile = () => {
     message="A jeni i sigurt që doni të dilni?"
     onClose={() => setShowLogoutModal(false)}
     buttons={[
-        { label: "Dil", color: "#d9544f7b", onPress: handleLogout },
+        { label: "Dil", color: "#d9534f", onPress: handleLogout },
         { label: "Anulo", color: "gray" }
     ]}
 />

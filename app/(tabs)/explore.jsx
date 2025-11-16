@@ -7,10 +7,11 @@ import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { Link } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MapView, { Marker, UrlTile } from 'react-native-maps';
-
+import { useTranslation } from "react-i18next";
 import * as Linking from "expo-linking"; 
 
 export default function Details() {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
@@ -26,9 +27,9 @@ export default function Details() {
     
       favorites.push({ ...destination, review });
       await AsyncStorage.setItem('@favorites', JSON.stringify(favorites));
-      alert(`${destination.name} added to Wishlist!`);
+      alert(t("details.favorites.added", { name: destination.name }));
     } else {
-      alert(`${destination.name} is already in your Wishlist.`);
+      alert(t("details.favorites.exists", { name: destination.name }))
     }
 
      console.log("Review saved in Firestore ✅");
@@ -41,7 +42,7 @@ export default function Details() {
 
   const sendReview = async (destination, review, setReview) => {
     if (!review.trim()) {
-      alert("Please write a review before sending!");
+      alert(t("details.review.alert.empty"));
       return;
     }
         try {
@@ -53,12 +54,12 @@ export default function Details() {
         timestamp: new Date(),
       });
       setReview("");
-      alert("Review sent ✅");
+      alert(t("details.review.alert.success"));
     console.log("Review saved in Firestore ✅");
     setReview(""); 
     } catch (e) {
       console.log("Error sending review:", e);
-      alert("Error sending review!");
+      alert(t("details.review.alert.error"));
     }
   };
  const openInMap = (lat, lng) => {
@@ -97,27 +98,27 @@ export default function Details() {
   };
 
   const DestinationsItem = ({ item }) => {
-    const [review, setReview] = useState("");
+  const [review, setReview] = useState("");
 
-    return (
-      <View
-        style={{
-          flex: 1,
-          margin: 5,
-          backgroundColor: theme.card,
-          borderRadius: 10,
-          padding: 10,
-          flexDirection: "column",
-        justifyContent: "space-between", 
-          alignItems: "center",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.2,
-          shadowRadius: 5,
-          elevation: 5, 
-        }}
-      >
-         <View style={{ width: "100%" }}>
+  return (
+    <View
+      style={{
+        flex: 1,
+        margin: 5,
+        backgroundColor: theme.card,
+        borderRadius: 10,
+        padding: 10,
+        minHeight: 380, // siguron një lartësi minimale
+        justifyContent: "space-between",
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 5,
+      }}
+    >
+      <View style={{ width: "100%" }}>
         <Image
           source={item.image}
           style={{ width: "100%", height: 150, borderRadius: 10 }}
@@ -134,6 +135,7 @@ export default function Details() {
         >
           {item.name}
         </Text>
+
         <Text
           style={{
             fontStyle: "italic",
@@ -141,11 +143,11 @@ export default function Details() {
             textAlign: "center",
             marginVertical: 5,
           }}
+          numberOfLines={3} // limiton tekstin në 3 rreshta
         >
           {item.desc}
         </Text>
 
-       
         <View style={{ flexDirection: "row", width: "100%", marginTop: 5 }}>
           <TextInput
             style={{
@@ -158,7 +160,7 @@ export default function Details() {
               backgroundColor: theme.inputBackground,
               color: theme.text,
             }}
-            placeholder="Write a review"
+            placeholder={t("details.review.placeholder")}
             placeholderTextColor={theme.placeholder}
             value={review}
             onChangeText={setReview}
@@ -166,7 +168,6 @@ export default function Details() {
           <TouchableOpacity
             onPress={() => sendReview(item, review, setReview)}
             style={{
-              
               marginLeft: 6,
               paddingHorizontal: 12,
               paddingVertical: 8,
@@ -181,41 +182,41 @@ export default function Details() {
         </View>
 
         <TouchableOpacity
-          onPress={() => openInMap(item.lat, item.lng)}   
-          style={{  marginBottom: 10}}
+          onPress={() => openInMap(item.lat, item.lng)}
+          style={{ marginTop: 8, marginBottom: 10 }}
         >
           <Text
             style={{
               color: theme.link,
               textDecorationLine: "underline",
               textAlign: "center",
-             
             }}
           >
-            View in Map
+              {t("details.map.view")}
           </Text>
         </TouchableOpacity>
-        </View>
+      </View>
 
-     <TouchableOpacity
-  onPress={() => addToFavorites(item)}
-  style={{
-   
-    backgroundColor: theme.button,
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    alignItems: "center",    
-  }}
->
-  <Text style={{ color: theme.buttonText, fontWeight: "bold" }}>
-    ❤️ Add to Wishlist
-  </Text>
-</TouchableOpacity>
-</View>
-    );
-  };
+      <TouchableOpacity
+        onPress={() => addToFavorites(item)}
+        style={{
+          backgroundColor: theme.button,
+          paddingVertical: 8,
+          paddingHorizontal: 15,
+          borderRadius: 8,
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        <Text style={{ color: theme.buttonText, fontWeight: "bold", textAlign: "center" }}>
+          ❤️ Add to Wishlist
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
+       
   const [destinations, setDestinations] = useState([
     {
       id: "1",
@@ -296,11 +297,11 @@ export default function Details() {
           color: theme.text,
         }}
       >
-        Explore Destinations
+        {t("details.title")}
       </Text>
 
       <TextInput
-        placeholder="Search destination"
+        placeholder={t("details.search.placeholder")}
         placeholderTextColor={theme.placeholder}
         value={searchText}
         onChangeText={setSearchText}

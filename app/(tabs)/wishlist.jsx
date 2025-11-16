@@ -4,11 +4,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { Ionicons } from "@expo/vector-icons"; 
+import { useTranslation } from "react-i18next";
 
 export default function WishlistScreen() {
-  const [favorites, setFavorites] = useState([]);
+   const [favorites, setFavorites] = useState([]);
    const { darkMode } = useContext(ThemeContext);
- 
+   const { t, i18n } = useTranslation();
    const theme = darkMode ? darkTheme : lightTheme;
 function fixImageSource(image) {
   if (typeof image === "number") {
@@ -61,9 +62,9 @@ function fixImageSource(image) {
   return (
     
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.title, { color: theme.text }]}>❤️ Wishlist</Text>
+      <Text style={[styles.title, { color: theme.text }]}>{t("title")}</Text>
       {favorites.length === 0 ? (
-      <Text style={[styles.empty, { color: theme.textSecondary }]}> No saved destinations yet.</Text>
+      <Text style={[styles.empty, { color: theme.textSecondary }]}> {t("empty")}</Text>
   
       ) : (
         <FlatList
