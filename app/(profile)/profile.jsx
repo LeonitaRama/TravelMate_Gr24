@@ -1,29 +1,57 @@
-import React, {useContext} from 'react'
+import React, {useContext, useState, useEffect} from 'react'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { Image, StyleSheet, Text, View, StatusBar, FlatList, TouchableOpacity, ScrollView } from 'react-native'
+import { Image, StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from "expo-router";
 import ProfileOption from './ProfileOption';
+import { auth1 as auth } from "../../firebase/firebaseConfig"
 import { ThemeContext } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 
 
 
 const Profile = () => {
-    
+    const [user, setUser] = useState(null);
     const router = useRouter();
     const { darkMode } = useContext(ThemeContext);
     const theme = darkMode ? darkTheme : lightTheme;
+    
+   useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.replace("/login");
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Loading user info...</Text>
+      </View>
+    )
+  }
+
+
 
     return (
         <SafeAreaView style={[styles.container,{backgroundColor:theme.background}]}>
             <ScrollView contentContainerStyle={[styles.scroll, {backgroundColor:theme.background}]}>
                 <View style={[styles.header,{backgroundColor:theme.header}]}>
 
-                {/* //fix this to save the  image of user logged in if logs in with facebook */}
                     <View style={styles.imageContainer}>
                         <Image
-                            source={{ uri: 'https://loremfaces.net/96/id/.jpg' }}
+                            source={{ uri: user.photoURL || 'https://loremfaces.net/96/id/.jpg' }}
                             style={styles.image}
                         />
                         <FontAwesome6
@@ -36,8 +64,8 @@ const Profile = () => {
                 </View>
 
                 <View style={styles.info}>
-                    <Text style={[styles.name, {color:theme.text}]}>Welcome User</Text>
-                    <Text style={[styles.phone, {color:theme.text}]}>Bio</Text>
+                    <Text style={[styles.name, {color:theme.text}]}>Welcome {user.displayName ? user.displayName : user.email}</Text>
+                    <Text style={[styles.phone, {color:theme.text}]}>{user.bio || ""}</Text>
                 </View>
 
                 <ProfileOption title="Personal Information" iconName="person-outline" headerTitle="Personal Information" target="/(profile)/personalInfo" />
@@ -46,10 +74,9 @@ const Profile = () => {
                 <ProfileOption title="Photos" iconName="images-outline" headerTitle="Photos" target="/(profile)/photos" />
                 </ScrollView>
 
-                {/* fix logout button */}
-            <TouchableOpacity style={[styles.logoutButton, {backgroundColor:theme.icon}]}
+            <TouchableOpacity style={[styles.logoutButton, {backgroundColor:theme.icon}]} onPress={handleLogout}
                 activeOpacity={0.6} >
-                <Text style={styles.logoutBtnText}>Logout</Text>
+                <Text style={styles.logoutBtnText}>Log Out</Text>
             </TouchableOpacity>
         </SafeAreaView>
     )
