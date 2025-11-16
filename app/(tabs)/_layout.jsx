@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingHorizontal: 13,
     paddingVertical: 10,
+     alignItems: "flex-end",
   },
   loginButton: {
     paddingVertical: 6,
@@ -103,6 +104,8 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 16,
     fontWeight: "600",
+     marginTop: 40,
+    
   },
   underline: {
     height: 2,
