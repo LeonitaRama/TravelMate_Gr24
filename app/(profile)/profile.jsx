@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect} from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { Image, StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -7,7 +7,7 @@ import ProfileOption from './ProfileOption';
 import { auth1 as auth } from "../../firebase/firebaseConfig"
 import { ThemeContext } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../context/ThemeStyles';
-
+import { signOut } from 'firebase/auth';
 
 
 const Profile = () => {
@@ -15,39 +15,43 @@ const Profile = () => {
     const router = useRouter();
     const { darkMode } = useContext(ThemeContext);
     const theme = darkMode ? darkTheme : lightTheme;
-    
-   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setUser(currentUser)
-    })
 
-    return () => unsubscribe()
-  }, [])
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+            setUser(currentUser);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      router.replace("/login");
-    } catch (error) {
-      console.log('error', error);
+            if (!currentUser) {
+                router.replace("/login")
+            }
+        });
+
+        return () => unsubscribe()
+    }, [])
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            router.replace("/login");
+        } catch (error) {
+            console.log('error', error);
+        }
     }
-  }
 
-  if (!user) {
+    if (!user) {
+        return (
+            <View style={styles.container}>
+                <ActivityIndicator size="large" color="#007AFF" />
+                <Text style={styles.loadingText}>Loading user info...</Text>
+            </View>
+        )
+    }
+
+
+
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading user info...</Text>
-      </View>
-    )
-  }
-
-
-
-    return (
-        <SafeAreaView style={[styles.container,{backgroundColor:theme.background}]}>
-            <ScrollView contentContainerStyle={[styles.scroll, {backgroundColor:theme.background}]}>
-                <View style={[styles.header,{backgroundColor:theme.header}]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+            <ScrollView contentContainerStyle={[styles.scroll, { backgroundColor: theme.background }]}>
+                <View style={[styles.header, { backgroundColor: theme.header }]}>
 
                     <View style={styles.imageContainer}>
                         <Image
@@ -64,17 +68,17 @@ const Profile = () => {
                 </View>
 
                 <View style={styles.info}>
-                    <Text style={[styles.name, {color:theme.text}]}>Welcome {user.displayName ? user.displayName : user.email}</Text>
-                    <Text style={[styles.phone, {color:theme.text}]}>{user.bio || ""}</Text>
+                    <Text style={[styles.name, { color: theme.text }]}>Welcome {user.displayName ? user.displayName : user.email}</Text>
+                    <Text style={[styles.phone, { color: theme.text }]}>{user.bio || ""}</Text>
                 </View>
 
                 <ProfileOption title="Personal Information" iconName="person-outline" headerTitle="Personal Information" target="/(profile)/personalInfo" />
                 <ProfileOption title="Reviews" iconName="star-outline" headerTitle="Reviews" target="/(profile)/reviews" />
                 <ProfileOption title="Wishlist" iconName="heart-outline" headerTitle="Wishlist" target="/(tabs)/wishlist" />
                 <ProfileOption title="Photos" iconName="images-outline" headerTitle="Photos" target="/(profile)/photos" />
-                </ScrollView>
+            </ScrollView>
 
-            <TouchableOpacity style={[styles.logoutButton, {backgroundColor:theme.icon}]} onPress={handleLogout}
+            <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.icon }]} onPress={handleLogout}
                 activeOpacity={0.6} >
                 <Text style={styles.logoutBtnText}>Log Out</Text>
             </TouchableOpacity>
