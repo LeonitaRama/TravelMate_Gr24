@@ -6,9 +6,6 @@ import { auth3, db3 } from "../../firebase/firebaseConfig";
 import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc } from "firebase/firestore";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from "expo-router";
-import { ThemeContext } from '../../context/ThemeContext';
-import { lightTheme, darkTheme } from '../../context/ThemeStyles';
-
 
 const MyPosts = () => {
   const { darkMode } = useContext(ThemeContext);

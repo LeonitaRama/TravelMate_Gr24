@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { collection, onSnapshot, orderBy, query, getDocs, where, deleteDoc, doc } from "firebase/firestore";
 import { db3, auth3 } from "../../firebase/firebaseConfig";
 import { useRouter } from "expo-router";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { ThemeContext } from '../../context/ThemeContext';
+import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 
 export default function SocialTravelFeed() {
   const [posts, setPosts] = useState([]);
@@ -11,6 +13,8 @@ export default function SocialTravelFeed() {
   const router = useRouter();
 
   const currentUserId = auth3.currentUser.uid;
+  const { darkMode } = useContext(ThemeContext);
+  const theme = darkMode ? darkTheme : lightTheme;
 
   // Fetch posts ordered by creation date desc
   useEffect(() => {
@@ -91,27 +95,27 @@ export default function SocialTravelFeed() {
   // Header with buttons and travel buddies section
   const ListHeader = () => (
     <View>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/addPost")}>
-          <Text style={styles.buttonText}>Post Your Trip</Text>
+      <View style={[styles.header, {backgroundColor:theme.background}]}>
+        <TouchableOpacity style={[styles.button, {backgroundColor:theme.button}]} onPress={() => router.push("/addPost")}>
+          <Text style={[styles.buttonText, {color:theme.text}]}>Post Your Trip</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/addTripPlan")}>
+        <TouchableOpacity style={[styles.button, {backgroundColor:theme.button}]} onPress={() => router.push("/addTripPlan")}>
           <Text style={styles.buttonText}>Add Trip Plan</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.buddiesContainer}>
-        <Text style={styles.sectionTitleSmall}>🚀 Travel Buddies With Matching Itineraries</Text>
+      <View style={[styles.buddiesContainer, {backgroundColor:theme.card}]}>
+        <Text style={[styles.sectionTitleSmall, {color:theme.textSecondary}]}>🚀 Travel Buddies With Matching Itineraries</Text>
         {travelBuddies.length === 0 ? (
-          <Text style={styles.noBuddiesText}>
+          <Text style={[styles.noBuddiesText, {color:theme.text}]}>
             No users found with matching itineraries.
           </Text>
         ) : (
           travelBuddies.map(buddy => (
-            <View key={buddy.id} style={styles.buddyCard}>
-              <Text style={styles.buddyText}>User: {buddy.userId}</Text>
-              <Text style={styles.buddyText}>Destination: {buddy.destination}</Text>
-              <Text style={styles.buddyText}>{buddy.startDate} → {buddy.endDate}</Text>
+            <View key={buddy.id} style={[styles.buddyCard, {backgroundColor:theme.card}]}>
+              <Text style={[styles.buddyText, {backgroundColor:theme.card}]}>User: {buddy.userId}</Text>
+              <Text style={[styles.buddyText, {backgroundColor:theme.card}]}>Destination: {buddy.destination}</Text>
+              <Text style={[styles.buddyText, {backgroundColor:theme.card}]}>{buddy.startDate} → {buddy.endDate}</Text>
             </View>
           ))
         )}
@@ -122,20 +126,20 @@ export default function SocialTravelFeed() {
   return (
     <FlatList
       data={[]}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[styles.container, {backgroundColor:theme.background}]}
       ListHeaderComponent={ListHeader}
       ListFooterComponent={
         <>
           {/* My Posts Section */}
-          <View style={styles.postsSectionContainer}>
-            <Text style={styles.sectionTitle}>🧳 My Posts</Text>
+          <View style={[styles.postsSectionContainer, {backgroundColor:theme.card}]}>
+            <Text style={[styles.sectionTitle, {color:theme.text}]}>🧳 My Posts</Text>
             {myPosts.length === 0 ? (
-              <Text style={styles.noBuddiesText}>No posts yet.</Text>
+              <Text style={[styles.noBuddiesText, {color:theme.text}]}>No posts yet.</Text>
             ) : (
               myPosts.map(post => (
-                <View key={post.id} style={styles.postCard}>
+                <View key={post.id} style={[styles.postCard, {backgroundColor:theme.placeholder}]}>
                   <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
-                  <Text style={styles.postText}>{post.text}</Text>
+                  <Text style={[styles.postText, {color:theme.background}]}>{post.text}</Text>
                   <TouchableOpacity
                     style={styles.deleteIconButton}
                     onPress={() => handleDeletePost(post.id)}
@@ -148,10 +152,10 @@ export default function SocialTravelFeed() {
           </View>
 
           {/* Other Posts Section */}
-          <View style={[styles.postsSectionContainer, { marginTop: 30 }]}>
-            <Text style={styles.sectionTitle}>🌍 Other Posts</Text>
+          <View style={[styles.postsSectionContainer, { marginTop: 30 }, {backgroundColor:theme.card}]}>
+            <Text style={[styles.sectionTitle, {color:theme.text}]}>🌍 Other Posts</Text>
             {otherPosts.length === 0 ? (
-              <Text style={styles.noBuddiesText}>No posts from other users yet.</Text>
+              <Text style={[styles.noBuddiesText, {color:theme.textSecondary}]}>No posts from other users yet.</Text>
             ) : (
               otherPosts.map(post => (
                 <View key={post.id} style={styles.postCard}>
