@@ -3,11 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "rea
 import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import MapView, { UrlTile } from 'react-native-maps';
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 export default function WhyChooseUs() {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { t, i18n } = useTranslation();
 
   const API_KEY = "2b702f2d80a1e6f46b130cd012d53bbd";
   const CITY = "Pristina";
@@ -39,26 +41,25 @@ export default function WhyChooseUs() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Why Thousands of Travelers Choose TravelMate</Text>
+      <Text style={styles.title}>{t("wtitle")}</Text>
       <Text style={styles.description}>
-        TravelMate makes exploring the world easier, safer, and more exciting with expert-crafted
-        itineraries, real-time weather insights, and 24/7 support.
+       {t("description")}
       </Text>
 
       <View style={styles.featuresContainer}>
         <View style={styles.featureBox}>
           <Ionicons name="map" size={32} color="#4A5D73" />
           <View style={{ marginLeft: 10 }}>
-            <Text style={styles.featureTitle}>Local Expertise</Text>
-            <Text style={styles.featureText}>Crafted by experts with insider knowledge.</Text>
+            <Text style={styles.featureTitle}>{t("local_expertise_title")}</Text>
+            <Text style={styles.featureText}>{t("local_expertise_desc")}</Text>
           </View>
         </View>
 
        <View style={styles.featureBox}>
   <FontAwesome5 name="calendar-check" size={28} color="#4A5D73" />
   <View style={{ marginLeft: 10 }}>
-    <Text style={styles.featureTitle}>All-in-One Booking</Text>
-    <Text style={styles.featureText}>Fast, secure and hassle-free reservations.</Text>
+    <Text style={styles.featureTitle}>{t("all_in_one_title")}</Text>
+    <Text style={styles.featureText}>{t("all_in_one_desc")}</Text>
   </View>
 </View>
 
@@ -67,8 +68,8 @@ export default function WhyChooseUs() {
         <View style={styles.featureBox}>
           <Ionicons name="headset" size={32} color="#4A5D73" />
           <View style={{ marginLeft: 10 }}>
-            <Text style={styles.featureTitle}>24/7 Support</Text>
-            <Text style={styles.featureText}>We're here anytime you need help.</Text>
+            <Text style={styles.featureTitle}>{t("support_title")}t</Text>
+            <Text style={styles.featureText}>{t("support_desc")}</Text>
           </View>
         </View>
       </View>
@@ -78,28 +79,28 @@ export default function WhyChooseUs() {
         <View style={styles.statItem}>
           <FontAwesome5 name="smile" size={28} color="#4A5D73" />
           <Text style={styles.statNumber}>12k+</Text>
-          <Text style={styles.statLabel}>Happy Travelers</Text>
+          <Text style={styles.statLabel}>{t("stat_travelers")}</Text>
         </View>
 
         <View style={styles.statItem}>
           <FontAwesome5 name="medal" size={28} color="#4A5D73" />
           <Text style={styles.statNumber}>10+ yrs</Text>
-          <Text style={styles.statLabel}>Industry Experience</Text>
+          <Text style={styles.statLabel}>{t("stat_experience")}</Text>
         </View>
 
         <View style={styles.statItem}>
           <Ionicons name="location-sharp" size={32} color="#4A5D73" />
           <Text style={styles.statNumber}>50+</Text>
-          <Text style={styles.statLabel}>Destinations</Text>
+          <Text style={styles.statLabel}>{t("stat_destinations")}</Text>
         </View>
       </View>
 
       <TouchableOpacity style={styles.weatherBox} onPress={fetchWeather}>
         <MaterialIcons name="cloud" size={34} color="#4A5D73" />
         <View style={{ marginLeft: 10 }}>
-          <Text style={styles.weatherTitle}>Real-Time Weather</Text>
+          <Text style={styles.weatherTitle}>{t("weather_title")}</Text>
           <Text style={styles.weatherText}>
-            Powered by OpenWeatherMap API{'\n'}for live weather updates during your trip.
+            Powered by OpenWeatherMap API{'\n'}{t("weather_desc")}
           </Text>
 
           {loading && <ActivityIndicator size="small" color="#0000ff" />}

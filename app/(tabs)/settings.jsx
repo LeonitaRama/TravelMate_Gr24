@@ -1,13 +1,23 @@
 import React, { useState, useContext } from "react";
 import {
-  View, Text, TouchableOpacity, StyleSheet, Switch, Modal, Pressable, ScrollView, Alert,Button
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Switch,
+  Modal,
+  Pressable,
+  ScrollView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ThemeContext} from "../../context/ThemeContext"; 
+import { ThemeContext } from "../../context/ThemeContext";
 import { useRouter } from "expo-router";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
+import { useTranslation } from "react-i18next"; // 🚨 Import i18n hook
 
 export default function SettingsScreen() {
+  const { t, i18n } = useTranslation(); // 🚨 Initialize i18n
   const { darkMode, setDarkMode } = useContext(ThemeContext);
   const [notifications, setNotifications] = useState(true);
   const [language, setLanguage] = useState("English");
@@ -15,54 +25,47 @@ export default function SettingsScreen() {
   const theme = darkMode ? darkTheme : lightTheme;
   const router = useRouter();
 
-  const languages = ["English", "Albanian", "German"];
+  const languages = ["English", "Albanian"]; // You can add more languages here
 
   const handlePress = (option) => {
-  if (option === "Log Out") {
-    router.replace("/login"); 
-  } 
-  else if (option === "Log Out") {
-  AsyncStorage.removeItem("isAuthenticated"); 
-  router.replace("/login"); 
-}
-  else if (option === "View Profile") {
-    router.push("/profile");
-
-      } else if (option === "Feed") {
-    router.push("/social-feed");
-  } 
-  else {
-    Alert.alert(`${option} clicked`);
-
-  }
-};
+    switch (option) {
+      case t("settings.viewProfile"):
+        router.push("/profile");
+        break;
+      case t("settings.feed"):
+        router.push("/social-feed");
+        break;
+      case t("settings.logOut"):
+        router.replace("/login");
+        break;
+      default:
+        Alert.alert(`${option} clicked`);
+    }
+  };
 
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
+
   const selectLanguage = (lang) => {
+    const langCode = lang === "Albanian" ? "al" : "en";
+    i18n.changeLanguage(langCode);
     setLanguage(lang);
     closeModal();
   };
 
   const settingsOptions = [
-    { title: "View Profile", icon: "person-outline" },
-    { title: "Notifications", icon: "notifications-outline" },
-    { title: "Change Language", icon: "globe-outline" },
-    { title: "Dark Mode", icon: "moon-outline" },
-    { title: "Feed", icon: "list-outline" },
-    { title: "Log Out", icon: "log-out-outline" },
+    { title: t("settings.viewProfile"), icon: "person-outline" },
+    { title: t("settings.notifications"), icon: "notifications-outline" },
+    { title: t("settings.changeLanguage"), icon: "globe-outline" },
+    { title: t("settings.darkMode"), icon: "moon-outline" },
+    { title: t("settings.feed"), icon: "list-outline" },
+    { title: t("settings.logOut"), icon: "log-out-outline" },
   ];
 
   return (
-    <ScrollView
-      style={[
-        styles.container,
-        { backgroundColor:theme.background }]}
-    >
-      <Text
-        style={[styles.header, { color: theme.text}]}
-      >
-        ⚙️ Settings
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.header, { color: theme.text }]}>
+        {t("settings.title")}
       </Text>
 
       {settingsOptions.map((item, index) => {
@@ -70,25 +73,19 @@ export default function SettingsScreen() {
         const textColor = theme.text;
         const iconColor = theme.icon;
 
-        if (item.title === "Notifications") {
+        if (item.title === t("settings.notifications")) {
           return (
-            <View
-              key={index}
-              style={[styles.option, { backgroundColor: theme.card }]}
-            >
+            <View key={index} style={[styles.option, { backgroundColor: theme.card }]}>
               <View style={styles.iconContainer}>
                 <Ionicons name={item.icon} size={22} color={iconColor} />
               </View>
               <Text style={[styles.optionText, { color: textColor }]}>
                 {item.title}
               </Text>
-              <Switch
-                value={notifications}
-                onValueChange={setNotifications}
-              />
+              <Switch value={notifications} onValueChange={setNotifications} />
             </View>
           );
-        } else if (item.title === "Change Language") {
+        } else if (item.title === t("settings.changeLanguage")) {
           return (
             <TouchableOpacity
               key={index}
@@ -101,23 +98,15 @@ export default function SettingsScreen() {
               <Text style={[styles.optionText, { color: textColor }]}>
                 {item.title}
               </Text>
-              <Text
-                style={[
-                  styles.languageText,
-                  { color: theme.text },
-                ]}
-              >
+              <Text style={[styles.languageText, { color: theme.text }]}>
                 {language}
               </Text>
               <Ionicons name="chevron-forward" size={20} color="#999" />
             </TouchableOpacity>
           );
-        } else if (item.title === "Dark Mode") {
+        } else if (item.title === t("settings.darkMode")) {
           return (
-            <View
-              key={index}
-              style={[styles.option, { backgroundColor: bgColor }]}
-            >
+            <View key={index} style={[styles.option, { backgroundColor: bgColor }]}>
               <View style={styles.iconContainer}>
                 <Ionicons name={item.icon} size={22} color={iconColor} />
               </View>
@@ -141,39 +130,26 @@ export default function SettingsScreen() {
                 {item.title}
               </Text>
               <Ionicons name="chevron-forward" size={20} color="#999" />
-          
             </TouchableOpacity>
-            
           );
         }
       })}
 
-      {/* Modal për Change Language */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={closeModal}
-      >
+      {/* Modal for Changing Language */}
+      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={closeModal}>
         <View style={styles.modalBackground}>
-          <View style={[styles.modalContainer,{backgroundColor: theme.card}]}>
+          <View style={[styles.modalContainer, { backgroundColor: theme.card }]}>
             {languages.map((lang, index) => (
-              <Pressable
-                key={index}
-                style={styles.modalOption}
-                onPress={() => selectLanguage(lang)}
-              >
-                <Text style={[styles.modalText,{color:theme.text}]}>{lang}</Text>
+              <Pressable key={index} style={styles.modalOption} onPress={() => selectLanguage(lang)}>
+                <Text style={[styles.modalText, { color: theme.text }]}>{lang}</Text>
               </Pressable>
             ))}
             <Pressable style={styles.modalClose} onPress={closeModal}>
-              <Text style={{ color: "#fff", fontWeight: "bold" }}>Cancel</Text>
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>{t("settings.cancel")}</Text>
             </Pressable>
           </View>
         </View>
       </Modal>
-
-
     </ScrollView>
   );
 }

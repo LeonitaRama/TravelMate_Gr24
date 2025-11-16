@@ -1,0 +1,73 @@
+{
+  "settings.title": "⚙️ Settings",
+  "settings.viewProfile": "View Profile",
+  "settings.notifications": "Notifications",
+  "settings.changeLanguage": "Change Language",
+  "settings.darkMode": "Dark Mode",
+  "settings.feed": "Feed",
+  "settings.logOut": "Log Out",
+  "settings.cancel": "Cancel",
+  "home.welcome": "Welcome to TravelMate 🌍",
+  
+
+  "home.subtitle": "Find your next adventure!",
+  "home.search.placeholder": "Search destinations...",
+  "home.categories": "Categories",
+  "home.popularDestinations": "Popular Destinations",
+  "home.popularDescription": "We have crafted different tours to offer the perfect experience for each traveler.",
+  "home.photoGallery": "Photos from Travellers",
+  "home.photoDescription": "Scroll to view moments captured by explorers around the world.",
+  "home.callToAction.title": "Call to Action",
+  "home.callToAction.text": "Ready for unforgettable travel? Remember us!",
+  "home.callToAction.description": "Some people want to make this announcement... let it be ornamented with elasticity, fit.",
+  "home.about.title": "About TravelMate",
+  "home.about.content": "TravelMate is your trusted companion in exploring the world. Start your journey today!",
+  "home.contactUs.title": "Contact Us!",
+  "home.contactUs.subtitle": "Feel free to contact and reach us!",
+  "home.footer": "©2025 TravelMate. All rights reserved",
+  "home.footer.privacy": "Privacy Policy",
+  "home.footer.terms": "Terms & Conditions",
+  "home.footer.faq": "FAQ",
+  "home.seeMore": "See More",
+  
+  "details.title": "Explore Destinations",
+  "details.search.placeholder": "Search destination",
+  "details.review.placeholder": "Write a review",
+  "details.review.send": "Send Review",
+  "details.map.view": "View in Map",
+  "details.wishlist.add": "❤️ Add to Wishlist",
+  "details.wishlist.added": "added to Wishlist!",
+  "details.wishlist.exists": "is already in your Wishlist.",
+  "details.review.alert.empty": "Please write a review before sending!",
+  "details.review.alert.success": "Review sent successfully!",
+  "details.review.alert.error": "Error sending review!",
+  "details.map.error": "Unable to open map!",
+  "details.alert.error": "Error occurred:",
+  "details.alert.favorite.saved": "Favorite saved!",
+  "details.alert.favorite.exists": "This destination is already in favorites.",
+  "title": "❤️ Wishlist",
+  "empty": "No saved destinations yet.",
+   "wtitle": "Why Thousands of Travelers Choose TravelMate",
+    "description": "TravelMate makes exploring the world easier, safer, and more exciting with expert-crafted itineraries, real-time weather insights, and 24/7 support.",
+
+    "local_expertise_title": "Local Expertise",
+    "local_expertise_desc": "Crafted by experts with insider knowledge.",
+
+    "all_in_one_title": "All-in-One Booking",
+    "all_in_one_desc": "Fast, secure and hassle-free reservations.",
+
+    "support_title": "24/7 Support",
+    "support_desc": "We're here anytime you need help.",
+
+    "stat_travelers": "Happy Travelers",
+    "stat_experience": "Industry Experience",
+    "stat_destinations": "Destinations",
+
+    "weather_title": "Real-Time Weather",
+    "weather_desc": "Powered by OpenWeatherMap API\nfor live weather updates during your trip."
+}
+
+
+ 
+
+

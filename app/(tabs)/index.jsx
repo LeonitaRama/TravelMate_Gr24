@@ -17,16 +17,21 @@ import {
   ScrollView as RNScrollView
 } from 'react-native';
 import WhyChooseUs from "../(components)/WhyChooseUs.jsx";
+import { useTranslation } from 'react-i18next';
+
 
 
 const { width } = Dimensions.get ('window');
 
 export default function HomeScreen() {
   const [query, setQuery] = useState('');
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const scrollX = useRef(new Animated.Value(0)).current;
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
+    const languages = ["English", "Albanian"];
+  
   
 
   const destinations = [
@@ -69,7 +74,7 @@ export default function HomeScreen() {
   const handleSeeMore = (destination) => {
     Alert.alert(
       destination.name,
-      `${destination.description}\nCategory: ${destination.category}\nRating: ${destination.rating} ★`,
+      `${destination.description}\n${t(HomeScreen.Category)}: ${destination.category}\nRating: ${destination.rating} ★`,
       [{ text: "Close" }]
     );
   };
@@ -98,7 +103,7 @@ export default function HomeScreen() {
           {'★'.repeat(Math.floor(item.rating)) + '☆'.repeat(5 - Math.floor(item.rating))}
         </Text>
         <TouchableOpacity onPress={() => handleSeeMore(item)} style={[ { backgroundColor: theme.button }, styles.seeMoreBtn,]}>
-          <Text style={[styles.seeMoreText, { color: theme.buttonText }]}>See More</Text>
+          <Text style={[styles.seeMoreText, { color: theme.buttonText }]}>{t("home.seeMore")}</Text>
         </TouchableOpacity>
       </Animated.View>
     );
@@ -125,11 +130,11 @@ export default function HomeScreen() {
         ]}
       />
         <Text style={styles.title}>
-    Welcome to TravelMate 🌍
+     {t('home.welcome')}
   </Text>
 
   <Text style={styles.subtitle}>
-    Find your next adventure!
+     {t('home.subtitle')}
   </Text>
 
   <TextInput
@@ -141,7 +146,7 @@ export default function HomeScreen() {
         borderColor: theme.border,
       },
     ]}
-    placeholder="Search destinations..."
+    placeholder={t('home.search.placeholder')}
     placeholderTextColor={theme.placeholder}
     value={query}
     onChangeText={setQuery}
@@ -149,7 +154,7 @@ export default function HomeScreen() {
 </ImageBackground>
 
       <View style={styles.contentSection}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Categories</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>{t('home.categories')}</Text>
         <FlatList
           data={categories}
           horizontal
@@ -168,10 +173,9 @@ export default function HomeScreen() {
           )}
         />
 
-        <Text style={[styles.sectionTitle, {color:theme.text}]}>Popular destination</Text>
+        <Text style={[styles.sectionTitle, {color:theme.text}]}>{t('home.popularDestinations')}</Text>
         <Text style={{ color: theme.textSecondary, fontSize: 16, textAlign: 'left' }}>
-          We have crafted different tours to offer the perfect experience
-          for each of Explore World’s travelers. Browse our tour types or learn more about what experience is right for you.
+          {t('home.popularDescription')}
         </Text>
 
         <Animated.FlatList
@@ -222,7 +226,7 @@ export default function HomeScreen() {
               </Text>
 
               <TouchableOpacity style={[styles.seeMoreBtn, {backgroundColor:theme.button}]} onPress={() => handleSeeMore(item)}>
-                <Text style={[styles.seeMoreText, {color:theme.buttonText}]}>See More</Text>
+                <Text style={[styles.seeMoreText, {color:theme.buttonText}]}>{t('home.seeMore')}</Text>
               </TouchableOpacity>
             </Animated.View>
           );
@@ -230,10 +234,9 @@ export default function HomeScreen() {
       />
 
 
-        <Text style={[styles.sectionTitle, {color: theme.text}]}>Photo's From Travellers</Text>
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('home.photoGallery')}</Text>
         <Text style={{ color: theme.textSecondary, fontSize: 16, textAlign: 'left' }}>
-          It seems to me that some people want to make this announcement, but only the
-          first ones, and no one else. The appearance of the praisers. Let it be ornamented with elasticity, fit.
+           {t('home.photoDescription')}
         </Text>
 
         <View style={[styles.photoCard, { maxHeight: 500 , backgroundColor: theme.card,}]}>
@@ -256,43 +259,40 @@ export default function HomeScreen() {
 <WhyChooseUs />
 </View> 
   <View style={[styles.textCard, { backgroundColor: theme.card }]}>
-  <Text style={[styles.textCardTitle, { color: theme.text }]}>CALL TO ACTION</Text>
-  <Text style={[styles.textCardContent, { color: theme.text}]}>READY FOR UNFORGETTABLE TRAVEL. REMEMBER US!</Text>
+  <Text style={[styles.textCardTitle, { color: theme.text }]}>{t('home.callToAction.title')}</Text>
+  <Text style={[styles.textCardContent, { color: theme.text}]}>{t('home.callToAction.text')}</Text>
   <ScrollView style={{ maxHeight: 150 }}>
     <Text style={[styles.textCardContent ,{color: theme.textSecondary}]}>
-      It seems to me that some people want to make this announcement, but only the first ones, and no one else. 
-   The appearance of the praisers. Let it be ornamented with elasticity, fit.
+ {t('home.callToAction.description')}
     </Text>
   </ScrollView>
 </View>
 
 <View style={[styles.infoCard, { backgroundColor: theme.card }]}>
-  <Text style={[styles.infoCardTitle, { color: theme.text }]}>About TravelMate</Text>
+  <Text style={[styles.infoCardTitle, { color: theme.text }]}>{t('home.about.title')}</Text>
   <ScrollView style={{ maxHeight: 120 }}>
     <Text style={[styles.infoCardContent,{ color: theme.textSecondary }]}>
-      TravelMate is your trusted companion in exploring the world. 
-      We help you find breathtaking destinations, plan unforgettable adventures, 
-      and connect with travelers around the globe. Start your journey today!
+       {t('home.about.content')}
     </Text>
   </ScrollView>
   
 
   <View style={styles.contactSection}>
-    <Text style={[styles.infoCardTitle,{color: theme.text}]}>Contact Us!</Text>
-    <Text style={[styles.infoCardContent, {color: theme.text}]}>Feel free to contact and reach us !!</Text>
+    <Text style={[styles.infoCardTitle,{color: theme.text}]}>{t('home.contactUs.title')}</Text>
+    <Text style={[styles.infoCardContent, {color: theme.text}]}>{t('home.contactUs.subtitle')}</Text>
     <Text style={[styles.contactItem,{ color: theme.text }]}>📞  +01 (123) 4567 90</Text>
     <Text style={[styles.contactItem, { color: theme.text }]}>✉️  info.TravelMate.com</Text>
     <Text style={[styles.contactItem,{ color: theme.text }]}>📍  Rruga “Agim Ramadani”, Prishtinë, Kosovë</Text>
   </View>
 </View>
 <View style={[styles.footer,{ backgroundColor: theme.footer, borderTopColor:theme.footer,}]}>
-  <Text style={[styles.footerText,{ color: theme.textSecondary }]}>©2025 TravelMate.All rights reserved</Text>
+  <Text style={[styles.footerText,{ color: theme.textSecondary }]}> {t('home.footer')}</Text>
   <View style={[styles.footerLinks,{ color: theme.text }]}>
-    <Text style={styles.link}>Privacy Policy</Text>
+    <Text style={styles.link}>{t('home.footer.privacy')}</Text>
     <Text style={styles.separator}> | </Text>
-    <Text style={styles.link}>Terms & Conditions</Text>
+    <Text style={styles.link}>{t('home.footer.terms')}</Text>
     <Text style={styles.separator}> | </Text>
-    <Text style={styles.link}>FAQ</Text>
+    <Text style={styles.link}>{t('home.footer.faq')}</Text>
   </View>
 </View>
 

@@ -7,10 +7,11 @@ import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { Link } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MapView, { Marker, UrlTile } from 'react-native-maps';
-
+import { useTranslation } from "react-i18next";
 import * as Linking from "expo-linking"; 
 
 export default function Details() {
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
@@ -26,9 +27,9 @@ export default function Details() {
     
       favorites.push({ ...destination, review });
       await AsyncStorage.setItem('@favorites', JSON.stringify(favorites));
-      alert(`${destination.name} added to Wishlist!`);
+      alert(t("details.favorites.added", { name: destination.name }));
     } else {
-      alert(`${destination.name} is already in your Wishlist.`);
+      alert(t("details.favorites.exists", { name: destination.name }))
     }
 
      console.log("Review saved in Firestore ✅");
@@ -41,7 +42,7 @@ export default function Details() {
 
   const sendReview = async (destination, review, setReview) => {
     if (!review.trim()) {
-      alert("Please write a review before sending!");
+      alert(t("details.review.alert.empty"));
       return;
     }
         try {
@@ -53,12 +54,12 @@ export default function Details() {
         timestamp: new Date(),
       });
       setReview("");
-      alert("Review sent ✅");
+      alert(t("details.review.alert.success"));
     console.log("Review saved in Firestore ✅");
     setReview(""); 
     } catch (e) {
       console.log("Error sending review:", e);
-      alert("Error sending review!");
+      alert(t("details.review.alert.error"));
     }
   };
  const openInMap = (lat, lng) => {
@@ -158,7 +159,7 @@ export default function Details() {
               backgroundColor: theme.inputBackground,
               color: theme.text,
             }}
-            placeholder="Write a review"
+            placeholder={t("details.review.placeholder")}
             placeholderTextColor={theme.placeholder}
             value={review}
             onChangeText={setReview}
@@ -192,7 +193,7 @@ export default function Details() {
              
             }}
           >
-            View in Map
+              {t("details.map.view")}
           </Text>
         </TouchableOpacity>
         </View>
@@ -209,7 +210,7 @@ export default function Details() {
   }}
 >
   <Text style={{ color: theme.buttonText, fontWeight: "bold" }}>
-    ❤️ Add to Wishlist
+      {t("details.wishlist.add")}
   </Text>
 </TouchableOpacity>
 </View>
@@ -296,11 +297,11 @@ export default function Details() {
           color: theme.text,
         }}
       >
-        Explore Destinations
+        {t("details.title")}
       </Text>
 
       <TextInput
-        placeholder="Search destination"
+        placeholder={t("details.search.placeholder")}
         placeholderTextColor={theme.placeholder}
         value={searchText}
         onChangeText={setSearchText}
