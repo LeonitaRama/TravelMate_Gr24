@@ -2,6 +2,7 @@
 // Ky app përdoret për Login
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 import AsyncStorage from '@react-native-async-storage/async-storage';
  import { getAuth } from "firebase/auth";
@@ -57,3 +58,30 @@ const app2 = !getApps().some(app => app.name === 'app2')
 
 export const auth2 = getAuth(app2);
 export const db2 = getFirestore(app2);
+
+
+
+// ================== Firebase App 3  ==================
+
+const firebaseConfig3 = {
+  apiKey: "AIzaSyDTBKMwDWZbj0rzc8CL4zVz2BVOvIUHk6E",
+  authDomain: "app-login-e5a16.firebaseapp.com",
+  projectId: "app-login-e5a16",
+  storageBucket: "app-login-e5a16.firebasestorage.app",
+  messagingSenderId: "1085626687454",
+  appId: "1:1085626687454:web:4582d8bead95581a52074f"
+};
+
+
+// Initialize Firebase
+const app3 = initializeApp(firebaseConfig3);
+
+// Auth (duhet patjetër ky version në Expo!)
+const auth3 = initializeAuth(app3, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+});
+
+// Firestore
+const db3 = getFirestore(app3);
+
+export { app3, auth3, db3 };

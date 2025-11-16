@@ -6,6 +6,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { Link } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MapView, { Marker, UrlTile } from 'react-native-maps';
 
 import * as Linking from "expo-linking"; 
 
@@ -60,11 +61,40 @@ export default function Details() {
       alert("Error sending review!");
     }
   };
-    const openInMap = (lat, lng) => {      
-    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;  
-    Linking.openURL(url);                
-  };     
-  
+ const openInMap = (lat, lng) => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    Linking.openURL(url);
+  };
+
+  // ✅ Harta me OpenStreetMap
+  const MapComponent = ({ destinations }) => {
+    return (
+      <MapView
+        style={{ width: '100%', height: 300, marginVertical: 10, borderRadius: 10 }}
+        initialRegion={{
+          latitude: destinations[0].lat,
+          longitude: destinations[0].lng,
+          latitudeDelta: 10,
+          longitudeDelta: 10,
+        }}
+        mapType="standard"
+      >
+        <UrlTile
+          urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maximumZ={19}
+          flipY={false}
+        />
+        {destinations.map((dest) => (
+          <Marker
+            key={dest.id}
+            coordinate={{ latitude: dest.lat, longitude: dest.lng }}
+            title={dest.name}
+            description={dest.desc}
+          />
+        ))}
+      </MapView>
+    );
+  };
 
   const DestinationsItem = ({ item }) => {
     const [review, setReview] = useState("");
