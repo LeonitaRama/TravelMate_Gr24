@@ -5,7 +5,7 @@ export const lightTheme = {
   header: "#ffffff",
   input: "#f2f2f2",
   card: "#f5f5f5",
-icon: "#6b63ff73",
+  icon: "#83b6f1ff",
   footer: "#d3d3d376",
 
   inputBackground: "#ffffff",
@@ -35,11 +35,11 @@ export const darkTheme = {
 
   inputBackground: "#222222",
   placeholder: "#888888",
-  icon: "#6b63ff73",
- input: "#1e1e1e",
+  icon: "#83b6f1ff",
+  input: "#1e1e1e",
   border: "#333333",
   accent: "#4da6ff",
-  button: "#4444ff",
+  button: "#83b6f1ff",
   buttonText: "#ffffff",
   link: "#4da6ff",
   link2: "#7cff7c",           // highlighted color

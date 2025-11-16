@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import {
-  View, Text, TouchableOpacity, StyleSheet, Switch, Modal, Pressable, ScrollView, Alert
+  View, Text, TouchableOpacity, StyleSheet, Switch, Modal, Pressable, ScrollView, Alert,Button
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemeContext} from "../../context/ThemeContext"; 
@@ -27,6 +27,9 @@ export default function SettingsScreen() {
 }
   else if (option === "View Profile") {
     router.push("/profile");
+
+      } else if (option === "Feed") {
+    router.push("/social-feed");
   } 
   else {
     Alert.alert(`${option} clicked`);
@@ -46,6 +49,7 @@ export default function SettingsScreen() {
     { title: "Notifications", icon: "notifications-outline" },
     { title: "Change Language", icon: "globe-outline" },
     { title: "Dark Mode", icon: "moon-outline" },
+    { title: "Feed", icon: "list-outline" },
     { title: "Log Out", icon: "log-out-outline" },
   ];
 
@@ -137,7 +141,9 @@ export default function SettingsScreen() {
                 {item.title}
               </Text>
               <Ionicons name="chevron-forward" size={20} color="#999" />
+          
             </TouchableOpacity>
+            
           );
         }
       })}
@@ -166,6 +172,8 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
+
+
     </ScrollView>
   );
 }

@@ -13,7 +13,7 @@ export default function ProfileLayout() {
 
   const titles = {
     personalInfo: "Edit Profile",
-    photos: "My Photos",
+    photos: "My Posts",
     reviews: "My Reviews",
     profile: "My Profile",
   };
@@ -28,7 +28,7 @@ export default function ProfileLayout() {
      <Stack
     screenOptions={{
     headerShown: true,
-    headerTitle: titles[current] || "Profile",
+    headerTitle: titles[current] || "Travel Posts",
     headerStyle: { backgroundColor: theme.background },
     headerTitleStyle: { color: theme.text },
     tabBarActiveTintColor: theme.accent,
