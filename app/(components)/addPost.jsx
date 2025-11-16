@@ -80,7 +80,7 @@ export default function AddPost() {
        <TouchableOpacity
               style={[styles.button, { backgroundColor: theme.button }]}
             >
-      <Text style={[styles.buttonText, { color: theme.text }]}>
+      <Text style={[styles.buttonText, { color: "#fff"}]}>
         {uploading ? "Posting..." : "Publish post"}
       </Text>
       </TouchableOpacity>

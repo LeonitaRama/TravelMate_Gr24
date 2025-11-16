@@ -97,7 +97,7 @@ export default function SocialTravelFeed() {
     <View>
       <View style={[styles.header, {backgroundColor:theme.background}]}>
         <TouchableOpacity style={[styles.button, {backgroundColor:theme.button}]} onPress={() => router.push("/addPost")}>
-          <Text style={[styles.buttonText, {color:theme.text}]}>Post Your Trip</Text>
+          <Text style={styles.buttonText}>Post Your Trip</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, {backgroundColor:theme.button}]} onPress={() => router.push("/addTripPlan")}>
           <Text style={styles.buttonText}>Add Trip Plan</Text>

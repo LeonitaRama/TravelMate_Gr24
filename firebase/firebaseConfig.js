@@ -58,10 +58,11 @@ const app2 = !getApps().some(app => app.name === 'app2')
 
 export const auth2 = getAuth(app2);
 export const db2 = getFirestore(app2);
-// firebase/firebaseConfig.js
 
 
-// *** VENDOSI KËTO NGA FIREBASE CONSOLE ***
+
+// ================== Firebase App 3  ==================
+
 const firebaseConfig3 = {
   apiKey: "AIzaSyDTBKMwDWZbj0rzc8CL4zVz2BVOvIUHk6E",
   authDomain: "app-login-e5a16.firebaseapp.com",
