@@ -8,6 +8,7 @@ import { auth1 as auth } from "../../firebase/firebaseConfig"
 import { ThemeContext } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 import { signOut } from 'firebase/auth';
+import * as ImagePicker from "expo-image-picker";
 import ConfirmModal from '../(components)/ConfirmModal';
 
 const Profile = () => {
@@ -17,6 +18,35 @@ const Profile = () => {
     const router = useRouter();
     const { darkMode } = useContext(ThemeContext);
     const theme = darkMode ? darkTheme : lightTheme;
+
+    const pickImage = async () => {
+        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (permission.status !== "granted") {
+            alert("Gallery permission is required!");
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.6,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+
+            await updateProfile(auth.currentUser, {
+                photoURL: base64Image,
+            });
+
+            setUser({...auth.currentUser});
+            setShowPhotoOptions(false);
+        }
+    };
+
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -60,7 +90,7 @@ const Profile = () => {
                             source={{ uri: user.photoURL || 'https://loremfaces.net/96/id/.jpg' }}
                             style={styles.image}
                         />
-                        
+
                         <FontAwesome6
                             name="add"
                             size={24}
@@ -81,32 +111,32 @@ const Profile = () => {
                 <ProfileOption title="Wishlist" iconName="heart-outline" headerTitle="Wishlist" target="/(tabs)/wishlist" />
                 <ProfileOption title="Photos" iconName="images-outline" headerTitle="Photos" target="/(profile)/photos" />
 
-            <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.icon }]} onPress={() => setShowLogoutModal(true)}
-                activeOpacity={0.6} >
-                <Text style={styles.logoutBtnText}>Log Out</Text>
-            </TouchableOpacity>
-                </ScrollView>
-<ConfirmModal
-    visible={showPhotoOptions}
-    title="Profile Photo"
-    onClose={() => setShowPhotoOptions(false)}
-    buttons={[
-        { label: "Take Photo", color: "#6b63ff", onPress: () => console.log("camera here") },
-        { label: "Choose from Gallery", color: "#6b63ff", onPress: () => console.log("gallery here") },
-        { label: "Remove Photo", color: "#d9534f", onPress: () => console.log("delete here") },
-        { label: "Cancel", color: "gray" }
-    ]}
-/>
-<ConfirmModal
-    visible={showLogoutModal}
-    title="Log Out"
-    message="A jeni i sigurt që doni të dilni?"
-    onClose={() => setShowLogoutModal(false)}
-    buttons={[
-        { label: "Dil", color: "#d9534f", onPress: handleLogout },
-        { label: "Anulo", color: "gray" }
-    ]}
-/>
+                <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.icon }]} onPress={() => setShowLogoutModal(true)}
+                    activeOpacity={0.6} >
+                    <Text style={styles.logoutBtnText}>Log Out</Text>
+                </TouchableOpacity>
+            </ScrollView>
+            <ConfirmModal
+                visible={showPhotoOptions}
+                title="Profile Photo"
+                onClose={() => setShowPhotoOptions(false)}
+                buttons={[
+                    { label: "Take Photo", color: "#6b63ff", onPress: () => console.log("camera here") },
+                    { label: "Choose from Gallery", color: "#6b63ff", onPress: () => console.log("gallery here") },
+                    { label: "Remove Photo", color: "#d9534f", onPress: () => console.log("delete here") },
+                    { label: "Cancel", color: "gray" }
+                ]}
+            />
+            <ConfirmModal
+                visible={showLogoutModal}
+                title="Log Out"
+                message="A jeni i sigurt që doni të dilni?"
+                onClose={() => setShowLogoutModal(false)}
+                buttons={[
+                    { label: "Dil", color: "#d9534f", onPress: handleLogout },
+                    { label: "Anulo", color: "gray" }
+                ]}
+            />
         </SafeAreaView>
     )
 }
@@ -167,19 +197,19 @@ const styles = StyleSheet.create({
         elevation: 4
     },
     addIcon: {
-     position: 'absolute',
-    bottom: 5,
-    right: 5,
-    backgroundColor: '#fff',
-    borderColor: '#000',
-    borderWidth: 3,     
-    borderRadius: 15,
-    padding: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+        position: 'absolute',
+        bottom: 5,
+        right: 5,
+        backgroundColor: '#fff',
+        borderColor: '#000',
+        borderWidth: 3,
+        borderRadius: 15,
+        padding: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     button: {
         backgroundColor: "#6b63ff0",
