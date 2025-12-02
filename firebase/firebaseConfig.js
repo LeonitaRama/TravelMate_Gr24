@@ -1,12 +1,10 @@
 // ================== Firebase App 1  ==================
 // Ky app përdoret për Login
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { initializeAuth, getReactNativePersistence, getAuth } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 import AsyncStorage from '@react-native-async-storage/async-storage';
- import { getAuth } from "firebase/auth";
-
 
 const firebaseConfig1 = {
   apiKey: "AIzaSyB7Wk5ebmL22kThHcIHt6bUNNL5B4o6wqQ",
@@ -17,24 +15,26 @@ const firebaseConfig1 = {
   appId: "1:235621972828:web:fb409fd9ccbfdfb319df99"
 };
 
-const app1 = !getApps().some(app => app.name === 'app1') 
-    ? initializeApp(firebaseConfig1, 'app1') 
-    : getApp('app1');
+const app1 = getApps().length === 0 ? initializeApp(firebaseConfig1, 'app1') : getApp('app1');
 
 
 let auth1;
+try{
 if (!getApps().some(app => app.name === 'app1')) {
   // Nëse nuk ekziston app, inicializo auth
   auth1 = initializeAuth(app1, {
-    persistence: getReactNativePersistence(AsyncStorage)
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage)
   });
 } else {
   auth1 = getAuth(app1);
 }
+}catch{
+  const app1 = getApps().length === 0 ? initializeApp(firebaseConfig1, 'app1') : getApp('app1');
+}
 
 // Firestore
-export const db1 = getFirestore(app1);
-export { auth1 };
+const db1 = getFirestore(app1);
+export { auth1, db1 };
 
 
 
