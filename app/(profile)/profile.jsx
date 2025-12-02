@@ -47,6 +47,34 @@ const Profile = () => {
         }
     };
 
+    const takePhoto = async () => {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+        
+        if(permission.status !== "granted"){
+            alert("Camera permission is required!");
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            allowsEditin: true,
+            aspect: [1, 1],
+            quality: 0.6,
+            base64: true,
+        });
+
+        if(!result.canceled){
+            const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      
+            await updateProfile(auth.currentUser, {
+                photoURL: base64Image,
+            });
+
+            setUser({...auth.currentUser});
+            setShowPhotoOptions(false);
+        }
+    };
+
+    
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
