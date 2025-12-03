@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-            console.log("Auth state changed:", firebaseUser ? firebaseUser.email : "No user");
+            // console.log("Auth state changed:", firebaseUser ? firebaseUser.email : "No user");
             
             if (firebaseUser) {
                 setUser({
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
             router.replace("/login");
         } catch (error) {
-            console.log("Logout error:", error);
+            // console.log("Logout error:", error);
         }
     };
 

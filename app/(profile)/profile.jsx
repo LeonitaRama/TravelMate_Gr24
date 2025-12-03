@@ -109,6 +109,7 @@ const Profile = () => {
     };
 
     const takePhoto = async () => {
+        try{
         const permission = await ImagePicker.requestCameraPermissionsAsync();
 
         if (permission.status !== "granted") {
@@ -126,12 +127,19 @@ const Profile = () => {
         if (!result.canceled) {
             const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
 
-            await updateProfile(auth.currentUser, {
+            const useRef = doc(db, "users", user.id);
+            await updateDoc(useRef, {
                 photoURL: base64Img,
+                updatedAt: new Date().toISOString(),
             });
 
-            setUser({ ...auth.currentUser });
+            setUserData(prev => ({ ...prev, photoURL: base64Img }));
             setShowPhotoOptions(false);
+            //alert box 
+        }
+    } catch (error) {
+            console.log("Error taking photo:", error);
+            alert("❌ Error: " + error.message);
         }
     };
 
@@ -210,7 +218,7 @@ const Profile = () => {
                 title="Profile Photo"
                 onClose={() => setShowPhotoOptions(false)}
                 buttons={[
-                    { label: "Take Photo", color: "#6b63ff", onPress: () => console.log("camera here") },
+                    { label: "Take Photo", color: "#6b63ff", onPress: takePhoto },
                     { label: "Choose from Gallery", color: "#6b63ff", onPress: pickImage },
                     { label: "Remove Photo", color: "#d9534f", onPress: () => console.log("delete here") },
                     { label: "Cancel", color: "gray" }
