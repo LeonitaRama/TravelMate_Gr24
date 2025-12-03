@@ -4,53 +4,114 @@ import { Image, StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Scr
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from "expo-router";
 import ProfileOption from './ProfileOption';
-import { auth1 as auth } from "../../firebase/firebaseConfig"
+import { auth1 as auth, db1 as db } from "../../firebase/firebaseConfig"
 import { ThemeContext } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../context/ThemeStyles';
-import { signOut } from 'firebase/auth';
 import * as ImagePicker from "expo-image-picker";
 import ConfirmModal from '../(components)/ConfirmModal';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { useAuth } from "../../context/AuthContext";
 
 const Profile = () => {
-    const [user, setUser] = useState(null);
+    const { user, loading, logout } = useAuth();
+    const [userData, setUserData] = useState(null);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [showPhotoOptions, setShowPhotoOptions] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
     const { darkMode } = useContext(ThemeContext);
     const theme = darkMode ? darkTheme : lightTheme;
 
-    const pickImage = async () => {
-        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-        if (permission.status !== "granted") {
-            alert("Gallery permission is required!");
-            return;
+    useEffect(() => {
+        if (!loading && !user) {
+            router.replace("/login");
         }
+    }, [loading, user, router]);
 
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 0.6,
-            base64: true,
-        });
+    // Merr të dhënat nga Firestore
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (user?.id) {
+                try {
+                    setIsLoading(true);
+                    const userRef = doc(db, "users", user.id);
+                    const docSnap = await getDoc(userRef);
 
-        if (!result.canceled) {
-            const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+                    if (docSnap.exists()) {
+                        setUserData(docSnap.data());
+                    } else {
+                        const defaultData = {
+                            email: user.email,
+                            displayName: user.displayName || "",
+                            photoURL: "",
+                            bio: "",
+                            phone: "",
+                            createdAt: new Date().toISOString(),
+                        };
+                        await setDoc(userRef, defaultData);
+                        setUserData(defaultData);
+                    }
+                } catch (error) {
+                    console.log("Error fetching user data:", error.message);
 
-            await updateProfile(auth.currentUser, {
-                photoURL: base64Image,
+                    setUserData({
+                        email: user.email,
+                        displayName: user.displayName || "",
+                        photoURL: "",
+                        bio: "",
+                        phone: "",
+                    });
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                setIsLoading(false);
+            }
+        };
+
+        if (user) {
+            fetchUserData();
+        }
+    }, [user]);
+
+    const pickImage = async () => {
+        try {
+            const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+            if (permission.status !== "granted") {
+                alert("Gallery permission is required!");
+                return;
+            }
+
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: "images",
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
+                base64: true,
             });
 
-            setUser({...auth.currentUser});
-            setShowPhotoOptions(false);
+            if (!result.canceled) {
+                const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
+                const userRef = doc(db, "users", user.id);
+                await updateDoc(userRef, {
+                    photoURL: base64Img,
+                    updatedAt: new Date().toISOString(),
+                });
+
+                setUserData(prev => ({ ...prev, photoURL: base64Img }));
+                setShowPhotoOptions(false);
+            }
+        } catch (error) {
+            console.log("Error updating photo:", error);
+            alert("Error: " + error.message);
         }
     };
 
     const takePhoto = async () => {
         const permission = await ImagePicker.requestCameraPermissionsAsync();
-        
-        if(permission.status !== "granted"){
+
+        if (permission.status !== "granted") {
             alert("Camera permission is required!");
             return;
         }
@@ -62,40 +123,29 @@ const Profile = () => {
             base64: true,
         });
 
-        if(!result.canceled){
-            const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
-      
+        if (!result.canceled) {
+            const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
+
             await updateProfile(auth.currentUser, {
-                photoURL: base64Image,
+                photoURL: base64Img,
             });
 
-            setUser({...auth.currentUser});
+            setUser({ ...auth.currentUser });
             setShowPhotoOptions(false);
         }
     };
 
-    
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-            setUser(currentUser);
-
-            if (!currentUser) {
-                router.replace("/login")
-            }
-        });
-
-        return () => unsubscribe()
-    }, [])
 
     const handleLogout = async () => {
         try {
-            await signOut(auth);
-            router.replace("/login");
+            await logout();
+            setShowLogoutModal(false);
         } catch (error) {
-            console.log('error', error);
+            alert("Error during logout: " + error.message);
         }
-    }
+    };
+
 
     if (!user) {
         return (
@@ -106,6 +156,7 @@ const Profile = () => {
         )
     }
 
+    const displayUser = userData || user;
 
 
     return (
@@ -114,10 +165,20 @@ const Profile = () => {
             <ScrollView contentContainerStyle={[styles.scroll, { backgroundColor: theme.background }]}>
                 <View style={[styles.header, { backgroundColor: theme.icon }]}>
                     <View style={styles.imageContainer}>
-                        <Image
-                            source={{ uri: user.photoURL || 'https://loremfaces.net/96/id/.jpg' }}
-                            style={styles.image}
-                        />
+                        {displayUser.photoURL ? (
+                            <Image
+                                source={{ uri: displayUser.photoURL }}
+                                style={styles.image}
+                            />
+                        ) : (
+                            <View style={[styles.image, styles.placeholderImage]}>
+                                <Text style={styles.placeholderText}>
+                                    {displayUser.displayName?.charAt(0)?.toUpperCase() ||
+                                        displayUser.email?.charAt(0)?.toUpperCase() ||
+                                        "U"}
+                                </Text>
+                            </View>
+                        )}
 
                         <FontAwesome6
                             name="add"
@@ -150,7 +211,7 @@ const Profile = () => {
                 onClose={() => setShowPhotoOptions(false)}
                 buttons={[
                     { label: "Take Photo", color: "#6b63ff", onPress: () => console.log("camera here") },
-                    { label: "Choose from Gallery", color: "#6b63ff", onPress: () => console.log("gallery here") },
+                    { label: "Choose from Gallery", color: "#6b63ff", onPress: pickImage },
                     { label: "Remove Photo", color: "#d9534f", onPress: () => console.log("delete here") },
                     { label: "Cancel", color: "gray" }
                 ]}
