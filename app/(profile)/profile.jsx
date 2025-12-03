@@ -109,37 +109,37 @@ const Profile = () => {
     };
 
     const takePhoto = async () => {
-        try{
-        const permission = await ImagePicker.requestCameraPermissionsAsync();
+        try {
+            const permission = await ImagePicker.requestCameraPermissionsAsync();
 
-        if (permission.status !== "granted") {
-            alert("Camera permission is required!");
-            return;
-        }
+            if (permission.status !== "granted") {
+                alert("Camera permission is required!");
+                return;
+            }
 
-        const result = await ImagePicker.launchCameraAsync({
-            allowsEditin: true,
-            aspect: [1, 1],
-            quality: 0.6,
-            base64: true,
-        });
-
-        if (!result.canceled) {
-            const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
-
-            const useRef = doc(db, "users", user.id);
-            await updateDoc(useRef, {
-                photoURL: base64Img,
-                updatedAt: new Date().toISOString(),
+            const result = await ImagePicker.launchCameraAsync({
+                allowsEditin: true,
+                aspect: [1, 1],
+                quality: 0.6,
+                base64: true,
             });
 
-            setUserData(prev => ({ ...prev, photoURL: base64Img }));
-            setShowPhotoOptions(false);
-            //alert box 
-        }
-    } catch (error) {
+            if (!result.canceled) {
+                const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
+
+                const useRef = doc(db, "users", user.id);
+                await updateDoc(useRef, {
+                    photoURL: base64Img,
+                    updatedAt: new Date().toISOString(),
+                });
+
+                setUserData(prev => ({ ...prev, photoURL: base64Img }));
+                setShowPhotoOptions(false);
+                //alert box 
+            }
+        } catch (error) {
             console.log("Error taking photo:", error);
-            alert("❌ Error: " + error.message);
+            alert("Error: " + error.message);
         }
     };
 
@@ -154,6 +154,32 @@ const Profile = () => {
         }
     };
 
+    if (loading || isLoading) {
+        return (
+            <View style={[styles.container, { backgroundColor: theme.background }]}>
+                <ActivityIndicator size="50" color="#007AFF" style={{ marginTop: 300 }} />
+                <Text style={[styles.loadingText, { color: theme.text }]}>Loading profile...</Text>
+            </View>
+        );
+    }
+
+        // console.log("remove photo");
+            const removePhoto = async () => {
+        try {
+            const userRef = doc(db, "users", user.id);
+            await updateDoc(userRef, {
+                photoURL: "",
+                updatedAt: new Date().toISOString(),
+            });
+
+            setUserData(prev => ({ ...prev, photoURL: "" }));
+            setShowPhotoOptions(false);
+            //alert box
+        } catch (error) {
+            console.log("Error removing photo:", error);
+            alert(" Error: " + error.message);
+        }
+    };
 
     if (!user) {
         return (
@@ -161,7 +187,7 @@ const Profile = () => {
                 <ActivityIndicator size="large" color="#007AFF" />
                 <Text style={styles.loadingText}>Loading user info...</Text>
             </View>
-        )
+        );
     }
 
     const displayUser = userData || user;
@@ -199,8 +225,8 @@ const Profile = () => {
                 </View>
 
                 <View style={styles.info}>
-                    <Text style={[styles.name, { color: theme.text }]}>Welcome {user.displayName ? user.displayName : user.email}</Text>
-                    <Text style={[styles.phone, { color: theme.text }]}>{user.bio || ""}</Text>
+                    <Text style={[styles.name, { color: theme.text }]}>Welcome {displayUser.displayName ? displayUser.displayName : displayUser.email}</Text>
+                    <Text style={[styles.bio, { color: theme.text }]}>{displayUser.bio || "No bio yet"}</Text>
                 </View>
 
                 <ProfileOption title="Personal Information" iconName="person-outline" headerTitle="Personal Information" target="/(profile)/personalInfo" />
@@ -220,7 +246,7 @@ const Profile = () => {
                 buttons={[
                     { label: "Take Photo", color: "#6b63ff", onPress: takePhoto },
                     { label: "Choose from Gallery", color: "#6b63ff", onPress: pickImage },
-                    { label: "Remove Photo", color: "#d9534f", onPress: () => console.log("delete here") },
+                    { label: "Remove Photo", color: "#d9534f", onPress: removePhoto },
                     { label: "Cancel", color: "gray" }
                 ]}
             />
@@ -256,6 +282,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 100,
         overflow: 'visible',
+    },
+    loadingText: {
+        fontSize: 16,
+        marginTop: 10,
+        textAlign: 'center',
     },
     headerTop: {
         flexDirection: 'row',
@@ -324,10 +355,16 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     name: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: "bold",
+        textAlign: 'center',
+        marginBottom: 5,
     },
-
+    bio: {
+        fontSize: 16,
+        textAlign: 'center',
+        opacity: 0.7,
+    },
     infoIcon: {
         backgroundColor: "#ececff",
         padding: 8,
@@ -335,10 +372,11 @@ const styles = StyleSheet.create({
     },
     logoutButton: {
         alignSelf: 'center',
-        width: "350",
+        width: "90%",
         alignItems: 'center',
         borderRadius: 10,
         padding: 25,
+        marginTop: 15,
         paddingHorizontal: 100,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
