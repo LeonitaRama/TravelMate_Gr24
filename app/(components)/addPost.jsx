@@ -79,6 +79,7 @@ export default function AddPost() {
       />
        <TouchableOpacity
               style={[styles.button, { backgroundColor: theme.button }]}
+              onPress={submitPost} 
             >
       <Text style={[styles.buttonText, { color: "#fff"}]}>
         {uploading ? "Posting..." : "Publish post"}
