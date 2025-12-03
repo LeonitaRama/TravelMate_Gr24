@@ -199,21 +199,10 @@ const Profile = () => {
             <ScrollView contentContainerStyle={[styles.scroll, { backgroundColor: theme.background }]}>
                 <View style={[styles.header, { backgroundColor: theme.icon }]}>
                     <View style={styles.imageContainer}>
-                        {displayUser.photoURL ? (
                             <Image
                                 source={{ uri: displayUser.photoURL }}
                                 style={styles.image}
                             />
-                        ) : (
-                            <View style={[styles.image, styles.placeholderImage]}>
-                                <Text style={styles.placeholderText}>
-                                    {displayUser.displayName?.charAt(0)?.toUpperCase() ||
-                                        displayUser.email?.charAt(0)?.toUpperCase() ||
-                                        "U"}
-                                </Text>
-                            </View>
-                        )}
-
                         <FontAwesome6
                             name="add"
                             size={24}
@@ -233,6 +222,7 @@ const Profile = () => {
                 <ProfileOption title="Reviews" iconName="star-outline" headerTitle="Reviews" target="/(profile)/reviews" />
                 <ProfileOption title="Wishlist" iconName="heart-outline" headerTitle="Wishlist" target="/(tabs)/wishlist" />
                 <ProfileOption title="Photos" iconName="images-outline" headerTitle="Photos" target="/(profile)/photos" />
+                <ProfileOption title="Badges" iconName="badge-outline" headerTitle="Badges" target="/(profile)/badges" />
 
                 <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.icon }]} onPress={() => setShowLogoutModal(true)}
                     activeOpacity={0.6} >

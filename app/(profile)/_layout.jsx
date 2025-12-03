@@ -16,30 +16,31 @@ export default function ProfileLayout() {
     photos: "My Posts",
     reviews: "My Reviews",
     profile: "My Profile",
+    badges: "My Badges"
   };
 
   return (
     <>
-     <StatusBar
-     barStyle={darkMode ? "light-content" : "dark-content"}
-     backgroundColor={theme.background}
-    />
+      <StatusBar
+        barStyle={darkMode ? "light-content" : "dark-content"}
+        backgroundColor={theme.background}
+      />
 
-     <Stack
-    screenOptions={{
-    headerShown: true,
-    headerTitle: titles[current] || "Travel Posts",
-    headerStyle: { backgroundColor: theme.background },
-    headerTitleStyle: { color: theme.text },
-    tabBarActiveTintColor: theme.accent,
-    tabBarInactiveTintColor: theme.textSecondary,
-    tabBarStyle: {
-      backgroundColor: theme.card,
-      borderTopColor: darkMode ? "#333" : "#ddd",
-    },
-  }}
-/>
-
+      <Stack
+        screenOptions={{
+          headerShown: true,
+          headerTitle: titles[current] || "Travel Posts",
+          headerStyle: { backgroundColor: theme.background },
+          headerTitleStyle: { color: theme.text },
+          headerTintColor: darkMode ? "#fff" : "#000", // back button and other header icons
+          tabBarActiveTintColor: theme.accent,
+          tabBarInactiveTintColor: theme.textSecondary,
+          tabBarStyle: {
+            backgroundColor: theme.card,
+            borderTopColor: darkMode ? "#333" : "#ddd",
+          },
+        }}
+      />
     </>
   );
 }
