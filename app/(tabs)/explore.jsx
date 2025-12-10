@@ -121,11 +121,20 @@ export default function Details() {
                 paddingVertical: 6,
                 backgroundColor: theme.inputBackground,
                 color: theme.text,
+                 textAlignVertical: "top", 
+               minHeight: 40, 
+                 maxHeight: 120, 
+                  fontSize: 14,
               }}
               placeholder={t("details.review.placeholder")}
               placeholderTextColor={theme.placeholder}
               value={review}
               onChangeText={setReview}
+                multiline={true} 
+                 onContentSizeChange={(e) => {
+                  const height = e.nativeEvent.contentSize.height;
+  }}
+              
             />
             <TouchableOpacity
               onPress={() => sendReview(item, review, setReview)}
