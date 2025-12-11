@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Animated } from "react-native";
+
 import {
   View,
   Text,
@@ -20,6 +22,26 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
+
+
+    // Button opacity animation
+  const buttonOpacity = useRef(new Animated.Value(1)).current;
+
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonOpacity, {
+        toValue: 0.5,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonOpacity, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
 
   const validateInputs = () => {
     if (!email || !password || !confirmPassword) {
@@ -114,9 +136,18 @@ export default function Signup() {
           />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleSignup}>
-          <Text style={styles.buttonText}>SIGN UP</Text>
-        </TouchableOpacity>
+       <Animated.View style={{ opacity: buttonOpacity, width: "100%" }}>
+  <TouchableOpacity
+    style={styles.button}
+    onPress={() => {
+      animateButton();
+      handleSignup();
+    }}
+  >
+    <Text style={styles.buttonText}>SIGN UP</Text>
+  </TouchableOpacity>
+</Animated.View>
+
 
         <TouchableOpacity onPress={() => router.push("/login")}>
           <Text style={styles.signupText}>Already have an account? LOGIN</Text>
