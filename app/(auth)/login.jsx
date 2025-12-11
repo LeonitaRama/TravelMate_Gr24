@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import {
   View,
   Text,
@@ -9,6 +10,7 @@ import {
   StyleSheet,
   Alert,
   Modal,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -20,6 +22,7 @@ import {
   GithubAuthProvider,
 } from "firebase/auth";
 import { WebView } from "react-native-webview";
+import * as Notifications from "expo-notifications";
 import { auth1 as auth } from "../../firebase/firebaseConfig";
 
 const GITHUB_CLIENT_ID = "Ov23li2C5DkV5tRMvj83";
@@ -32,6 +35,25 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+
+    // Button opacity animation
+const buttonOpacity = useRef(new Animated.Value(1)).current;
+
+
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonOpacity, {
+        toValue: 0.5,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonOpacity, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   const validateInputs = () => {
     if (!email || !password) {
@@ -184,9 +206,17 @@ export default function Login() {
           />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>LOGIN</Text>
-        </TouchableOpacity>
+     <Animated.View style={{ opacity: buttonOpacity, width: "100%" }}>
+  <TouchableOpacity
+    style={styles.button}
+    onPress={() => {
+      animateButton();
+      handleLogin();
+    }}
+  >
+    <Text style={styles.buttonText}>LOGIN</Text>
+  </TouchableOpacity>
+</Animated.View>
 
         <TouchableOpacity
           style={[styles.button, { backgroundColor: "#333" }]}
