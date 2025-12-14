@@ -4,6 +4,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { db3, auth3 } from "../../firebase/firebaseConfig";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
+import { scheduleLocalNotification } from "../../utils/localNotifications";
 
 export default function AddTripPlan() {
   const [destination, setDestination] = useState("");
@@ -24,7 +25,12 @@ export default function AddTripPlan() {
         destination,
         startDate,
         endDate,
+
       });
+      await scheduleLocalNotification(
+      "Trip Reminder",
+      "Mos harro udhëtimin tënd nesër ✈️"
+);
       Alert.alert("Trip plan saved!");
       setDestination("");
       setStartDate("");
