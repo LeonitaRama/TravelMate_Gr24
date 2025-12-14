@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from "react";
-import { SafeAreaView, View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert, Platform, StatusBar } from "react-native";
+import React, { useEffect, useState, useContext,useRef} from "react";
+import { SafeAreaView, View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert, Platform, StatusBar,Animated } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { Ionicons } from "@expo/vector-icons"; 
@@ -12,6 +12,29 @@ export default function WishlistScreen() {
   const { darkMode } = useContext(ThemeContext);
   const { t } = useTranslation();
   const theme = darkMode ? darkTheme : lightTheme;
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success"); // 
+  const toastAnim = useRef(new Animated.Value(100)).current; 
+
+  const showToast = (message, type = "success") => {
+  setToastMessage(message);
+  setToastType(type);
+
+  Animated.timing(toastAnim, {
+    toValue: 0,
+    duration: 300,
+    useNativeDriver: true,
+  }).start(() => {
+    setTimeout(() => {
+      Animated.timing(toastAnim, {
+        toValue: 100,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }, 2000); 
+  });
+};
+
 
   const fixImageSource = (image) => typeof image === "number" ? image : { uri: image };
 
@@ -37,10 +60,10 @@ export default function WishlistScreen() {
     try {
       await deleteDoc(doc(db, "favorites", id));
       setFavorites(prev => prev.filter(item => item.id !== id));
-      Alert.alert("Deleted", "Favorite removed successfully");
+      showToast("Favorite removed successfully", "success"); 
     } catch (e) {
       console.log("Error removing favorite:", e);
-      Alert.alert("Error", "Failed to remove favorite");
+      showToast("Failed to remove favorite", "error");
     }
   };
 
@@ -72,6 +95,25 @@ export default function WishlistScreen() {
             contentContainerStyle={{ paddingBottom: 30 }}
           />
         )}
+        {toastMessage ? (
+  <Animated.View
+    style={{
+      position: "absolute",
+      bottom: 30,
+      left: 20,
+      right: 20,
+      padding: 15,
+      backgroundColor: toastType === "success" ? "green" : "red",
+      borderRadius: 8,
+      alignItems: "center",
+      transform: [{ translateY: toastAnim }],
+      zIndex: 999,
+    }}
+  >
+    <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
+  </Animated.View>
+) : null}
+
       </View>
     </SafeAreaView>
   );
