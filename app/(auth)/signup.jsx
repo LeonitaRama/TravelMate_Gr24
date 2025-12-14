@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Animated } from "react-native";
 
+
+
 import {
   View,
   Text,
@@ -10,6 +12,7 @@ import {
   ImageBackground,
   StyleSheet,
   Alert,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -17,10 +20,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth1 as auth } from '../../firebase/firebaseConfig';
 
+import * as ImagePicker from "expo-image-picker";
+
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+    const [profileImage, setProfileImage] = useState(null);
   const router = useRouter();
 
 
@@ -40,6 +46,19 @@ export default function Signup() {
         useNativeDriver: true,
       }),
     ]).start();
+  };
+
+    const pickProfileImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
   };
 
 
@@ -98,6 +117,14 @@ export default function Signup() {
     >
       <SafeAreaView style={styles.overlay}>
         <Text style={styles.title}>Sign Up</Text>
+
+         <TouchableOpacity onPress={pickProfileImage} style={styles.imagePicker}>
+          {profileImage ? (
+            <Image source={{ uri: profileImage }} style={styles.profilePic} />
+          ) : (
+            <Text style={{ color: "#fff" }}>Choose Profile Image</Text>
+          )}
+        </TouchableOpacity>
 
         <View style={styles.inputWrapper}>
           <Ionicons name="person-outline" size={20} color="#fff" style={styles.icon} />

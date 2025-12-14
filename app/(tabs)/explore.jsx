@@ -1,5 +1,5 @@
-import React, { useState, useContext } from "react";
-import { View, Text, Image, TouchableOpacity, TextInput, FlatList, Alert } from "react-native";
+import React, { useState, useContext,useRef,useEffect } from "react";
+import { View, Text, Image, TouchableOpacity, TextInput, FlatList, Alert,Animated  } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { db2 as db } from "../../firebase/firebaseConfig";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
@@ -13,37 +13,56 @@ export default function Details() {
   const [searchText, setSearchText] = useState("");
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success"); 
+  const toastAnim = useRef(new Animated.Value(100)).current; 
+
+const showToast = (message, type = "success") => {
+  setToastMessage(message);
+  setToastType(type);
+
+  Animated.timing(toastAnim, {
+    toValue: 0,
+    duration: 300,
+    useNativeDriver: true,
+  }).start(() => {
+    setTimeout(() => {
+      Animated.timing(toastAnim, {
+        toValue: 100,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }, 2000);
+  });
+};
 
   const addToFavorites = async (destination) => {
     try {
-      // Kontrollo nëse favorite ekziston
       const q = query(collection(db, "favorites"), where("destinationId", "==", destination.id));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        Alert.alert("Already in Wishlist", `${destination.name} is already added.`);
-        return;
+      showToast(`${destination.name} is already in Wishlist`, "error");        return;
       }
 
       await addDoc(collection(db, "favorites"), {
         destinationId: destination.id,
         name: destination.name,
-        image: destination.image.uri || destination.image, // ruaj URI ose local image
+        image: destination.image.uri || destination.image, 
         desc: destination.desc,
         timestamp: new Date(),
       });
 
-      Alert.alert("Added to Wishlist", `${destination.name} added successfully!`);
+     showToast(`${destination.name} added to Wishlist!`, "success");
       console.log("Favorite saved in Firestore ✅");
     } catch (e) {
       console.log("Error adding favorite:", e);
-      Alert.alert("Error", "Failed to add favorite");
-    }
+      showToast("Failed to add favorite", "error");    }
   };
 
   const sendReview = async (destination, review, setReview) => {
     if (!review.trim()) {
-      Alert.alert(t("details.review.alert.empty"));
+      showToast(t("details.review.alert.empty"), "error");
       return;
     }
     try {
@@ -55,11 +74,11 @@ export default function Details() {
         timestamp: new Date(),
       });
       setReview("");
-      Alert.alert(t("details.review.alert.success"));
+      showToast(t("details.review.alert.success"), "success"); 
       console.log("Review saved in Firestore ✅");
     } catch (e) {
       console.log("Error sending review:", e);
-      Alert.alert(t("details.review.alert.error"));
+       showToast("Failed to add favorite", "error");
     }
   };
 
@@ -68,11 +87,30 @@ export default function Details() {
     Linking.openURL(url);
   };
 
-  const DestinationsItem = ({ item }) => {
+  const DestinationsItem = ({ item,index, theme }) => {
     const [review, setReview] = useState("");
+   const fadeAnim = useRef(new Animated.Value(0)).current;  
+   const scaleAnim = useRef(new Animated.Value(0.8)).current; 
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        delay: index * 150, 
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 7,
+        delay: index * 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
 
     return (
-      <View
+      <Animated.View
         style={{
           flex: 1,
           margin: 5,
@@ -87,6 +125,8 @@ export default function Details() {
           shadowOpacity: 0.2,
           shadowRadius: 5,
           elevation: 5,
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }], 
         }}
       >
         <View style={{ width: "100%" }}>
@@ -161,6 +201,7 @@ export default function Details() {
 
         <TouchableOpacity
           onPress={() => addToFavorites(item)}
+          activeOpacity={0.7}
           style={{
             backgroundColor: theme.button,
             paddingVertical: 8,
@@ -174,7 +215,7 @@ export default function Details() {
             ❤️ Add to Wishlist
           </Text>
         </TouchableOpacity>
-      </View>
+        </Animated.View>
     );
   };
 
@@ -208,9 +249,28 @@ export default function Details() {
         keyExtractor={(item) => item.id}
         numColumns={2}
         columnWrapperStyle={{ justifyContent: "space-between" }}
-        renderItem={({ item }) => <DestinationsItem item={item} />}
+        renderItem={({ item,index}) => <DestinationsItem item={item} index={index} theme={theme} />}
         showsVerticalScrollIndicator={false}
       />
+      {toastMessage ? (
+  <Animated.View
+    style={{
+      position: "absolute",
+      bottom: 30,
+      left: 20,
+      right: 20,
+      padding: 15,
+      backgroundColor: toastType === "success" ? "green" : "red",
+      borderRadius: 8,
+      alignItems: "center",
+      transform: [{ translateY: toastAnim }],
+      zIndex: 999,
+    }}
+  >
+    <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
+  </Animated.View>
+) : null}
+
     </View>
   );
 }

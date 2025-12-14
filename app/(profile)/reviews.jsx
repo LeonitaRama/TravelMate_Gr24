@@ -1,7 +1,7 @@
 import { db2 as db } from '../../firebase/firebaseConfig'; 
 import { collection, getDocs, query, orderBy, deleteDoc, updateDoc, doc } from 'firebase/firestore';
-import React, { useEffect, useState, useContext } from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState, useContext,useRef } from 'react';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity,Animated} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeContext } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../context/ThemeStyles';
@@ -14,6 +14,28 @@ const Reviews = () => {
     const [editingText, setEditingText] = useState('');
     const { darkMode } = useContext(ThemeContext);
     const theme = darkMode ? darkTheme : lightTheme;
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState("success"); 
+    const toastAnim = useRef(new Animated.Value(100)).current; 
+
+    const showToast = (message, type = "success") => {
+    setToastMessage(message);
+    setToastType(type);
+
+    Animated.timing(toastAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+    }).start(() => {
+        setTimeout(() => {
+            Animated.timing(toastAnim, {
+                toValue: 100,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        }, 2000);
+    });
+};
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -43,39 +65,32 @@ const Reviews = () => {
             await deleteDoc(reviewRef);
             
             setReviews(prev => prev.filter(r => r.id !== id));
-            Alert.alert("Review deleted successfully");
+            showToast("Review deleted successfully", "success"); 
             console.log("Deleted review with ID:", id);
         } catch (error) {
             console.log("Error deleting review:", error);
-            Alert.alert("Failed to delete review");
+            showToast("Failed to delete review", "error");
         }
     };
 
     
-    const handleDelete = (id) => {
-        Alert.alert(
-            "Delete Review",
-            "Are you sure you want to delete this review?",
-            [
-                { text: "Cancel", style: "cancel" },
-                { text: "Delete", style: "destructive", onPress: () => deleteReview(id) }
-            ]
-        );
-    };
+ const handleDelete = (id) => {
+    deleteReview(id);
+};
 
     
     const handleUpdate = async (id) => {
-        if (!editingText.trim()) return Alert.alert("Review cannot be empty");
+        if (!editingText.trim()) return  showToast("Review cannot be empty", "error");
         try {
             const reviewRef = doc(db, 'reviews', id);
             await updateDoc(reviewRef, { review: editingText });
             setReviews(prev => prev.map(r => r.id === id ? { ...r, review: editingText } : r));
             setEditingId(null);
             setEditingText('');
-            Alert.alert("Review updated successfully");
+            showToast("Review updated successfully", "success");
         } catch (e) {
             console.log("Error updating review:", e);
-            Alert.alert("Error updating review");
+           showToast("Error updating review", "error");
         }
     };
 
@@ -157,6 +172,24 @@ const Reviews = () => {
                     reviews.map(renderReview)
                 )}
             </ScrollView>
+                {toastMessage ? (
+      <Animated.View
+        style={{
+          position: "absolute",
+          bottom: 30,
+          left: 20,
+          right: 20,
+          padding: 15,
+          backgroundColor: toastType === "success" ? "green" : "red",
+          borderRadius: 8,
+          alignItems: "center",
+          transform: [{ translateY: toastAnim }],
+          zIndex: 999,
+        }}
+      >
+        <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
+      </Animated.View>
+    ) : null}
         </SafeAreaView>
     );
 };
