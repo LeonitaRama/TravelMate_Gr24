@@ -57,13 +57,12 @@ const showToast = (message, type = "success") => {
       console.log("Favorite saved in Firestore ✅");
     } catch (e) {
       console.log("Error adding favorite:", e);
-      Alert.alert("Error", "Failed to add favorite");
-    }
+      showToast("Failed to add favorite", "error");    }
   };
 
   const sendReview = async (destination, review, setReview) => {
     if (!review.trim()) {
-      Alert.alert(t("details.review.alert.empty"));
+      showToast(t("details.review.alert.empty"), "error");
       return;
     }
     try {
@@ -75,7 +74,7 @@ const showToast = (message, type = "success") => {
         timestamp: new Date(),
       });
       setReview("");
-      Alert.alert(t("details.review.alert.success"));
+      showToast(t("details.review.alert.success"), "success"); 
       console.log("Review saved in Firestore ✅");
     } catch (e) {
       console.log("Error sending review:", e);
