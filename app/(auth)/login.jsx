@@ -1,6 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import {
   View,
   Text,
@@ -23,21 +22,53 @@ import {
 } from "firebase/auth";
 import { WebView } from "react-native-webview";
 import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
 import { auth1 as auth } from "../../firebase/firebaseConfig";
 
 const GITHUB_CLIENT_ID = "Ov23li2C5DkV5tRMvj83";
 const GITHUB_CLIENT_SECRET = "b908103ca0f8ddd230c80a26ebd1c8677301f120";
-
 const REDIRECT_URI =
   "https://myreactnativeapp-def5a.firebaseapp.com/__/auth/handler";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [githubVisible, setGithubVisible] = useState(false);
   const router = useRouter();
 
-    // Button opacity animation
-const buttonOpacity = useRef(new Animated.Value(1)).current;
+  const buttonOpacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+
+  const registerForPushNotificationsAsync = async () => {
+    const { status: existingStatus } =
+      await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      alert("Failed to get push token for notifications!");
+      return;
+    }
+  };
+
+  const sendLoginNotification = async (username) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Login Successful ✅",
+        body: `Welcome back, ${username}!`,
+        sound: true,
+      },
+      trigger: null, // menjëherë
+    });
+  };
 
 
   const animateButton = () => {
@@ -54,6 +85,7 @@ const buttonOpacity = useRef(new Animated.Value(1)).current;
       }),
     ]).start();
   };
+
 
   const validateInputs = () => {
     if (!email || !password) {
@@ -83,6 +115,7 @@ const buttonOpacity = useRef(new Animated.Value(1)).current;
       );
       await AsyncStorage.setItem("isAuthenticated", "true");
       Alert.alert("Success", `Login successful: ${userCredential.user.email}`);
+      await sendLoginNotification(userCredential.user.email); // Local Notification
       router.replace("/");
     } catch (error) {
       if (error.code === "auth/user-not-found") {
@@ -97,6 +130,7 @@ const buttonOpacity = useRef(new Animated.Value(1)).current;
             "Success",
             `Account created and logged in: ${newUser.user.email}`
           );
+          await sendLoginNotification(newUser.user.email); // Local Notification
           router.replace("/");
         } catch (signupError) {
           Alert.alert("Signup failed", signupError.message);
@@ -106,12 +140,6 @@ const buttonOpacity = useRef(new Animated.Value(1)).current;
       }
     }
   };
-
-  // ---------------------------
-  // GITHUB LOGIN STATE & WEBVIEW
-  // ---------------------------
-
-  const [githubVisible, setGithubVisible] = useState(false);
 
   const handleGitHubCode = async (code) => {
     try {
@@ -144,12 +172,15 @@ const buttonOpacity = useRef(new Animated.Value(1)).current;
       const userCredential = await signInWithCredential(auth, credential);
 
       await AsyncStorage.setItem("isAuthenticated", "true");
-
       Alert.alert(
         "Success",
         `Logged in as ${
           userCredential.user.displayName || userCredential.user.email
         }`
+      );
+
+      await sendLoginNotification(
+        userCredential.user.displayName || userCredential.user.email
       );
 
       router.replace("/");
@@ -171,6 +202,7 @@ const buttonOpacity = useRef(new Animated.Value(1)).current;
       setGithubVisible(false);
     }
   };
+
 
   return (
     <ImageBackground
@@ -206,17 +238,17 @@ const buttonOpacity = useRef(new Animated.Value(1)).current;
           />
         </View>
 
-     <Animated.View style={{ opacity: buttonOpacity, width: "100%" }}>
-  <TouchableOpacity
-    style={styles.button}
-    onPress={() => {
-      animateButton();
-      handleLogin();
-    }}
-  >
-    <Text style={styles.buttonText}>LOGIN</Text>
-  </TouchableOpacity>
-</Animated.View>
+        <Animated.View style={{ opacity: buttonOpacity, width: "100%" }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              animateButton();
+              handleLogin();
+            }}
+          >
+            <Text style={styles.buttonText}>LOGIN</Text>
+          </TouchableOpacity>
+        </Animated.View>
 
         <TouchableOpacity
           style={[styles.button, { backgroundColor: "#333" }]}
@@ -226,9 +258,7 @@ const buttonOpacity = useRef(new Animated.Value(1)).current;
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push("/signup")}>
-          <Text style={styles.signupText}>
-            Don't have an account? SIGN UP
-          </Text>
+          <Text style={styles.signupText}>Don't have an account? SIGN UP</Text>
         </TouchableOpacity>
 
         {/* GitHub WebView Modal */}
@@ -279,6 +309,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
 
 
 
