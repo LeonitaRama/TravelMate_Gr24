@@ -5,6 +5,7 @@ import { db3, auth3 } from "../../firebase/firebaseConfig";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { scheduleLocalNotification } from "../../utils/localNotifications";
+import { NotificationContext } from "../../context/NotificationContext";
 
 export default function AddTripPlan() {
   const [destination, setDestination] = useState("");
@@ -12,6 +13,7 @@ export default function AddTripPlan() {
   const [endDate, setEndDate] = useState("");
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
+  const { addNotification } = useContext(NotificationContext);
 
   const submitPlan = async () => {
     if (!destination || !startDate || !endDate) {
@@ -31,6 +33,8 @@ export default function AddTripPlan() {
       "Trip Reminder",
       "Mos harro udhëtimin tënd nesër ✈️"
 );
+addNotification();
+
       Alert.alert("Trip plan saved!");
       setDestination("");
       setStartDate("");

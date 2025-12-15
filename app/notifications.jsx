@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect,useState, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,9 +10,18 @@ import {
   getLocalNotifications,
   clearLocalNotifications,
 } from "../utils/localNotifications";
+import { useFocusEffect } from "expo-router";
+import { NotificationContext } from "../context/NotificationContext";
 
 export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState([]);
+  const { clearNotifications } = useContext(NotificationContext);
+  
+      useFocusEffect(
+    useCallback(() => {
+      clearNotifications(); // 👉 hek badge-in sapo hapet screen-i
+    }, [])
+  );
 
   useEffect(() => {
     load();
@@ -28,6 +37,9 @@ export default function NotificationsScreen() {
       <TouchableOpacity onPress={clearLocalNotifications}>
         <Text style={styles.clear}>Clear all</Text>
       </TouchableOpacity>
+          <View>
+      <Text>Notifications</Text>
+    </View>
 
       <FlatList
         data={notifications}

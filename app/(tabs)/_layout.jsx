@@ -2,7 +2,7 @@ import { Tabs, useRouter, usePathname } from "expo-router";
 import { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Platform, StatusBar } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
+import { NotificationContext } from "../../context/NotificationContext";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 
@@ -12,10 +12,10 @@ export default function TabsLayout() {
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
   const showLoginHeader = pathname === "/" || pathname === "/explore";
+  const { unreadCount } = useContext(NotificationContext);
+
 
   return (
- 
-      
       <Tabs
         screenOptions={{
           headerShown: true,
@@ -27,15 +27,37 @@ export default function TabsLayout() {
             borderTopColor: darkMode ? "#333" : "#ddd",
           },
             headerRight: () => (
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color={darkMode ? "#fff" : "#000"}
-            style={{ marginRight: 15 }}
-            onPress={() => router.push("/notifications")}
-            
-          />
-            ), 
+          <TouchableOpacity
+    onPress={() => router.push("/notifications")}
+    style={{ marginRight: 15 }}
+  >
+    <Ionicons
+      name="notifications-outline"
+      size={24}
+      color={darkMode ? "#fff" : "#000"}
+    />
+
+    {unreadCount > 0 && (
+      <View
+        style={{
+          position: "absolute",
+          top: -4,
+          right: -6,
+          backgroundColor: "red",
+          borderRadius: 10,
+          minWidth: 16,
+          height: 16,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: "#fff", fontSize: 10, fontWeight: "bold" }}>
+          {unreadCount}
+        </Text>
+      </View>
+    )}
+  </TouchableOpacity>
+),
             headerLeft: () =>
             showLoginHeader ? (
            <TouchableOpacity
