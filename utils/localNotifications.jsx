@@ -7,7 +7,12 @@ export async function requestLocalNotificationPermission() {
 }
 
 export async function scheduleLocalNotification(title, body) {
-  const id = await Notifications.scheduleNotificationAsync({
+const storedEnabled = await AsyncStorage.getItem("notificationsEnabled");
+const enabled = storedEnabled ? JSON.parse(storedEnabled) : true;
+   if (!enabled) {
+    return; // 🚫 OFF → mos dërgo asgjë
+  }
+    const id = await Notifications.scheduleNotificationAsync({
     content: {
       title,
       body,

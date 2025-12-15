@@ -17,6 +17,7 @@ export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState([]);
   const { clearNotifications } = useContext(NotificationContext);
   
+  
       useFocusEffect(
     useCallback(() => {
       clearNotifications(); // 👉 hek badge-in sapo hapet screen-i
