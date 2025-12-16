@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Animated } from "react-native";
 
@@ -21,6 +21,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth1 as auth } from '../../firebase/firebaseConfig';
 
 import * as ImagePicker from "expo-image-picker";
+import * as Notifications from "expo-notifications";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -30,25 +31,55 @@ export default function Signup() {
   const router = useRouter();
 
 
-    // Button opacity animation
+
   const buttonOpacity = useRef(new Animated.Value(1)).current;
 
   const animateButton = () => {
     Animated.sequence([
-      Animated.timing(buttonOpacity, {
-        toValue: 0.5,
-        duration: 120,
-        useNativeDriver: true,
-      }),
-      Animated.timing(buttonOpacity, {
-        toValue: 1,
-        duration: 120,
-        useNativeDriver: true,
-      }),
+      Animated.timing(buttonOpacity, { toValue: 0.5, duration: 120, useNativeDriver: true }),
+      Animated.timing(buttonOpacity, { toValue: 1, duration: 120, useNativeDriver: true }),
     ]).start();
   };
 
-    const pickProfileImage = async () => {
+useEffect(() => {
+  registerForPushNotificationsAsync();
+}, []);
+
+
+  const registerForPushNotificationsAsync = async () => {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      console.log("Push notification permission not granted");
+      return null;
+    }
+
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log("Expo Push Token:", token);
+    return token;
+  };
+
+  const sendSignupNotification = async (username) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Signup Successful ✅",
+        body: `Welcome, ${username}! Your account has been created.`,
+        sound: true,
+      },
+      trigger: null, 
+    });
+  };
+
+  // ------------------------------
+  // Image Picker
+  // ------------------------------
+  const pickProfileImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -61,26 +92,25 @@ export default function Signup() {
     }
   };
 
-
+  // ------------------------------
+  // Input validation
+  // ------------------------------
   const validateInputs = () => {
     if (!email || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill all fields");
       return false;
     }
 
-    // Validim email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Alert.alert("Error", "Please enter a valid email");
       return false;
     }
 
- 
     if (password.length < 6) {
       Alert.alert("Error", "Password must be at least 6 characters");
       return false;
     }
-
 
     if (password !== confirmPassword) {
       Alert.alert("Error", "Passwords do not match");
@@ -90,14 +120,19 @@ export default function Signup() {
     return true;
   };
 
+
   const handleSignup = async () => {
     if (!validateInputs()) return;
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("isAuthenticated", "true");
+
+
+      await sendSignupNotification(userCredential.user.email);
+
       Alert.alert("Success", `Account created: ${userCredential.user.email}`);
-      router.replace("/login"); 
+      router.replace("/login");
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         Alert.alert("Error", "Email is already in use");
@@ -110,15 +145,11 @@ export default function Signup() {
   };
 
   return (
-    <ImageBackground
-      source={require("../../assets/image.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
+    <ImageBackground source={require("../../assets/image.png")} style={styles.background} resizeMode="cover">
       <SafeAreaView style={styles.overlay}>
         <Text style={styles.title}>Sign Up</Text>
 
-         <TouchableOpacity onPress={pickProfileImage} style={styles.imagePicker}>
+        <TouchableOpacity onPress={pickProfileImage} style={styles.imagePicker}>
           {profileImage ? (
             <Image source={{ uri: profileImage }} style={styles.profilePic} />
           ) : (
@@ -163,18 +194,11 @@ export default function Signup() {
           />
         </View>
 
-       <Animated.View style={{ opacity: buttonOpacity, width: "100%" }}>
-  <TouchableOpacity
-    style={styles.button}
-    onPress={() => {
-      animateButton();
-      handleSignup();
-    }}
-  >
-    <Text style={styles.buttonText}>SIGN UP</Text>
-  </TouchableOpacity>
-</Animated.View>
-
+        <Animated.View style={{ opacity: buttonOpacity, width: "100%" }}>
+          <TouchableOpacity style={styles.button} onPress={() => { animateButton(); handleSignup(); }}>
+            <Text style={styles.buttonText}>SIGN UP</Text>
+          </TouchableOpacity>
+        </Animated.View>
 
         <TouchableOpacity onPress={() => router.push("/login")}>
           <Text style={styles.signupText}>Already have an account? LOGIN</Text>
@@ -183,6 +207,7 @@ export default function Signup() {
     </ImageBackground>
   );
 }
+
 
 const styles = StyleSheet.create({
   background: { flex: 1, justifyContent: "center" },

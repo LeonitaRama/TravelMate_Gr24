@@ -18,6 +18,8 @@ import {
 } from 'react-native';
 import WhyChooseUs from "../(components)/WhyChooseUs.jsx";
 import { useTranslation } from 'react-i18next';
+import { scheduleLocalNotification } from "../../utils/localNotifications";
+import { NotificationContext } from "../../context/NotificationContext";
 
 
 
@@ -30,7 +32,8 @@ export default function HomeScreen() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
-    const languages = ["English", "Albanian"];
+  const languages = ["English", "Albanian"];
+  const { addNotification } = useContext(NotificationContext);
   
   
 
@@ -71,6 +74,13 @@ export default function HomeScreen() {
     setSelectedCategory(categoryName === selectedCategory ? null : categoryName);
   };
 
+  const sendNotification = async () => {
+  await scheduleLocalNotification(
+    "New Destination ✈️",
+    "Check out our latest travel offers!"
+  );
+  addNotification(); 
+};
   const handleSeeMore = (destination) => {
     Alert.alert(
       destination.name,
@@ -104,6 +114,9 @@ export default function HomeScreen() {
         </Text>
         <TouchableOpacity onPress={() => handleSeeMore(item)} style={[ { backgroundColor: theme.button }, styles.seeMoreBtn,]}>
           <Text style={[styles.seeMoreText, { color: theme.buttonText }]}>{t("home.seeMore")}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={sendNotification}>
+          <Text>Notify me</Text>
         </TouchableOpacity>
       </Animated.View>
     );
