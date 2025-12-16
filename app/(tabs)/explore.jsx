@@ -1,40 +1,41 @@
-import React, { useState, useContext,useRef,useEffect,useCallback  } from "react";
-import { View, Text, TouchableOpacity, TextInput, FlatList, Alert,Animated,  } from "react-native";
+import React, { useState, useContext, useRef, useEffect, useCallback } from "react";
+import { View, Text, TouchableOpacity, TextInput, FlatList, Animated } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { db2 as db } from "../../firebase/firebaseConfig";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
-import MapView, { Marker, UrlTile } from 'react-native-maps';
 import { useTranslation } from "react-i18next";
 import * as Linking from "expo-linking";
 import { Image } from 'expo-image';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { scheduleLocalNotification } from "../../utils/localNotifications";
 export default function Details() {
   const { t } = useTranslation();
-  const [searchText, setSearchText] = useState("");
+    const [searchText, setSearchText] = useState("");
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
   const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState("success"); 
-  const toastAnim = useRef(new Animated.Value(100)).current; 
+  const [toastType, setToastType] = useState("success");
+  const toastAnim = useRef(new Animated.Value(100)).current;
 
-const showToast = (message, type = "success") => {
-  setToastMessage(message);
-  setToastType(type);
+  const showToast = (message, type = "success") => {
+    setToastMessage(message);
+    setToastType(type);
 
-  Animated.timing(toastAnim, {
-    toValue: 0,
-    duration: 300,
-    useNativeDriver: true,
-  }).start(() => {
-    setTimeout(() => {
-      Animated.timing(toastAnim, {
-        toValue: 100,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }, 2000);
-  });
-};
+    Animated.timing(toastAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setTimeout(() => {
+        Animated.timing(toastAnim, {
+          toValue: 100,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }, 2000);
+    });
+  };
 
   const addToFavorites = useCallback(async (destination) => {
     try {
@@ -42,8 +43,8 @@ const showToast = (message, type = "success") => {
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-      showToast(`${destination.name} is already in Wishlist`, "error");   
-           return;
+        showToast(`${destination.name} is already in Wishlist`, "error");   
+        return;
       }
 
       await addDoc(collection(db, "favorites"), {
@@ -54,11 +55,16 @@ const showToast = (message, type = "success") => {
         timestamp: new Date(),
       });
 
-     showToast(`${destination.name} added to Wishlist!`, "success");
+      showToast(`${destination.name} added to Wishlist!`, "success");
+      await scheduleLocalNotification(
+        "Added to Wishlist ❤️",
+        `${destination.name} was saved successfully`
+      );
       console.log("Favorite saved in Firestore ✅");
     } catch (e) {
       console.log("Error adding favorite:", e);
-      showToast("Failed to add favorite", "error");    }
+      showToast("Failed to add favorite", "error");    
+    }
   }, [db]);
 
   const sendReview = useCallback(async (destination, review, setReview) => {
@@ -79,36 +85,36 @@ const showToast = (message, type = "success") => {
       console.log("Review saved in Firestore ✅");
     } catch (e) {
       console.log("Error sending review:", e);
-       showToast("Failed to add favorite", "error");
+      showToast("Failed to add review", "error");
     }
-    }, [db, t]);
+  }, [db, t]);
 
   const openInMap = useCallback((lat, lng) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     Linking.openURL(url);
   }, []);
 
-const DestinationsItem = React.memo(({ item, index, theme, sendReview, addToFavorites, openInMap }) => {
+  const DestinationsItem = React.memo(({ item, index, theme, sendReview, addToFavorites, openInMap }) => {
     const [review, setReview] = useState("");
-   const fadeAnim = useRef(new Animated.Value(0)).current;  
-   const scaleAnim = useRef(new Animated.Value(0.8)).current; 
+    const fadeAnim = useRef(new Animated.Value(0)).current;  
+    const scaleAnim = useRef(new Animated.Value(0.8)).current; 
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 500,
-        delay: index * 150, 
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 7,
-        delay: index * 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
+    useEffect(() => {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 500,
+          delay: index * 150, 
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 7,
+          delay: index * 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, []);
 
     return (
       <Animated.View
@@ -131,13 +137,13 @@ const DestinationsItem = React.memo(({ item, index, theme, sendReview, addToFavo
         }}
       >
         <View style={{ width: "100%" }}>
-         <Image
-        source={item.image}
-      style={{ width: "100%", height: 150, borderRadius: 10 }}
-  contentFit="cover"
-  cachePolicy="memory-disk"
-  transition={200}   
-/>
+          <Image
+            source={item.image}
+            style={{ width: "100%", height: 150, borderRadius: 10 }}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={200}   
+          />
 
           <Text style={{ marginTop: 8, fontWeight: "bold", color: theme.text, textAlign: "center" }}>
             {item.name}
@@ -165,21 +171,17 @@ const DestinationsItem = React.memo(({ item, index, theme, sendReview, addToFavo
                 paddingVertical: 6,
                 backgroundColor: theme.inputBackground,
                 color: theme.text,
-                 textAlignVertical: "top", 
-               minHeight: 40, 
-                 maxHeight: 120, 
-                  fontSize: 14,
+                textAlignVertical: "top", 
+                minHeight: 40, 
+                maxHeight: 120, 
+                fontSize: 14,
               }}
               placeholder={t("details.review.placeholder")}
               placeholderTextColor={theme.placeholder}
               value={review}
               onChangeText={setReview}
-                multiline={true} 
-                 onContentSizeChange={(e) => {
-                  const height = e.nativeEvent.contentSize.height;
-  }}
-              
-            />
+              multiline={true}             />
+
             <TouchableOpacity
               onPress={() => sendReview(item, review, setReview)}
               style={{
@@ -219,9 +221,9 @@ const DestinationsItem = React.memo(({ item, index, theme, sendReview, addToFavo
             ❤️ Add to Wishlist
           </Text>
         </TouchableOpacity>
-        </Animated.View>
+      </Animated.View>
     );
-});
+  });
 
   const [destinations, setDestinations] = useState([
     { id: "1", name: "Budva, Montenegro", image: require("../../assets/Explore-Destinations/budva.jpg"), desc: "A beautiful coastal city in Montenegro known for its beaches and historic old town.", lat: 42.2929, lng: 18.8403 },
@@ -232,13 +234,42 @@ const DestinationsItem = React.memo(({ item, index, theme, sendReview, addToFavo
     { id: "6", name: "Jinhae, South Korea", image: require("../../assets/Explore-Destinations/Jinhae.jpg"), desc: "Famous for its cherry blossoms, turning the city pink every spring.", lat: 35.1494, lng: 128.6597 },
     { id: "7", name: "Harbor Island, Bahamas", image: require("../../assets/Explore-Destinations/Bahamas.jpg"), desc: "A serene beach with soft pink sand and turquoise waters.", lat: 25.5000, lng: -76.6310 },
     { id: "8", name: "Rugova Canyon, Kosovo", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
+    { id: "9", name: "Test", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
+    { id: "20", name: "Test1", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
   ]);
+ useEffect(() => {
+  const checkNewDestinations = async () => {
+    try {
+      const seenIds = await AsyncStorage.getItem("seenDestinations");
+      let seenArray = seenIds ? JSON.parse(seenIds) : [];
+
+      const newDestinations = destinations.filter(d => !seenArray.includes(d.id));
+
+      for (const dest of newDestinations) {
+        await scheduleLocalNotification(
+          "New Destination Added 🗺️",
+          `${dest.name} is now available on Explore!`
+        );
+      }
+
+      if (newDestinations.length > 0) {
+        const updatedSeenIds = [...seenArray, ...newDestinations.map(d => d.id)];
+        await AsyncStorage.setItem("seenDestinations", JSON.stringify(updatedSeenIds));
+      }
+    } catch (e) {
+      console.log("Error checking new destinations:", e);
+    }
+  };
+
+  checkNewDestinations();
+}, [destinations]);
+
 
   const filteredDestinations = React.useMemo(() => {
-  return destinations.filter((item) =>
-    item.name.toLowerCase().includes(searchText.toLowerCase())
-  );
-}, [destinations, searchText]);
+    return destinations.filter((item) =>
+      item.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [destinations, searchText]);
 
 
   return (
@@ -255,48 +286,48 @@ const DestinationsItem = React.memo(({ item, index, theme, sendReview, addToFavo
         style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: theme.inputBackground, borderRadius: 8, padding: 8, marginBottom: 15 }}
       />
 
-     <FlatList
-  data={filteredDestinations}
-  keyExtractor={(item) => item.id}
-  numColumns={2}
-  columnWrapperStyle={{ justifyContent: "space-between" }}
-  renderItem={({ item, index }) => (
-    <DestinationsItem
-      item={item}
-      index={index}
-      theme={theme}
-      sendReview={sendReview}
-      addToFavorites={addToFavorites}
-      openInMap={openInMap}
-    />
-  )}
-  initialNumToRender={4}
-  maxToRenderPerBatch={4}
-  windowSize={5}
-  removeClippedSubviews={true}  
-  updateCellsBatchingPeriod={50}
-  showsVerticalScrollIndicator={false}
-/>
+      <FlatList
+        data={filteredDestinations}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        renderItem={({ item, index }) => (
+          <DestinationsItem
+            item={item}
+            index={index}
+            theme={theme}
+            sendReview={sendReview}
+            addToFavorites={addToFavorites}
+            openInMap={openInMap}
+          />
+        )}
+        initialNumToRender={4}
+        maxToRenderPerBatch={4}
+        windowSize={5}
+        removeClippedSubviews={true}  
+        updateCellsBatchingPeriod={50}
+        showsVerticalScrollIndicator={false}
+      />
 
 
       {toastMessage ? (
-  <Animated.View
-    style={{
-      position: "absolute",
-      bottom: 30,
-      left: 20,
-      right: 20,
-      padding: 15,
-      backgroundColor: toastType === "success" ? "green" : "red",
-      borderRadius: 8,
-      alignItems: "center",
-      transform: [{ translateY: toastAnim }],
-      zIndex: 999,
-    }}
-  >
-    <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
-  </Animated.View>
-) : null}
+        <Animated.View
+          style={{
+            position: "absolute",
+            bottom: 30,
+            left: 20,
+            right: 20,
+            padding: 15,
+            backgroundColor: toastType === "success" ? "green" : "red",
+            borderRadius: 8,
+            alignItems: "center",
+            transform: [{ translateY: toastAnim }],
+            zIndex: 999,
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
+        </Animated.View>
+      ) : null}
 
     </View>
   );
