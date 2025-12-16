@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext,useRef} from "react";
+import React, { useEffect, useState, useContext,useRef,useCallback } from "react";
 import { SafeAreaView, View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert, Platform, StatusBar,Animated } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
@@ -56,7 +56,7 @@ export default function WishlistScreen() {
     loadFavorites();
   }, []);
 
-  const removeFavorite = async (id) => {
+  const removeFavorite = useCallback(async (id) => {
     try {
       await deleteDoc(doc(db, "favorites", id));
       setFavorites(prev => prev.filter(item => item.id !== id));
@@ -65,20 +65,33 @@ export default function WishlistScreen() {
       console.log("Error removing favorite:", e);
       showToast("Failed to remove favorite", "error");
     }
-  };
+ }, []);
 
-  const renderItem = ({ item }) => (
-    <View style={[styles.card, { backgroundColor: theme.card }]}>
-      <Image source={fixImageSource(item.image)} style={styles.image} />    
-      <View style={styles.info}> 
-        <Text style={[styles.name, { color: theme.text }]}>{item.name}</Text>
-        <Text style={[styles.desc, { color: theme.textSecondary }]}>{item.desc}</Text>
-        {item.review && <Text style={[styles.review, { color: "green" }]}>{item.review}</Text>}
+   const WishlistItem = React.memo(({ item, theme, onDelete }) => {
+    return (
+      <View style={[styles.card, { backgroundColor: theme.card }]}>
+        <Image source={fixImageSource(item.image)} style={styles.image} />    
+        <View style={styles.info}> 
+          <Text style={[styles.name, { color: theme.text }]}>{item.name}</Text>
+          <Text style={[styles.desc, { color: theme.textSecondary }]}>{item.desc}</Text>
+          {item.review && <Text style={[styles.review, { color: "green" }]}>{item.review}</Text>}
+        </View>
+        <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(item.id)}>
+          <Ionicons name="trash" size={22} color="white" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.deleteBtn} onPress={() => removeFavorite(item.id)}>
-        <Ionicons name="trash" size={22} color="white" />
-      </TouchableOpacity>
-    </View>
+    );
+  });
+
+
+  const renderItem = useCallback(({ item }) => (
+ <WishlistItem
+        item={item}
+        theme={theme}
+        onDelete={removeFavorite}
+      />
+    ),
+    [theme, removeFavorite]
   );
 
   return (
@@ -93,6 +106,12 @@ export default function WishlistScreen() {
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
             contentContainerStyle={{ paddingBottom: 30 }}
+            initialNumToRender={6}
+            maxToRenderPerBatch={6}
+            windowSize={5}
+            removeClippedSubviews={true}
+            updateCellsBatchingPeriod={50}
+            showsVerticalScrollIndicator={false}
           />
         )}
         {toastMessage ? (

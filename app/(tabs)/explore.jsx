@@ -1,5 +1,5 @@
-import React, { useState, useContext,useRef,useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, TextInput, FlatList, Alert,Animated  } from "react-native";
+import React, { useState, useContext,useRef,useEffect,useCallback  } from "react";
+import { View, Text, TouchableOpacity, TextInput, FlatList, Alert,Animated,  } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { db2 as db } from "../../firebase/firebaseConfig";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
@@ -7,7 +7,7 @@ import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import MapView, { Marker, UrlTile } from 'react-native-maps';
 import { useTranslation } from "react-i18next";
 import * as Linking from "expo-linking";
-
+import { Image } from 'expo-image';
 export default function Details() {
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState("");
@@ -36,13 +36,14 @@ const showToast = (message, type = "success") => {
   });
 };
 
-  const addToFavorites = async (destination) => {
+  const addToFavorites = useCallback(async (destination) => {
     try {
       const q = query(collection(db, "favorites"), where("destinationId", "==", destination.id));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-      showToast(`${destination.name} is already in Wishlist`, "error");        return;
+      showToast(`${destination.name} is already in Wishlist`, "error");   
+           return;
       }
 
       await addDoc(collection(db, "favorites"), {
@@ -58,9 +59,9 @@ const showToast = (message, type = "success") => {
     } catch (e) {
       console.log("Error adding favorite:", e);
       showToast("Failed to add favorite", "error");    }
-  };
+  }, [db]);
 
-  const sendReview = async (destination, review, setReview) => {
+  const sendReview = useCallback(async (destination, review, setReview) => {
     if (!review.trim()) {
       showToast(t("details.review.alert.empty"), "error");
       return;
@@ -80,17 +81,18 @@ const showToast = (message, type = "success") => {
       console.log("Error sending review:", e);
        showToast("Failed to add favorite", "error");
     }
-  };
+    }, [db, t]);
 
-  const openInMap = (lat, lng) => {
+  const openInMap = useCallback((lat, lng) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     Linking.openURL(url);
-  };
+  }, []);
 
-  const DestinationsItem = ({ item,index, theme }) => {
+const DestinationsItem = React.memo(({ item, index, theme, sendReview, addToFavorites, openInMap }) => {
     const [review, setReview] = useState("");
    const fadeAnim = useRef(new Animated.Value(0)).current;  
    const scaleAnim = useRef(new Animated.Value(0.8)).current; 
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -107,7 +109,6 @@ const showToast = (message, type = "success") => {
       }),
     ]).start();
   }, []);
-
 
     return (
       <Animated.View
@@ -130,11 +131,14 @@ const showToast = (message, type = "success") => {
         }}
       >
         <View style={{ width: "100%" }}>
-          <Image
-            source={item.image}
-            style={{ width: "100%", height: 150, borderRadius: 10 }}
-            resizeMode="cover"
-          />
+         <Image
+        source={item.image}
+      style={{ width: "100%", height: 150, borderRadius: 10 }}
+  contentFit="cover"
+  cachePolicy="memory-disk"
+  transition={200}   
+/>
+
           <Text style={{ marginTop: 8, fontWeight: "bold", color: theme.text, textAlign: "center" }}>
             {item.name}
           </Text>
@@ -217,7 +221,7 @@ const showToast = (message, type = "success") => {
         </TouchableOpacity>
         </Animated.View>
     );
-  };
+});
 
   const [destinations, setDestinations] = useState([
     { id: "1", name: "Budva, Montenegro", image: require("../../assets/Explore-Destinations/budva.jpg"), desc: "A beautiful coastal city in Montenegro known for its beaches and historic old town.", lat: 42.2929, lng: 18.8403 },
@@ -229,6 +233,13 @@ const showToast = (message, type = "success") => {
     { id: "7", name: "Harbor Island, Bahamas", image: require("../../assets/Explore-Destinations/Bahamas.jpg"), desc: "A serene beach with soft pink sand and turquoise waters.", lat: 25.5000, lng: -76.6310 },
     { id: "8", name: "Rugova Canyon, Kosovo", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
   ]);
+
+  const filteredDestinations = React.useMemo(() => {
+  return destinations.filter((item) =>
+    item.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+}, [destinations, searchText]);
+
 
   return (
     <View style={{ flex: 1, padding: 20, backgroundColor: theme.background }}>
@@ -244,14 +255,30 @@ const showToast = (message, type = "success") => {
         style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: theme.inputBackground, borderRadius: 8, padding: 8, marginBottom: 15 }}
       />
 
-      <FlatList
-        data={destinations.filter((item) => item.name.toLowerCase().includes(searchText.toLowerCase()))}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-        renderItem={({ item,index}) => <DestinationsItem item={item} index={index} theme={theme} />}
-        showsVerticalScrollIndicator={false}
-      />
+     <FlatList
+  data={filteredDestinations}
+  keyExtractor={(item) => item.id}
+  numColumns={2}
+  columnWrapperStyle={{ justifyContent: "space-between" }}
+  renderItem={({ item, index }) => (
+    <DestinationsItem
+      item={item}
+      index={index}
+      theme={theme}
+      sendReview={sendReview}
+      addToFavorites={addToFavorites}
+      openInMap={openInMap}
+    />
+  )}
+  initialNumToRender={4}
+  maxToRenderPerBatch={4}
+  windowSize={5}
+  removeClippedSubviews={true}  
+  updateCellsBatchingPeriod={50}
+  showsVerticalScrollIndicator={false}
+/>
+
+
       {toastMessage ? (
   <Animated.View
     style={{
