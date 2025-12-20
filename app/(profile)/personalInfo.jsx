@@ -6,9 +6,11 @@ import { useRouter } from 'expo-router'
 import { ThemeContext } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 import { auth1 as auth, db1 as db } from "../../firebase/firebaseConfig";
-import { doc, updateDoc } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from "../../context/AuthContext";
-import { AnyOfSchema } from 'firebase/ai';
+import { updateProfile } from 'firebase/auth';
+import ConfirmModal from '../(components)/ConfirmModal';
+
 
 const PersonalInfo = () => {
     const { user, setUser } = useAuth();
@@ -17,6 +19,13 @@ const PersonalInfo = () => {
     const [email, setEmail] = useState(user?.email || '');
     const [phone, setPhone] = useState(user?.phone || '');
     const [loading, setLoading] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalConfig, setModalConfig] = useState({
+        title: "",
+        message: "",
+        buttons: []
+    });
+
 
     const router = useRouter();
     const { darkMode } = useContext(ThemeContext);
@@ -44,14 +53,33 @@ const PersonalInfo = () => {
                 bio: bio,
                 phone: phone
             });
+            setModalConfig({
+                title: "Success",
+                message: "Profile updated successfully!",
+                buttons: [
+                    {
+                        label: "OK",
+                        color: "#6b63ff",
+                        onPress: () => router.back()
+                    }
+                ]
+            });
+            setModalVisible(true);
 
-            Alert.alert(
-                "Success",
-                "Profile updated successfully!",
-                [{ text: "OK", onPress: () => router.back() }]
-            );
+
         } catch (error) {
-            Alert.alert("Error", "Failed to update profile: " + error.message);
+            setModalConfig({
+                title: "Error",
+                message: "Failed to update profile:\n" + error.message,
+                buttons: [
+                    {
+                        label: "Close",
+                        color: "#ff4d4d"
+                    }
+                ]
+            });
+            setModalVisible(true);
+
         } finally {
             setLoading(false);
         }
@@ -101,14 +129,22 @@ const PersonalInfo = () => {
                         value={phone}
                         onChangeText={setPhone} />
 
-                    <TouchableOpacity style={[styles.saveButton, loading && styles.disabledButton]} 
-                    onPress={handleSave}
-                    disabled={loading}
+                    <TouchableOpacity style={[styles.saveButton, loading && styles.disabledButton]}
+                        onPress={handleSave}
+                        disabled={loading}
                     >
                         <Text style={styles.saveText}> {loading ? "Saving..." : "Save Changes"}</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+            <ConfirmModal
+                visible={modalVisible}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                buttons={modalConfig.buttons}
+                onClose={() => setModalVisible(false)}
+            />
+
         </SafeAreaView>
     )
 }

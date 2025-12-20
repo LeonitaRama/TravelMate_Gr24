@@ -2,9 +2,8 @@
 // Ky app përdoret për Login
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { initializeAuth, getReactNativePersistence, getAuth } from "firebase/auth";
-import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig1 = {
   apiKey: "AIzaSyB7Wk5ebmL22kThHcIHt6bUNNL5B4o6wqQ",
@@ -23,7 +22,7 @@ try{
 if (!getApps().some(app => app.name === 'app1')) {
   // Nëse nuk ekziston app, inicializo auth
   auth1 = initializeAuth(app1, {
-    persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+    persistence: getReactNativePersistence(AsyncStorage)
   });
 } else {
   auth1 = getAuth(app1);
@@ -78,7 +77,7 @@ const app3 = initializeApp(firebaseConfig3);
 
 // Auth (duhet patjetër ky version në Expo!)
 const auth3 = initializeAuth(app3, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+  persistence: getReactNativePersistence(AsyncStorage),
 });
 
 // Firestore

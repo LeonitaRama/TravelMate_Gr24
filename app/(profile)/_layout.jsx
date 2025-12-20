@@ -1,8 +1,8 @@
 import { Stack, useSegments } from "expo-router";
-import { StatusBar } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { useContext } from "react";
+import { StatusBar } from "react-native";
 
 export default function ProfileLayout() {
   const segments = useSegments();
@@ -16,7 +16,6 @@ export default function ProfileLayout() {
     photos: "My Posts",
     reviews: "My Reviews",
     profile: "My Profile",
-    badges: "My Badges"
   };
 
   return (
