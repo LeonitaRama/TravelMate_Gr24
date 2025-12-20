@@ -69,17 +69,19 @@ const Profile = () => {
 
     const updatePhoto = async (base64Img) => {
         setLoadingModal(true);
-        const userRef = doc(db, "users", user.id);
         try {
+            const userRef = doc(db, "users", user.id);
             await updateDoc(userRef, { photoURL: base64Img });
+
             setUser(prev => ({ ...prev, photoURL: base64Img }));
+
+            setShowPhotoOptions(false);
             showNotice("success", "Image uploaded successfully!");
         } catch (err) {
             console.log(err);
             showNotice("error", "Failed to update image!");
         } finally {
             setLoadingModal(false);
-            setShowPhotoOptions(false);
         }
     };
 
@@ -173,12 +175,10 @@ const Profile = () => {
                 buttons={[{ label: "OK", color: "#6b63ff", onPress: handleNoticeClose }]}
             />
             {loadingModal && (
-                <ConfirmModal
-                    visible={loadingModal}
-                    title="Please wait"
-                    message="Processing..."
-                    buttons={[]}
-                />
+                <View style={styles.loadingOverlay}>
+                    <ActivityIndicator size="large" color="#6b63ff" />
+                    <Text style={{ marginTop: 10, color: theme.text }}>Processing...</Text>
+                </View>
             )}
         </SafeAreaView>
     )
@@ -202,7 +202,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 100,
         overflow: 'visible',
-    },
+    }, loadingOverlay: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 999
+    }
+
+    ,
     loadingText: {
         fontSize: 16,
         marginTop: 10,
