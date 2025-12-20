@@ -9,6 +9,8 @@ const ConfirmModal = ({ visible,
     buttons = [],
     onClose }) => {
 
+    const defaultButtons = buttons.length ? buttons : [{ label: "OK", color: "#6b63ff", onPress: onClose }];
+
     const { darkMode, setDarkMode } = useContext(ThemeContext);
     const theme = darkMode ? darkTheme : lightTheme;
 
@@ -20,8 +22,8 @@ const ConfirmModal = ({ visible,
                     <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
                     {message && <Text style={[styles.message, { color: theme.textSecondary }]}>{message}</Text>}
 
-                    <View style={styles.buttons}>
-                        {buttons.map((btn, index) => (
+                    <View>
+                        {(buttons.length ? buttons : [{ label: "OK", color: "#6b63ff", onPress: onClose }]).map((btn, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={[styles.button, { backgroundColor: btn.color || theme.button }]}

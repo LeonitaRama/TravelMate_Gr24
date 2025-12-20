@@ -9,189 +9,114 @@ import { ThemeContext } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../context/ThemeStyles';
 import * as ImagePicker from "expo-image-picker";
 import ConfirmModal from '../(components)/ConfirmModal';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from "../../context/AuthContext";
 
 const Profile = () => {
-    const { user, loading, logout } = useAuth();
-    const [userData, setUserData] = useState(null);
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [showPhotoOptions, setShowPhotoOptions] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const { user, loading, logout, setUser } = useAuth();
     const router = useRouter();
     const { darkMode } = useContext(ThemeContext);
     const theme = darkMode ? darkTheme : lightTheme;
 
-    useEffect(() => {
-        if (!loading && !user) {
-            router.replace("/login");
-        }
-    }, [loading, user, router]);
+    //per modal
+    const [showPhotoOptions, setShowPhotoOptions] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [noticeModal, setNoticeModal] = useState({ visible: false, type: "success", message: "" });
+    const [loadingModal, setLoadingModal] = useState(false);
 
-    // Merr të dhënat nga Firestore
-    useEffect(() => {
-        const fetchUserData = async () => {
-            if (user?.id) {
-                try {
-                    setIsLoading(true);
-                    const userRef = doc(db, "users", user.id);
-                    const docSnap = await getDoc(userRef);
+    const showNotice = (type, message) => {
+        setNoticeModal({ visible: true, type, message });
+    };
 
-                    if (docSnap.exists()) {
-                        setUserData(docSnap.data());
-                    } else {
-                        const defaultData = {
-                            email: user.email,
-                            displayName: user.displayName || "",
-                            photoURL: "",
-                            bio: "",
-                            phone: "",
-                            createdAt: new Date().toISOString(),
-                        };
-                        await setDoc(userRef, defaultData);
-                        setUserData(defaultData);
-                    }
-                } catch (error) {
-                    console.log("Error fetching user data:", error.message);
 
-                    setUserData({
-                        email: user.email,
-                        displayName: user.displayName || "",
-                        photoURL: "",
-                        bio: "",
-                        phone: "",
-                    });
-                } finally {
-                    setIsLoading(false);
-                }
-            } else {
-                setIsLoading(false);
-            }
-        };
-
-        if (user) {
-            fetchUserData();
-        }
-    }, [user]);
+    const handleNoticeClose = () => {
+        setNoticeModal({ ...noticeModal, visible: false });
+    };
 
     const pickImage = async () => {
-        try {
-            const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+            showNotice("error", "Permission to access media library is required!");
+            return;
+        }
 
-            if (permission.status !== "granted") {
-                alert("Gallery permission is required!");
-                return;
-            }
+        let results = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ["images"], allowsEditing: true, aspect: [1, 1], quality: 0.5, base64: true,
+        });
 
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: "images",
-                allowsEditing: true,
-                aspect: [1, 1],
-                quality: 0.5,
-                base64: true,
-            });
-
-            if (!result.canceled) {
-                const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
-                const userRef = doc(db, "users", user.id);
-                await updateDoc(userRef, {
-                    photoURL: base64Img,
-                    updatedAt: new Date().toISOString(),
-                });
-
-                setUserData(prev => ({ ...prev, photoURL: base64Img }));
-                setShowPhotoOptions(false);
-            }
-        } catch (error) {
-            console.log("Error updating photo:", error);
-            alert("Error: " + error.message);
+        if (!results.canceled) {
+            const base64Img = `data:image/jpeg;base64,${results.assets[0].base64}`;
+            await updatePhoto(base64Img);
         }
     };
 
     const takePhoto = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== "granted") {
+            showNotice("error", "Permission to access camera is required!");
+            return;
+        }
+
+        let results = await ImagePicker.launchCameraAsync({
+            mediaTypes: ["images"], allowsEditing: true, aspect: [1, 1], quality: 0.5, base64: true,
+        });
+
+        if (!results.canceled) {
+            const base64Img = `data:image/jpeg;base64,${results.assets[0].base64}`;
+            await updatePhoto(base64Img);
+        };
+    }
+
+    const updatePhoto = async (base64Img) => {
+        setLoadingModal(true);
+        const userRef = doc(db, "users", user.id);
         try {
-            const permission = await ImagePicker.requestCameraPermissionsAsync();
-
-            if (permission.status !== "granted") {
-                alert("Camera permission is required!");
-                return;
-            }
-
-            const result = await ImagePicker.launchCameraAsync({
-                allowsEditin: true,
-                aspect: [1, 1],
-                quality: 0.6,
-                base64: true,
-            });
-
-            if (!result.canceled) {
-                const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
-
-                const useRef = doc(db, "users", user.id);
-                await updateDoc(useRef, {
-                    photoURL: base64Img,
-                    updatedAt: new Date().toISOString(),
-                });
-
-                setUserData(prev => ({ ...prev, photoURL: base64Img }));
-                setShowPhotoOptions(false);
-                //alert box 
-            }
-        } catch (error) {
-            console.log("Error taking photo:", error);
-            alert("Error: " + error.message);
+            await updateDoc(userRef, { photoURL: base64Img });
+            setUser(prev => ({ ...prev, photoURL: base64Img }));
+            showNotice("success", "Image uploaded successfully!");
+        } catch (err) {
+            console.log(err);
+            showNotice("error", "Failed to update image!");
+        } finally {
+            setLoadingModal(false);
+            setShowPhotoOptions(false);
         }
     };
-
-
 
     const handleLogout = async () => {
         try {
             await logout();
             setShowLogoutModal(false);
+            router.push("/login")
         } catch (error) {
-            alert("Error during logout: " + error.message);
+            showNotice("error", "Logout failed!");
         }
     };
 
-    if (loading || isLoading) {
-        return (
-            <View style={[styles.container, { backgroundColor: theme.background }]}>
-                <ActivityIndicator size="50" color="#007AFF" style={{ marginTop: 300 }} />
-                <Text style={[styles.loadingText, { color: theme.text }]}>Loading profile...</Text>
-            </View>
-        );
-    }
-
-        // console.log("remove photo");
-            const removePhoto = async () => {
+    const removePhoto = async () => {
+        setLoadingModal(true);
+        const userRef = doc(db, "users", user.id);
         try {
-            const userRef = doc(db, "users", user.id);
-            await updateDoc(userRef, {
-                photoURL: "",
-                updatedAt: new Date().toISOString(),
-            });
-
-            setUserData(prev => ({ ...prev, photoURL: "" }));
-            setShowPhotoOptions(false);
-            //alert box
+            await updateDoc(userRef, { photoURL: "" });
+            setUser(prev => ({ ...prev, photoURL: "" }));
+            showNotice("success", "Photo removed successfully!");
         } catch (error) {
             console.log("Error removing photo:", error);
-            alert(" Error: " + error.message);
+            showNotice("error", "Failed to remove photo!");
+        } finally {
+            setLoadingModal(false);
+            setShowPhotoOptions(false);
         }
     };
 
     if (!user) {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, { backgroundColor: theme.background }]}>
                 <ActivityIndicator size="large" color="#007AFF" />
                 <Text style={styles.loadingText}>Loading user info...</Text>
             </View>
         );
     }
-
-    const displayUser = userData || user;
-
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -199,36 +124,26 @@ const Profile = () => {
             <ScrollView contentContainerStyle={[styles.scroll, { backgroundColor: theme.background }]}>
                 <View style={[styles.header, { backgroundColor: theme.icon }]}>
                     <View style={styles.imageContainer}>
-                            <Image
-                                source={{ uri: displayUser.photoURL }}
-                                style={styles.image}
-                            />
-                        <FontAwesome6
-                            name="add"
-                            size={24}
-                            color="black"
-                            style={styles.addIcon}
-                            onPress={() => setShowPhotoOptions(true)}
-                        />
+                        <Image source={{ uri: user.photoURL }} style={styles.image} />
+                        <FontAwesome6 name="add" size={24} color="black" style={styles.addIcon} onPress={() => setShowPhotoOptions(true)} />
                     </View>
                 </View>
 
                 <View style={styles.info}>
-                    <Text style={[styles.name, { color: theme.text }]}>Welcome {displayUser.displayName ? displayUser.displayName : displayUser.email}</Text>
-                    <Text style={[styles.bio, { color: theme.text }]}>{displayUser.bio || "No bio yet"}</Text>
+                    <Text style={[styles.name, { color: theme.text }]}>Welcome {user.displayName ? user.displayName : user.email}</Text>
+                    <Text style={[styles.bio, { color: theme.text }]}>{user.bio || "No bio yet"}</Text>
                 </View>
 
                 <ProfileOption title="Personal Information" iconName="person-outline" headerTitle="Personal Information" target="/(profile)/personalInfo" />
                 <ProfileOption title="Reviews" iconName="star-outline" headerTitle="Reviews" target="/(profile)/reviews" />
                 <ProfileOption title="Wishlist" iconName="heart-outline" headerTitle="Wishlist" target="/(tabs)/wishlist" />
                 <ProfileOption title="Photos" iconName="images-outline" headerTitle="Photos" target="/(profile)/photos" />
-                <ProfileOption title="Badges" iconName="badge-outline" headerTitle="Badges" target="/(profile)/badges" />
 
-                <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.icon }]} onPress={() => setShowLogoutModal(true)}
-                    activeOpacity={0.6} >
+                <TouchableOpacity style={[styles.logoutButton, { backgroundColor: theme.icon }]} onPress={() => setShowLogoutModal(true)} activeOpacity={0.6} >
                     <Text style={styles.logoutBtnText}>Log Out</Text>
                 </TouchableOpacity>
             </ScrollView>
+
             <ConfirmModal
                 visible={showPhotoOptions}
                 title="Profile Photo"
@@ -243,13 +158,28 @@ const Profile = () => {
             <ConfirmModal
                 visible={showLogoutModal}
                 title="Log Out"
-                message="A jeni i sigurt që doni të dilni?"
+                message="Are you sure you want to log out?"
                 onClose={() => setShowLogoutModal(false)}
                 buttons={[
-                    { label: "Dil", color: "#d9534f", onPress: handleLogout },
-                    { label: "Anulo", color: "gray" }
+                    { label: "Yes", color: "#d9534f", onPress: handleLogout },
+                    { label: "Cancel", color: "gray" }
                 ]}
             />
+            <ConfirmModal
+                visible={noticeModal.visible}
+                type={noticeModal.type}
+                message={noticeModal.message}
+                onClose={handleNoticeClose}
+                buttons={[{ label: "OK", color: "#6b63ff", onPress: handleNoticeClose }]}
+            />
+            {loadingModal && (
+                <ConfirmModal
+                    visible={loadingModal}
+                    title="Please wait"
+                    message="Processing..."
+                    buttons={[]}
+                />
+            )}
         </SafeAreaView>
     )
 }
@@ -288,14 +218,14 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '700',
     },
-    image: {
-        width: 150,
-        height: 150,
-        borderRadius: 1000,
-        borderWidth: 1,
-        borderColor: 'black',
-        overflow: 'hidden'
-    },
+    // image: {
+    //     width: 150,
+    //     height: 150,
+    //     borderRadius: 1000,
+    //     borderWidth: 1,
+    //     borderColor: 'black',
+    //     overflow: 'hidden'
+    // },
     imageContainer: {
         position: 'absolute',
         bottom: -70,
