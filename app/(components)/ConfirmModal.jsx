@@ -51,23 +51,25 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "rgba(0,0,0,0.5)"
-    }
-    , box: {
+    }, 
+    box: {
         width: "80%",
         backgroundColor: "#fff",
         borderRadius: 15,
         padding: 20
-    }
-    , title: {
+    }, 
+    title: {
+        textAlign: "center",
         fontSize: 20,
         fontWeight: "700",
         marginBottom: 10
-    }
-    , message: {
+    }, 
+    message: {
+        textAlign: "center",
         fontSize: 16,
         marginBottom: 20
-    }
-    , button: {
+    }, 
+    button: {
         padding: 12,
         borderRadius: 10,
         marginTop: 10,
