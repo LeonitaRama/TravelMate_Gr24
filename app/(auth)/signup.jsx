@@ -1,19 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Animated } from "react-native";
-
-
-
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ImageBackground,
-  StyleSheet,
-  Alert,
-  Image,
-} from "react-native";
+import { Animated, View, Text, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Alert, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -27,10 +14,8 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-    const [profileImage, setProfileImage] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
   const router = useRouter();
-
-
 
   const buttonOpacity = useRef(new Animated.Value(1)).current;
 
@@ -41,10 +26,9 @@ export default function Signup() {
     ]).start();
   };
 
-useEffect(() => {
-  registerForPushNotificationsAsync();
-}, []);
-
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
 
   const registerForPushNotificationsAsync = async () => {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -72,7 +56,7 @@ useEffect(() => {
         body: `Welcome, ${username}! Your account has been created.`,
         sound: true,
       },
-      trigger: null, 
+      trigger: null,
     });
   };
 
@@ -80,6 +64,13 @@ useEffect(() => {
   // Image Picker
   // ------------------------------
   const pickProfileImage = async () => {
+    // Kërko lejet
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission denied", "You need to grant camera roll permissions to choose a profile image.");
+      return;
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -120,14 +111,12 @@ useEffect(() => {
     return true;
   };
 
-
   const handleSignup = async () => {
     if (!validateInputs()) return;
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("isAuthenticated", "true");
-
 
       await sendSignupNotification(userCredential.user.email);
 
@@ -208,7 +197,6 @@ useEffect(() => {
   );
 }
 
-
 const styles = StyleSheet.create({
   background: { flex: 1, justifyContent: "center" },
   overlay: {
@@ -245,7 +233,22 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textDecorationLine: "underline",
   },
+  imagePicker: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  profilePic: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
 });
+
 
 
 
