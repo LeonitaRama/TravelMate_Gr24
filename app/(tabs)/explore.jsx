@@ -1,22 +1,35 @@
 import React, { useState, useContext, useRef, useEffect, useCallback } from "react";
-import { View, Text, TouchableOpacity, TextInput, FlatList, Animated } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, FlatList, Animated ,Alert } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
-import { db2 as db } from "../../firebase/firebaseConfig";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { useTranslation } from "react-i18next";
 import * as Linking from "expo-linking";
 import { Image } from 'expo-image';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { scheduleLocalNotification } from "../../utils/localNotifications";
+import { onAuthStateChanged } from "firebase/auth";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+
+// Importojmë Auth dhe DB nga app1 dhe db2
+import { auth1, db2 } from "../../firebase/firebaseConfig";
+
 export default function Details() {
   const { t } = useTranslation();
-    const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState("");
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
   const toastAnim = useRef(new Animated.Value(100)).current;
+  const [user, setUser] = useState(auth1.currentUser); // përdoruesi aktual
+
+  // Dëgjimi i ndryshimeve të autentikimit
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth1, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const showToast = (message, type = "success") => {
     setToastMessage(message);
@@ -38,56 +51,71 @@ export default function Details() {
   };
 
   const addToFavorites = useCallback(async (destination) => {
+    if (!user) {  
+     
+      Alert.alert("Login Required", "You need to login first!");
+      return;
+    }
+
     try {
-      const q = query(collection(db, "favorites"), where("destinationId", "==", destination.id));
+      const q = query(
+        collection(db2, "favorites"),
+        where("destinationId", "==", destination.id),
+        where("userId", "==", user.uid)
+      );
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        showToast(`${destination.name} is already in Wishlist`, "error");   
+        showToast(`${destination.name} is already in Wishlist`, "error");
         return;
       }
 
-      await addDoc(collection(db, "favorites"), {
+      await addDoc(collection(db2, "favorites"), {
+        userId: user.uid,
         destinationId: destination.id,
         name: destination.name,
-        image: destination.image.uri || destination.image, 
+        image: destination.image.uri || destination.image,
         desc: destination.desc,
         timestamp: new Date(),
       });
 
       showToast(`${destination.name} added to Wishlist!`, "success");
-      await scheduleLocalNotification(
-        "Added to Wishlist ❤️",
-        `${destination.name} was saved successfully`
-      );
       console.log("Favorite saved in Firestore ✅");
     } catch (e) {
       console.log("Error adding favorite:", e);
-      showToast("Failed to add favorite", "error");    
+      showToast("Failed to add favorite", "error");
     }
-  }, [db]);
+  }, [user]);
 
   const sendReview = useCallback(async (destination, review, setReview) => {
+    if (!user) {  
+      Alert.alert("Login Required", "You need to login first!");
+      return;
+    }
+
     if (!review.trim()) {
       showToast(t("details.review.alert.empty"), "error");
       return;
     }
+
     try {
-      await addDoc(collection(db, "reviews"), {
+      await addDoc(collection(db2, "reviews"), {
+        userId: user.uid,
         destinationId: destination.id,
         name: destination.name,
         review: review,
         description: destination.desc,
         timestamp: new Date(),
       });
+
       setReview("");
-      showToast(t("details.review.alert.success"), "success"); 
+      showToast(t("details.review.alert.success"), "success");
       console.log("Review saved in Firestore ✅");
     } catch (e) {
       console.log("Error sending review:", e);
       showToast("Failed to add review", "error");
     }
-  }, [db, t]);
+  }, [user, t]);
 
   const openInMap = useCallback((lat, lng) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
@@ -180,7 +208,8 @@ export default function Details() {
               placeholderTextColor={theme.placeholder}
               value={review}
               onChangeText={setReview}
-              multiline={true}             />
+              multiline={true}             
+            />
 
             <TouchableOpacity
               onPress={() => sendReview(item, review, setReview)}
@@ -237,40 +266,39 @@ export default function Details() {
     { id: "9", name: "Test", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
     { id: "20", name: "Test1", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
   ]);
- useEffect(() => {
-  const checkNewDestinations = async () => {
-    try {
-      const seenIds = await AsyncStorage.getItem("seenDestinations");
-      let seenArray = seenIds ? JSON.parse(seenIds) : [];
 
-      const newDestinations = destinations.filter(d => !seenArray.includes(d.id));
+  useEffect(() => {
+    const checkNewDestinations = async () => {
+      try {
+        const seenIds = await AsyncStorage.getItem("seenDestinations");
+        let seenArray = seenIds ? JSON.parse(seenIds) : [];
 
-      for (const dest of newDestinations) {
-        await scheduleLocalNotification(
-          "New Destination Added 🗺️",
-          `${dest.name} is now available on Explore!`
-        );
+        const newDestinations = destinations.filter(d => !seenArray.includes(d.id));
+
+        for (const dest of newDestinations) {
+          await scheduleLocalNotification(
+            "New Destination Added 🗺️",
+            `${dest.name} is now available on Explore!`
+          );
+        }
+
+        if (newDestinations.length > 0) {
+          const updatedSeenIds = [...seenArray, ...newDestinations.map(d => d.id)];
+          await AsyncStorage.setItem("seenDestinations", JSON.stringify(updatedSeenIds));
+        }
+      } catch (e) {
+        console.log("Error checking new destinations:", e);
       }
+    };
 
-      if (newDestinations.length > 0) {
-        const updatedSeenIds = [...seenArray, ...newDestinations.map(d => d.id)];
-        await AsyncStorage.setItem("seenDestinations", JSON.stringify(updatedSeenIds));
-      }
-    } catch (e) {
-      console.log("Error checking new destinations:", e);
-    }
-  };
-
-  checkNewDestinations();
-}, [destinations]);
-
+    checkNewDestinations();
+  }, [destinations]);
 
   const filteredDestinations = React.useMemo(() => {
     return destinations.filter((item) =>
       item.name.toLowerCase().includes(searchText.toLowerCase())
     );
   }, [destinations, searchText]);
-
 
   return (
     <View style={{ flex: 1, padding: 20, backgroundColor: theme.background }}>
@@ -309,7 +337,6 @@ export default function Details() {
         showsVerticalScrollIndicator={false}
       />
 
-
       {toastMessage ? (
         <Animated.View
           style={{
@@ -328,7 +355,6 @@ export default function Details() {
           <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
         </Animated.View>
       ) : null}
-
     </View>
   );
 }
