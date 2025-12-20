@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useContext,useRef,useCallback } from "react";
-import { SafeAreaView, View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert, Platform, StatusBar,Animated } from "react-native";
+import React, { useEffect, useState, useContext, useRef, useCallback } from "react";
+import { SafeAreaView, View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert, Animated } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { Ionicons } from "@expo/vector-icons"; 
 import { useTranslation } from "react-i18next";
 import { db2 as db } from "../../firebase/firebaseConfig";
-import { collection, query, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, query, getDocs, deleteDoc, doc, where } from "firebase/firestore";
+import { auth1 } from "../../firebase/firebaseConfig"; // Auth nga app1
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function WishlistScreen() {
   const [favorites, setFavorites] = useState([]);
@@ -13,34 +15,47 @@ export default function WishlistScreen() {
   const { t } = useTranslation();
   const theme = darkMode ? darkTheme : lightTheme;
   const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState("success"); // 
-  const toastAnim = useRef(new Animated.Value(100)).current; 
+  const [toastType, setToastType] = useState("success");
+  const toastAnim = useRef(new Animated.Value(100)).current;
+
+  const [user, setUser] = useState(auth1.currentUser);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth1, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const showToast = (message, type = "success") => {
-  setToastMessage(message);
-  setToastType(type);
+    setToastMessage(message);
+    setToastType(type);
 
-  Animated.timing(toastAnim, {
-    toValue: 0,
-    duration: 300,
-    useNativeDriver: true,
-  }).start(() => {
-    setTimeout(() => {
-      Animated.timing(toastAnim, {
-        toValue: 100,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }, 2000); 
-  });
-};
-
+    Animated.timing(toastAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setTimeout(() => {
+        Animated.timing(toastAnim, {
+          toValue: 100,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }, 2000); 
+    });
+  };
 
   const fixImageSource = (image) => typeof image === "number" ? image : { uri: image };
 
   const loadFavorites = async () => {
+    if (!user) {
+      Alert.alert("Login Required", "You need to login first!");
+      return;
+    }
+
     try {
-      const q = query(collection(db, "favorites"));
+      const q = query(collection(db, "favorites"), where("userId", "==", user.uid));
       const querySnapshot = await getDocs(q);
       const savedFavorites = querySnapshot.docs.map(doc => ({
         id: doc.id,
@@ -54,7 +69,7 @@ export default function WishlistScreen() {
 
   useEffect(() => {
     loadFavorites();
-  }, []);
+  }, [user]);
 
   const removeFavorite = useCallback(async (id) => {
     try {
@@ -65,7 +80,7 @@ export default function WishlistScreen() {
       console.log("Error removing favorite:", e);
       showToast("Failed to remove favorite", "error");
     }
- }, []);
+ }, [user]);
 
    const WishlistItem = React.memo(({ item, theme, onDelete }) => {
     return (
@@ -83,16 +98,25 @@ export default function WishlistScreen() {
     );
   });
 
-
   const renderItem = useCallback(({ item }) => (
- <WishlistItem
-        item={item}
-        theme={theme}
-        onDelete={removeFavorite}
-      />
-    ),
-    [theme, removeFavorite]
+    <WishlistItem
+      item={item}
+      theme={theme}
+      onDelete={removeFavorite}
+    />
+  ),
+  [theme, removeFavorite]
   );
+
+  if (!user) {
+    return (
+      <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.background }}>
+        <Text style={{ color: theme.text, fontSize: 18, textAlign: "center", marginHorizontal: 20 }}>
+          You need to login to view your Wishlist!
+        </Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
@@ -115,24 +139,23 @@ export default function WishlistScreen() {
           />
         )}
         {toastMessage ? (
-  <Animated.View
-    style={{
-      position: "absolute",
-      bottom: 30,
-      left: 20,
-      right: 20,
-      padding: 15,
-      backgroundColor: toastType === "success" ? "green" : "red",
-      borderRadius: 8,
-      alignItems: "center",
-      transform: [{ translateY: toastAnim }],
-      zIndex: 999,
-    }}
-  >
-    <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
-  </Animated.View>
-) : null}
-
+          <Animated.View
+            style={{
+              position: "absolute",
+              bottom: 30,
+              left: 20,
+              right: 20,
+              padding: 15,
+              backgroundColor: toastType === "success" ? "green" : "red",
+              borderRadius: 8,
+              alignItems: "center",
+              transform: [{ translateY: toastAnim }],
+              zIndex: 999,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
+          </Animated.View>
+        ) : null}
       </View>
     </SafeAreaView>
   );
