@@ -1,7 +1,7 @@
 # 🌍 TravelMate_Gr24
 **Aplikacion për Udhëtime & Eksplorim**
 #### Një aplikacion mobil për udhëtarët që u mundëson të: 
-- zbulojnë destinacione të reja
+- Zbulojnë destinacione të reja
 - Marrin informata praktike si moti, harta dhe atraksione
 - Planifikojnë itinerarë
 - Ndajnë përvoja me komente e foto.
