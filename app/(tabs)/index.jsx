@@ -31,9 +31,26 @@ export default function HomeScreen() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
-    const languages = ["English", "Albanian"];
+  const languages = ["English", "Albanian"];
   
+  const handleSearchInput = (text) => {
+  // Shembull validation: vetem shkronja dhe numra, deri ne 50 karaktere
+  const regex = /^[a-zA-Z0-9\s]*$/;
   
+  if(!regex.test(text)) {
+    Alert.alert("Invalid input", "Please enter only letters and numbers.");
+    return;
+  }
+
+  if(text.length > 50) {
+    Alert.alert("Input too long", "Maximum 50 characters allowed.");
+    return;
+  }
+
+  // Nëse kalon validation, vendos vlerën
+  setQuery(text);
+};
+
 
   const destinations = [
     { id: '1', name: 'Paris', img: require('../../assets/Paris.jpg'), category: 'City', description: 'City of Lights, famous for the Eiffel Tower, cafes, and art museums.', rating: 4.8 },
@@ -252,10 +269,10 @@ const closeModal = () => {
         borderColor: theme.border,
       },
     ]}
-    placeholder={t('home.search.placeholder')}
-    placeholderTextColor={theme.placeholder}
-    value={query}
-    onChangeText={setQuery}
+  placeholder={t('home.search.placeholder')}
+  placeholderTextColor={theme.placeholder}
+  value={query}
+  onChangeText={handleSearchInput}
   />
 </ImageBackground>
 
