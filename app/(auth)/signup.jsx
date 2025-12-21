@@ -1,87 +1,78 @@
 import React, { useState, useRef, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Animated,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ImageBackground,
-  StyleSheet,
-  Alert,
-  Image,
-} from "react-native";
+import { Animated, View, Text, TextInput, TouchableOpacity, ImageBackground, StyleSheet, Alert, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth1 as auth } from "../../firebase/firebaseConfig";
+import { auth1 as auth } from '../../firebase/firebaseConfig';
+
 import * as ImagePicker from "expo-image-picker";
 import * as Notifications from "expo-notifications";
-
-/* 🔔 NOTIFICATION HANDLER (OBLIGATIVE) */
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [profileImage, setProfileImage] = useState(null);
-
   const router = useRouter();
+
   const buttonOpacity = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    requestNotificationPermission();
-  }, []);
-
-  const requestNotificationPermission = async () => {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status !== "granted") {
-      await Notifications.requestPermissionsAsync();
-    }
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonOpacity, { toValue: 0.5, duration: 120, useNativeDriver: true }),
+      Animated.timing(buttonOpacity, { toValue: 1, duration: 120, useNativeDriver: true }),
+    ]).start();
   };
 
-  const sendSignupNotification = async (email) => {
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  const registerForPushNotificationsAsync = async () => {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      console.log("Push notification permission not granted");
+      return null;
+    }
+
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log("Expo Push Token:", token);
+    return token;
+  };
+
+  const sendSignupNotification = async (username) => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Signup Successful ✅",
-        body: `Mirë se erdhe ${email}`,
+        body: `Welcome, ${username}! Your account has been created.`,
         sound: true,
       },
       trigger: null,
     });
   };
 
-  const animateButton = () => {
-    Animated.sequence([
-      Animated.timing(buttonOpacity, {
-        toValue: 0.5,
-        duration: 120,
-        useNativeDriver: true,
-      }),
-      Animated.timing(buttonOpacity, {
-        toValue: 1,
-        duration: 120,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
+  // ------------------------------
+  // Image Picker
+  // ------------------------------
   const pickProfileImage = async () => {
+    // Kërko lejet
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Gabim", "Duhet leje për galeri");
+      Alert.alert("Permission denied", "You need to grant camera roll permissions to choose a profile image.");
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.7,
@@ -92,19 +83,31 @@ export default function Signup() {
     }
   };
 
+  // ------------------------------
+  // Input validation
+  // ------------------------------
   const validateInputs = () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert("Gabim", "Plotëso të gjitha fushat");
+      Alert.alert("Error", "Please fill all fields");
       return false;
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Please enter a valid email");
+      return false;
+    }
+
     if (password.length < 6) {
-      Alert.alert("Gabim", "Password min 6 karaktere");
+      Alert.alert("Error", "Password must be at least 6 characters");
       return false;
     }
+
     if (password !== confirmPassword) {
-      Alert.alert("Gabim", "Password nuk përputhen");
+      Alert.alert("Error", "Passwords do not match");
       return false;
     }
+
     return true;
   };
 
@@ -112,126 +115,137 @@ export default function Signup() {
     if (!validateInputs()) return;
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("isAuthenticated", "true");
+
       await sendSignupNotification(userCredential.user.email);
 
-      Alert.alert("Sukses", "Llogaria u krijua me sukses");
+      Alert.alert("Success", `Account created: ${userCredential.user.email}`);
       router.replace("/login");
     } catch (error) {
-      Alert.alert("Gabim", error.message);
+      if (error.code === "auth/email-already-in-use") {
+        Alert.alert("Error", "Email is already in use");
+      } else if (error.code === "auth/invalid-email") {
+        Alert.alert("Error", "Invalid email");
+      } else {
+        Alert.alert("Signup failed", error.message);
+      }
     }
   };
 
   return (
-    <ImageBackground
-      source={require("../../assets/image.png")}
-      style={styles.background}
-    >
+    <ImageBackground source={require("../../assets/image.png")} style={styles.background} resizeMode="cover">
       <SafeAreaView style={styles.overlay}>
         <Text style={styles.title}>Sign Up</Text>
 
-        <TouchableOpacity style={styles.imagePicker} onPress={pickProfileImage}>
+        <TouchableOpacity onPress={pickProfileImage} style={styles.imagePicker}>
           {profileImage ? (
             <Image source={{ uri: profileImage }} style={styles.profilePic} />
           ) : (
-            <Text style={{ color: "#fff" }}>Zgjedh Foto</Text>
+            <Text style={{ color: "#fff" }}>Choose Profile Image</Text>
           )}
         </TouchableOpacity>
 
         <View style={styles.inputWrapper}>
-          <Ionicons name="mail-outline" size={20} color="#fff" />
+          <Ionicons name="person-outline" size={20} color="#fff" style={styles.icon} />
           <TextInput
             placeholder="Email"
             placeholderTextColor="#fff"
             style={styles.input}
             value={email}
             onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
 
         <View style={styles.inputWrapper}>
-          <Ionicons name="lock-closed-outline" size={20} color="#fff" />
+          <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.icon} />
           <TextInput
             placeholder="Password"
             placeholderTextColor="#fff"
-            secureTextEntry
             style={styles.input}
+            secureTextEntry
             value={password}
             onChangeText={setPassword}
           />
         </View>
 
         <View style={styles.inputWrapper}>
-          <Ionicons name="lock-closed-outline" size={20} color="#fff" />
+          <Ionicons name="lock-closed-outline" size={20} color="#fff" style={styles.icon} />
           <TextInput
             placeholder="Confirm Password"
             placeholderTextColor="#fff"
-            secureTextEntry
             style={styles.input}
+            secureTextEntry
             value={confirmPassword}
             onChangeText={setConfirmPassword}
           />
         </View>
 
         <Animated.View style={{ opacity: buttonOpacity, width: "100%" }}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              animateButton();
-              handleSignup();
-            }}
-          >
+          <TouchableOpacity style={styles.button} onPress={() => { animateButton(); handleSignup(); }}>
             <Text style={styles.buttonText}>SIGN UP</Text>
           </TouchableOpacity>
         </Animated.View>
+
+        <TouchableOpacity onPress={() => router.push("/login")}>
+          <Text style={styles.signupText}>Already have an account? LOGIN</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  background: { flex: 1 },
+  background: { flex: 1, justifyContent: "center" },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.3)",
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 30,
   },
-  title: { fontSize: 36, color: "#fff", marginBottom: 40 },
+  title: { fontSize: 36, fontWeight: "bold", color: "white", marginBottom: 60 },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "rgba(255,255,255,0.2)",
-    width: "100%",
     borderRadius: 30,
+    width: "100%",
     paddingHorizontal: 15,
     marginBottom: 15,
-    height: 45,
   },
-  input: { flex: 1, color: "#fff", marginLeft: 10 },
+  icon: { marginRight: 10 },
+  input: { flex: 1, color: "#fff", height: 45 },
   button: {
     backgroundColor: "#3b82f6",
     borderRadius: 30,
     paddingVertical: 12,
+    width: "100%",
     alignItems: "center",
     marginTop: 15,
   },
-  buttonText: { color: "#fff", fontWeight: "bold" },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  signupText: {
+    color: "#fff",
+    fontSize: 14,
+    marginTop: 20,
+    textDecorationLine: "underline",
+  },
   imagePicker: {
     width: 120,
     height: 120,
     borderRadius: 60,
     backgroundColor: "rgba(255,255,255,0.2)",
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
   },
-  profilePic: { width: 120, height: 120, borderRadius: 60 },
+  profilePic: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
 });
+
