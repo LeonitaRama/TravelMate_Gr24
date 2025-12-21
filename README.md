@@ -42,8 +42,10 @@ npx expo start --tunnel
 ```
 ## Modulet
 ### Login - Sign up
-![1000019094](https://github.com/user-attachments/assets/a9744306-8040-47cd-91ab-1239920fd3b9)
-![1000019093](https://github.com/user-attachments/assets/c41f52fa-2438-4d5a-8965-7e36577cbae5)
+<img src="https://github.com/user-attachments/assets/a9744306-8040-47cd-91ab-1239920fd3b9" width="200" />
+
+<img src="https://github.com/user-attachments/assets/c41f52fa-2438-4d5a-8965-7e36577cbae5" width="200" />
+
 
 ---
 Projekti është zhvilluar nga 
