@@ -85,7 +85,7 @@ const [selectedDestination, setSelectedDestination] = useState(null);
   Animated.parallel([
     Animated.timing(modalFadeAnim, {
       toValue: 1,
-      duration: 300,
+      
       useNativeDriver: true,
     }),
     Animated.spring(modalScaleAnim, {
