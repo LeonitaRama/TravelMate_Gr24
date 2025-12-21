@@ -34,7 +34,7 @@ export default function HomeScreen() {
   const languages = ["English", "Albanian"];
   
   const handleSearchInput = (text) => {
-  // Shembull validation: vetem shkronja dhe numra, deri ne 50 karaktere
+ 
   const regex = /^[a-zA-Z0-9\s]*$/;
   
   if(!regex.test(text)) {
@@ -47,7 +47,7 @@ export default function HomeScreen() {
     return;
   }
 
-  // Nëse kalon validation, vendos vlerën
+ 
   setQuery(text);
 };
 

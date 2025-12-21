@@ -3,7 +3,7 @@ import { render, fireEvent } from '@testing-library/react-native';
 import ConfirmModal from '../(components)/ConfirmModal';
 import { ThemeContext } from '../../context/ThemeContext';
 
-// --- Mock AsyncStorage për të shmangur gabimet ---
+
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn(() => Promise.resolve(null)),
   setItem: jest.fn(() => Promise.resolve()),
@@ -14,7 +14,7 @@ describe('ConfirmModal Component', () => {
   const mockOnClose = jest.fn();
   const mockOnPress = jest.fn();
 
-  // --- Wrapper minimal për ThemeContext ---
+
   const wrapper = (component) => (
     <ThemeContext.Provider value={{ darkMode: false }}>
       {component}
@@ -25,7 +25,7 @@ describe('ConfirmModal Component', () => {
     jest.clearAllMocks();
   });
 
-  // --- Snapshot tests ---
+
   describe('Snapshot tests', () => {
     it('matches snapshot when visible', () => {
       const tree = render(
@@ -62,7 +62,7 @@ describe('ConfirmModal Component', () => {
     });
   });
 
-  // --- Rendering tests ---
+
   describe('Rendering tests', () => {
     it('renders title and message correctly', () => {
       const { getByText } = render(
@@ -129,7 +129,6 @@ describe('ConfirmModal Component', () => {
     });
   });
 
-  // --- Interaction tests ---
   describe('Interaction tests', () => {
     it('calls onClose when default OK button is pressed', () => {
       const { getByText } = render(
@@ -143,7 +142,7 @@ describe('ConfirmModal Component', () => {
       );
 
       fireEvent.press(getByText('OK'));
-      // Kontrollojmë vetëm që është thirrur, jo numrin e saktë
+      
       expect(mockOnClose).toHaveBeenCalled();
     });
 

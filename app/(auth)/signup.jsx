@@ -60,11 +60,8 @@ export default function Signup() {
     });
   };
 
-  // ------------------------------
-  // Image Picker
-  // ------------------------------
+
   const pickProfileImage = async () => {
-    // Kërko lejet
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert("Permission denied", "You need to grant camera roll permissions to choose a profile image.");
@@ -83,9 +80,7 @@ export default function Signup() {
     }
   };
 
-  // ------------------------------
-  // Input validation
-  // ------------------------------
+
   const validateInputs = () => {
     if (!email || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill all fields");

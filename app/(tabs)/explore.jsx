@@ -8,8 +8,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { scheduleLocalNotification } from "../../utils/localNotifications";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
-
-// Importojmë Auth dhe DB nga app1 dhe db2
 import { auth1, db2 } from "../../firebase/firebaseConfig";
 
 export default function Details() {
@@ -20,9 +18,9 @@ export default function Details() {
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
   const toastAnim = useRef(new Animated.Value(100)).current;
-  const [user, setUser] = useState(auth1.currentUser); // përdoruesi aktual
+  const [user, setUser] = useState(auth1.currentUser); 
 
-  // Dëgjimi i ndryshimeve të autentikimit
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth1, (currentUser) => {
       setUser(currentUser);

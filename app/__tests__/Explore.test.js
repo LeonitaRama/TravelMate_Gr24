@@ -3,8 +3,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { ThemeContext } from '../../context/ThemeContext';
 jest.mock('firebase/auth', () => ({
   onAuthStateChanged: jest.fn((auth, callback) => {
-    callback(null); // nuk ka user
-    return jest.fn(); // unsubscribe
+    callback(null);
+    return jest.fn(); 
   }),
 }));
 
@@ -16,14 +16,13 @@ jest.mock('firebase/firestore', () => ({
   getDocs: jest.fn(() => Promise.resolve({ empty: true })),
 }));
 
-// --- Mock Firebase dhe modulë të tjerë jashtë ---
 jest.mock('../../firebase/firebaseConfig', () => {
   return {
     auth1: { currentUser: null },
     db2: {},
     onAuthStateChanged: jest.fn((auth, callback) => {
-      callback(null); // nuk ka user gjatë testit
-      return jest.fn(); // unsubscribe
+      callback(null); 
+      return jest.fn(); 
     }),
     collection: jest.fn(),
     addDoc: jest.fn(() => Promise.resolve()),
@@ -47,7 +46,7 @@ jest.mock('../../utils/localNotifications', () => ({
   scheduleLocalNotification: jest.fn(() => Promise.resolve()),
 }));
 
-// --- Importo komponentin pasi mocks janë vendosur ---
+
 import Details from '../(tabs)/explore.jsx';
 
 const themeProvider = (component) => (

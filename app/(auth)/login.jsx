@@ -40,9 +40,6 @@ export default function Login() {
     registerForPushNotificationsAsync();
   }, []);
 
-  // ------------------------------
-  // Push Notifications (Expo token)
-  // ------------------------------
   const registerForPushNotificationsAsync = async () => {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
@@ -73,9 +70,7 @@ export default function Login() {
     });
   };
 
-  // ------------------------------
-  // Button animation
-  // ------------------------------
+
   const animateButton = () => {
     Animated.sequence([
       Animated.timing(buttonOpacity, {
@@ -91,9 +86,6 @@ export default function Login() {
     ]).start();
   };
 
-  // ------------------------------
-  // Input validation
-  // ------------------------------
   const validateInputs = () => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter email and password");
@@ -111,9 +103,6 @@ export default function Login() {
     return true;
   };
 
-  // ------------------------------
-  // Email/Password Login
-  // ------------------------------
   const handleLogin = async () => {
     if (!validateInputs()) return;
 
@@ -140,9 +129,7 @@ export default function Login() {
     }
   };
 
-  // ------------------------------
-  // GitHub OAuth Login
-  // ------------------------------
+
   const handleGitHubCode = async (code) => {
     try {
       const tokenResponse = await fetch(
