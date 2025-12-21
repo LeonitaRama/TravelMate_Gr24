@@ -19,7 +19,6 @@ import {
 } from 'react-native';
 import WhyChooseUs from "../(components)/WhyChooseUs.jsx";
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'expo-router';
 
 
 
