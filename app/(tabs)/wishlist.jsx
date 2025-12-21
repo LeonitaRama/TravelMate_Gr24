@@ -80,9 +80,9 @@ export default function WishlistScreen() {
       console.log("Error removing favorite:", e);
       showToast("Failed to remove favorite", "error");
     }
- }, [user]);
+  }, [user]);
 
-   const WishlistItem = React.memo(({ item, theme, onDelete }) => {
+  const WishlistItem = React.memo(({ item, theme, onDelete }) => {
     return (
       <View style={[styles.card, { backgroundColor: theme.card }]}>
         <Image source={fixImageSource(item.image)} style={styles.image} />    

@@ -17,6 +17,28 @@ export const lightTheme = {
   buttonText: "#ffffff",
   link: "blue",
   link2: "green",
+   spacing: {
+    xs: 4,
+    sm: 8,
+    md: 16,
+    lg: 24,
+    xl: 32,
+  },
+  borderRadius: {
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
+    round: 50,
+  },
+  fontSizes: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 22,
+    xxl: 28,
+  }
 };
 
 
@@ -42,5 +64,27 @@ export const darkTheme = {
   button: "#83b6f1ff",
   buttonText: "#ffffff",
   link: "#4da6ff",
-  link2: "#7cff7c",           // highlighted color
+  link2: "#7cff7c",  // highlighted color
+   spacing: {
+    xs: 4,
+    sm: 8,
+    md: 16,
+    lg: 24,
+    xl: 32,
+  },
+  borderRadius: {
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
+    round: 50,
+  },
+  fontSizes: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 22,
+    xxl: 28,
+  }         
 };
