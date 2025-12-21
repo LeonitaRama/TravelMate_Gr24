@@ -75,7 +75,7 @@ const modalFadeAnim = useRef(new Animated.Value(0)).current;
 const modalScaleAnim = useRef(new Animated.Value(0.8)).current;
 const modalTranslateY = useRef(new Animated.Value(40)).current;
 const [modalVisible, setModalVisible] = useState(false);
-const [selectedDestination, setSelectedDestination] = useState(null);
+
 
 
  const handleSeeMore = (destination) => {
