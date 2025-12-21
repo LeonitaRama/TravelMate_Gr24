@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { requestLocalNotificationPermission } from "../utils/localNotifications";
 import { NotificationProvider } from "../context/NotificationContext";
 import * as Notifications from "expo-notifications";
+import '../i18n';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
