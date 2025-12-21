@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Alert,
   Modal,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -20,19 +21,79 @@ import {
   GithubAuthProvider,
 } from "firebase/auth";
 import { WebView } from "react-native-webview";
-import { auth1 as auth } from "../../firebase/firebaseConfig";
+import * as Notifications from "expo-notifications";
+import { auth1 as auth } from "../../firebase/firebaseConfig"; // JS SDK Auth
 
 const GITHUB_CLIENT_ID = "Ov23li2C5DkV5tRMvj83";
 const GITHUB_CLIENT_SECRET = "b908103ca0f8ddd230c80a26ebd1c8677301f120";
-
 const REDIRECT_URI =
   "https://myreactnativeapp-def5a.firebaseapp.com/__/auth/handler";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [githubVisible, setGithubVisible] = useState(false);
   const router = useRouter();
+  const buttonOpacity = useRef(new Animated.Value(1)).current;
 
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  // ------------------------------
+  // Push Notifications (Expo token)
+  // ------------------------------
+  const registerForPushNotificationsAsync = async () => {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      console.log("Push notification permission not granted");
+      return null;
+    }
+
+    const token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log("Expo Push Token:", token);
+    return token;
+  };
+
+  const sendLoginNotification = async (username) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Login Successful ✅",
+        body: `Welcome back, ${username}!`,
+        sound: true,
+      },
+      trigger: null,
+    });
+  };
+
+  // ------------------------------
+  // Button animation
+  // ------------------------------
+  const animateButton = () => {
+    Animated.sequence([
+      Animated.timing(buttonOpacity, {
+        toValue: 0.5,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonOpacity, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  // ------------------------------
+  // Input validation
+  // ------------------------------
   const validateInputs = () => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter email and password");
@@ -50,31 +111,25 @@ export default function Login() {
     return true;
   };
 
+  // ------------------------------
+  // Email/Password Login
+  // ------------------------------
   const handleLogin = async () => {
     if (!validateInputs()) return;
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("isAuthenticated", "true");
+      await sendLoginNotification(userCredential.user.email);
       Alert.alert("Success", `Login successful: ${userCredential.user.email}`);
       router.replace("/");
     } catch (error) {
       if (error.code === "auth/user-not-found") {
         try {
-          const newUser = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
+          const newUser = await createUserWithEmailAndPassword(auth, email, password);
           await AsyncStorage.setItem("isAuthenticated", "true");
-          Alert.alert(
-            "Success",
-            `Account created and logged in: ${newUser.user.email}`
-          );
+          await sendLoginNotification(newUser.user.email);
+          Alert.alert("Success", `Account created and logged in: ${newUser.user.email}`);
           router.replace("/");
         } catch (signupError) {
           Alert.alert("Signup failed", signupError.message);
@@ -85,22 +140,16 @@ export default function Login() {
     }
   };
 
-  // ---------------------------
-  // GITHUB LOGIN STATE & WEBVIEW
-  // ---------------------------
-
-  const [githubVisible, setGithubVisible] = useState(false);
-
+  // ------------------------------
+  // GitHub OAuth Login
+  // ------------------------------
   const handleGitHubCode = async (code) => {
     try {
       const tokenResponse = await fetch(
         "https://github.com/login/oauth/access_token",
         {
           method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
+          headers: { Accept: "application/json", "Content-Type": "application/json" },
           body: JSON.stringify({
             client_id: GITHUB_CLIENT_ID,
             client_secret: GITHUB_CLIENT_SECRET,
@@ -109,7 +158,6 @@ export default function Login() {
           }),
         }
       );
-
       const tokenData = await tokenResponse.json();
       const accessToken = tokenData.access_token;
 
@@ -122,14 +170,8 @@ export default function Login() {
       const userCredential = await signInWithCredential(auth, credential);
 
       await AsyncStorage.setItem("isAuthenticated", "true");
-
-      Alert.alert(
-        "Success",
-        `Logged in as ${
-          userCredential.user.displayName || userCredential.user.email
-        }`
-      );
-
+      await sendLoginNotification(userCredential.user.displayName || userCredential.user.email);
+      Alert.alert("Success", `Logged in as ${userCredential.user.displayName || userCredential.user.email}`);
       router.replace("/");
     } catch (err) {
       Alert.alert("GitHub Login Failed", err.message);
@@ -142,20 +184,13 @@ export default function Login() {
     if (event.url.startsWith(REDIRECT_URI)) {
       const codeMatch = event.url.match(/[?&]code=([^&]+)/);
       const code = codeMatch ? codeMatch[1] : null;
-
-      if (code) {
-        handleGitHubCode(code);
-      }
+      if (code) handleGitHubCode(code);
       setGithubVisible(false);
     }
   };
 
   return (
-    <ImageBackground
-      source={require("../../assets/image.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
+    <ImageBackground source={require("../../assets/image.png")} style={styles.background} resizeMode="cover">
       <SafeAreaView style={styles.overlay}>
         <Text style={styles.title}>Log In</Text>
 
@@ -184,34 +219,28 @@ export default function Login() {
           />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>LOGIN</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ opacity: buttonOpacity, width: "100%" }}>
+          <TouchableOpacity style={styles.button} onPress={() => { animateButton(); handleLogin(); }}>
+            <Text style={styles.buttonText}>LOGIN</Text>
+          </TouchableOpacity>
+        </Animated.View>
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#333" }]}
-          onPress={() => setGithubVisible(true)}
-        >
+        <TouchableOpacity style={[styles.button, { backgroundColor: "#333" }]} onPress={() => setGithubVisible(true)}>
           <Text style={styles.buttonText}>LOGIN WITH GITHUB</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push("/signup")}>
-          <Text style={styles.signupText}>
-            Don't have an account? SIGN UP
-          </Text>
+          <Text style={styles.signupText}>Don't have an account? SIGN UP</Text>
         </TouchableOpacity>
 
-        {/* GitHub WebView Modal */}
         <Modal visible={githubVisible} animationType="slide">
-          <WebView
-            source={{ uri: loginUrl }}
-            onNavigationStateChange={handleNavChange}
-          />
+          <WebView source={{ uri: loginUrl }} onNavigationStateChange={handleNavChange} />
         </Modal>
       </SafeAreaView>
     </ImageBackground>
   );
 }
+
 
 const styles = StyleSheet.create({
   background: { flex: 1, justifyContent: "center" },
@@ -249,11 +278,3 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
-
-
-
-
-
-
-
-

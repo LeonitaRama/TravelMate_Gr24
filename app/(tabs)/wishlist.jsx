@@ -1,98 +1,174 @@
-import React, { useEffect, useState, useContext } from "react";
-import { View, Text, FlatList, Image, StyleSheet ,TouchableOpacity} from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState, useContext, useRef, useCallback } from "react";
+import { SafeAreaView, View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert, Animated } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { Ionicons } from "@expo/vector-icons"; 
 import { useTranslation } from "react-i18next";
+import { db2 as db } from "../../firebase/firebaseConfig";
+import { collection, query, getDocs, deleteDoc, doc, where } from "firebase/firestore";
+import { auth1 } from "../../firebase/firebaseConfig"; // Auth nga app1
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function WishlistScreen() {
-   const [favorites, setFavorites] = useState([]);
-   const { darkMode } = useContext(ThemeContext);
-   const { t, i18n } = useTranslation();
-   const theme = darkMode ? darkTheme : lightTheme;
-function fixImageSource(image) {
-  if (typeof image === "number") {
-    return image;
-  }
-  return { uri: image };
-}
+  const [favorites, setFavorites] = useState([]);
+  const { darkMode } = useContext(ThemeContext);
+  const { t } = useTranslation();
+  const theme = darkMode ? darkTheme : lightTheme;
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
+  const toastAnim = useRef(new Animated.Value(100)).current;
 
+  const [user, setUser] = useState(auth1.currentUser);
 
   useEffect(() => {
-    const loadFavorites = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem('@favorites');
-        const savedFavorites = jsonValue != null ? JSON.parse(jsonValue) : [];
-        setFavorites(savedFavorites);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    loadFavorites();
-
+    const unsubscribe = onAuthStateChanged(auth1, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
   }, []);
-  const removeFavorite = async (id) => {
-    const updated = favorites.filter((item) => item.id !== id);
-    setFavorites(updated);
-    await AsyncStorage.setItem("@favorites", JSON.stringify(updated));
+
+  const showToast = (message, type = "success") => {
+    setToastMessage(message);
+    setToastType(type);
+
+    Animated.timing(toastAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setTimeout(() => {
+        Animated.timing(toastAnim, {
+          toValue: 100,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }, 2000); 
+    });
   };
 
+  const fixImageSource = (image) => typeof image === "number" ? image : { uri: image };
 
-  const renderItem = ({ item }) => (
-    <View style={[styles.card, { backgroundColor: theme.card }]}>
-<Image source={fixImageSource(item.image)} style={styles.image }/>    
-   <View style={styles.info}> 
+  const loadFavorites = async () => {
+    if (!user) {
+      Alert.alert("Login Required", "You need to login first!");
+      return;
+    }
 
-      <Text style={[styles.name, {color:theme.text}]}>{item.name}</Text>
-      <Text style={[styles.desc, {color:theme.textSecondary}]}>{item.desc}</Text>
+    try {
+      const q = query(collection(db, "favorites"), where("userId", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+      const savedFavorites = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setFavorites(savedFavorites);
+    } catch (e) {
+      console.log("Error loading favorites:", e);
+    }
+  };
 
-      {item.review ? <Text style={[styles.review, {color:"green"}]}>{item.review}</Text> : null}
-    </View>
-     <TouchableOpacity 
-        style={styles.deleteBtn} 
-        onPress={() => removeFavorite(item.id)}
-      >
-        <Ionicons name="trash" size={22} color="white" />
-      </TouchableOpacity>
-    </View>
+  useEffect(() => {
+    loadFavorites();
+  }, [user]);
+
+  const removeFavorite = useCallback(async (id) => {
+    try {
+      await deleteDoc(doc(db, "favorites", id));
+      setFavorites(prev => prev.filter(item => item.id !== id));
+      showToast("Favorite removed successfully", "success"); 
+    } catch (e) {
+      console.log("Error removing favorite:", e);
+      showToast("Failed to remove favorite", "error");
+    }
+ }, [user]);
+
+   const WishlistItem = React.memo(({ item, theme, onDelete }) => {
+    return (
+      <View style={[styles.card, { backgroundColor: theme.card }]}>
+        <Image source={fixImageSource(item.image)} style={styles.image} />    
+        <View style={styles.info}> 
+          <Text style={[styles.name, { color: theme.text }]}>{item.name}</Text>
+          <Text style={[styles.desc, { color: theme.textSecondary }]}>{item.desc}</Text>
+          {item.review && <Text style={[styles.review, { color: "green" }]}>{item.review}</Text>}
+        </View>
+        <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(item.id)}>
+          <Ionicons name="trash" size={22} color="white" />
+        </TouchableOpacity>
+      </View>
+    );
+  });
+
+  const renderItem = useCallback(({ item }) => (
+    <WishlistItem
+      item={item}
+      theme={theme}
+      onDelete={removeFavorite}
+    />
+  ),
+  [theme, removeFavorite]
   );
 
-  
+  if (!user) {
+    return (
+      <SafeAreaView style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.background }}>
+        <Text style={{ color: theme.text, fontSize: 18, textAlign: "center", marginHorizontal: 20 }}>
+          You need to login to view your Wishlist!
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.title, { color: theme.text }]}>{t("title")}</Text>
-      {favorites.length === 0 ? (
-      <Text style={[styles.empty, { color: theme.textSecondary }]}> {t("empty")}</Text>
-  
-      ) : (
-        <FlatList
-          data={favorites}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 30 }}
-        />
-        
-      )}
-    </View>
-    
-    
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      <View style={{ flex: 1, padding: 20 }}>
+        <Text style={[styles.title, { color: theme.text }]}>{t("title")}</Text>
+        {favorites.length === 0 ? (
+          <Text style={[styles.empty, { color: theme.textSecondary }]}>{t("empty")}</Text>
+        ) : (
+          <FlatList
+            data={favorites}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingBottom: 30 }}
+            initialNumToRender={6}
+            maxToRenderPerBatch={6}
+            windowSize={5}
+            removeClippedSubviews={true}
+            updateCellsBatchingPeriod={50}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+        {toastMessage ? (
+          <Animated.View
+            style={{
+              position: "absolute",
+              bottom: 30,
+              left: 20,
+              right: 20,
+              padding: 15,
+              backgroundColor: toastType === "success" ? "green" : "red",
+              borderRadius: 8,
+              alignItems: "center",
+              transform: [{ translateY: toastAnim }],
+              zIndex: 999,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>{toastMessage}</Text>
+          </Animated.View>
+        ) : null}
+      </View>
+    </SafeAreaView>
   );
-  
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20},
   title: { fontSize: 28, fontWeight: "bold", marginBottom: 15 },
-  empty: { fontSize: 18,marginTop:20,textAlign: "center"},
-   card: { flexDirection: "row",padding: 12,borderRadius: 16, marginBottom: 16,shadowColor: "#000",shadowOpacity: 0.15,           
-    shadowRadius: 6,elevation: 5,alignItems: "center",position: "relative"
-  },
- image: {  width: 110, height: 110,borderRadius: 14,marginRight: 12 }, 
+  empty: { fontSize: 18, marginTop: 20, textAlign: "center" },
+  card: { flexDirection: "row", padding: 12, borderRadius: 16, marginBottom: 16, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 6, elevation: 5, alignItems: "center", position: "relative" },
+  image: { width: 110, height: 110, borderRadius: 14, marginRight: 12 },
+  info: { flex: 1 },
   name: { fontWeight: "bold", fontSize: 18 },
-  desc: {marginTop: 4,fontSize: 14,fontStyle: "italic",width: "90%" },
-  review: { marginTop: 6, fontSize: 14, fontWeight: "600"},
-  deleteBtn: {position: "absolute",right: 12,bottom: 12,backgroundColor: "red",padding: 8,borderRadius: 10 }
-
+  desc: { marginTop: 4, fontSize: 14, fontStyle: "italic", width: "90%" },
+  review: { marginTop: 6, fontSize: 14, fontWeight: "600" },
+  deleteBtn: { position: "absolute", right: 12, bottom: 12, backgroundColor: "red", padding: 8, borderRadius: 10 }
 });

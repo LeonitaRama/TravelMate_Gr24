@@ -1,8 +1,8 @@
 import { Stack, useSegments } from "expo-router";
-import { StatusBar } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { useContext } from "react";
+import { StatusBar } from "react-native";
 
 export default function ProfileLayout() {
   const segments = useSegments();
@@ -20,26 +20,26 @@ export default function ProfileLayout() {
 
   return (
     <>
-     <StatusBar
-     barStyle={darkMode ? "light-content" : "dark-content"}
-     backgroundColor={theme.background}
-    />
+      <StatusBar
+        barStyle={darkMode ? "light-content" : "dark-content"}
+        backgroundColor={theme.background}
+      />
 
-     <Stack
-    screenOptions={{
-    headerShown: true,
-    headerTitle: titles[current] || "Travel Posts",
-    headerStyle: { backgroundColor: theme.background },
-    headerTitleStyle: { color: theme.text },
-    tabBarActiveTintColor: theme.accent,
-    tabBarInactiveTintColor: theme.textSecondary,
-    tabBarStyle: {
-      backgroundColor: theme.card,
-      borderTopColor: darkMode ? "#333" : "#ddd",
-    },
-  }}
-/>
-
+      <Stack
+        screenOptions={{
+          headerShown: true,
+          headerTitle: titles[current] || "Travel Posts",
+          headerStyle: { backgroundColor: theme.background },
+          headerTitleStyle: { color: theme.text },
+          headerTintColor: darkMode ? "#fff" : "#000", // back button and other header icons
+          tabBarActiveTintColor: theme.accent,
+          tabBarInactiveTintColor: theme.textSecondary,
+          tabBarStyle: {
+            backgroundColor: theme.card,
+            borderTopColor: darkMode ? "#333" : "#ddd",
+          },
+        }}
+      />
     </>
   );
 }

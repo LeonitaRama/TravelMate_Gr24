@@ -9,6 +9,8 @@ const ConfirmModal = ({ visible,
     buttons = [],
     onClose }) => {
 
+    const defaultButtons = buttons.length ? buttons : [{ label: "OK", color: "#6b63ff", onPress: onClose }];
+
     const { darkMode, setDarkMode } = useContext(ThemeContext);
     const theme = darkMode ? darkTheme : lightTheme;
 
@@ -20,8 +22,8 @@ const ConfirmModal = ({ visible,
                     <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
                     {message && <Text style={[styles.message, { color: theme.textSecondary }]}>{message}</Text>}
 
-                    <View style={styles.buttons}>
-                        {buttons.map((btn, index) => (
+                    <View>
+                        {(buttons.length ? buttons : [{ label: "OK", color: "#6b63ff", onPress: onClose }]).map((btn, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={[styles.button, { backgroundColor: btn.color || theme.button }]}
@@ -49,23 +51,25 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "rgba(0,0,0,0.5)"
-    }
-    , box: {
+    }, 
+    box: {
         width: "80%",
         backgroundColor: "#fff",
         borderRadius: 15,
         padding: 20
-    }
-    , title: {
+    }, 
+    title: {
+        textAlign: "center",
         fontSize: 20,
         fontWeight: "700",
         marginBottom: 10
-    }
-    , message: {
+    }, 
+    message: {
+        textAlign: "center",
         fontSize: 16,
         marginBottom: 20
-    }
-    , button: {
+    }, 
+    button: {
         padding: 12,
         borderRadius: 10,
         marginTop: 10,

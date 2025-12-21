@@ -15,6 +15,7 @@ import { ThemeContext } from "../../context/ThemeContext";
 import { useRouter } from "expo-router";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { useTranslation } from "react-i18next"; // 🚨 Import i18n hook
+import { NotificationContext } from "../../context/NotificationContext";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation(); // 🚨 Initialize i18n
@@ -24,7 +25,10 @@ export default function SettingsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const theme = darkMode ? darkTheme : lightTheme;
   const router = useRouter();
-
+    const {
+    notificationsEnabled,
+    setNotificationsEnabledValue,
+  } = useContext(NotificationContext);
   const languages = ["English", "Albanian"]; // You can add more languages here
 
   const handlePress = (option) => {
@@ -82,7 +86,7 @@ export default function SettingsScreen() {
               <Text style={[styles.optionText, { color: textColor }]}>
                 {item.title}
               </Text>
-              <Switch value={notifications} onValueChange={setNotifications} />
+              <Switch value={notificationsEnabled} onValueChange={setNotificationsEnabledValue} />
             </View>
           );
         } else if (item.title === t("settings.changeLanguage")) {
