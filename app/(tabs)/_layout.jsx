@@ -20,6 +20,11 @@ export default function TabsLayout() {
         screenOptions={{
           headerShown: true,
           headerTitle:"",
+          headerStyle: {
+            backgroundColor: theme.card,
+          },
+          headerTintColor: theme.text,
+          headerShadowVisible: false,
           tabBarActiveTintColor: theme.accent,
           tabBarInactiveTintColor: theme.textSecondary,
           tabBarStyle: {
