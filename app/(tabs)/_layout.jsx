@@ -5,15 +5,18 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { NotificationContext } from "../../context/NotificationContext";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
+import { useTranslation } from "react-i18next";
+
 
 export default function TabsLayout() {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
   const showLoginHeader = pathname === "/" || pathname === "/explore";
   const { unreadCount } = useContext(NotificationContext);
-
+  const languages = ["English", "Albanian"];
 
   return (
       <Tabs
@@ -65,7 +68,7 @@ export default function TabsLayout() {
             style={{ marginLeft: 15 }}
            >
           <Text style={{ color: theme.text, fontWeight: "600" , fontSize: 18}}>
-          Login
+           {t("login.title")}
          </Text>
          </TouchableOpacity>
           ) : null,
