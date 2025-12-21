@@ -11,6 +11,7 @@
   "home.categories": "Kategoritë",
   "home.welcome": "Mirësevini në TravelMate 🌍",
   "home.subtitle": "Gjeni aventurën tuaj të ardhshme!",
+  "login.title":"Kycu",
   "home.popularDestinations": "Destinacionet Popullore",
   "home.popularDescription": "Ne kemi krijuar paketa të ndryshme për t’ju ofruar përvojën perfekte për çdo udhëtar.",
   "home.photoGallery": "Fotot nga Udhëtarët",
@@ -32,7 +33,7 @@
   "details.review.placeholder": "Shkruaj një përshkrim",
   "details.review.send": "Dërgo Komentin",
   "details.map.view": "Shiko në Hartë",
-  "details.wishlist.add": "❤️ Shto në Dëshira",
+  "details.wishlist.add": "❤️ Shto në listën e dëshirave",
   "details.wishlist.added": "u shtua në Dëshira!",
   "details.wishlist.exists": "është tashmë në listën tuaj të Dëshirave.",
   "details.review.alert.empty": "Ju lutemi shkruani një koment para se ta dërgoni!",
@@ -61,7 +62,38 @@
     "stat_destinations": "Destinacione",
 
     "weather_title": "Moti në Kohë Reale",
-    "weather_desc": "I mundësuar nga OpenWeatherMap API\npër përditësime moti gjatë udhëtimit."
-}
+    "weather_desc": "I mundësuar nga OpenWeatherMap API\npër përditësime moti gjatë udhëtimit.",
+ "destination_budva_name": "Budva, Mali i Zi",
+  "destination_budva_desc": "Një qytet bregdetar i bukur në Mal të Zi, i njohur për plazhet dhe qytetin e vjetër historik.",
+
+  "destination_zermatt_name": "Zermatt, Zvicër",
+  "destination_zermatt_desc": "Qytet alpin pa makina, i famshëm për skijim, ecje malore dhe pamje mahnitëse të Matterhorn.",
+
+  "destination_venice_name": "Venecia, Itali",
+  "destination_venice_desc": "Pamje mahnitëse e Venecias, qyteti i kanaleve, ndërtesave shumëngjyrëshe dhe gondolave ikonike.",
+
+  "destination_blue_eye_name": "Syri i Kaltër, Shqipëri",
+  "destination_blue_eye_desc": "“Syri i Kaltër” në Shqipëri është një burim uji kristal i pastër me ngjyra blu dhe jeshile.",
+
+  "destination_aurora_name": "Aurora, Islandë",
+  "destination_aurora_desc": "Aurora Borealis ndriçon qiellin mbi hotelin Ion Adventure në Islandë.",
+
+  "destination_jinhae_name": "Jinhae, Koreja e Jugut",
+  "destination_jinhae_desc": "I famshëm për lulet e qershisë, që e bëjnë qytetin rozë çdo pranverë.",
+
+  "destination_bahamas_name": "Harbor Island, Bahamas",
+  "destination_bahamas_desc": "Një plazh i qetë me rërë rozë dhe ujëra turkeze.",
+
+  "destination_rugova_name": "Gryka e Rugovës, Kosovë",
+  "destination_rugova_desc": "Një grykë mbresëlënëse me formacione shkëmbore dhe bukuri natyrore.",
+
+  "destination_test_name": "Test",
+  "destination_test_desc": "Një grykë mbresëlënëse me formacione shkëmbore dhe bukuri natyrore.",
+
+  "destination_test1_name": "Test1",
+  "destination_test1_desc": "Një grykë mbresëlënëse me formacione shkëmbore dhe bukuri natyrore."
+
+
+  }
 
   

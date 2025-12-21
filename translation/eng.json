@@ -8,8 +8,7 @@
   "settings.logOut": "Log Out",
   "settings.cancel": "Cancel",
   "home.welcome": "Welcome to TravelMate 🌍",
-  
-
+  "login.title":"Login",
   "home.subtitle": "Find your next adventure!",
   "home.search.placeholder": "Search destinations...",
   "home.categories": "Categories",
@@ -62,9 +61,37 @@
     "stat_travelers": "Happy Travelers",
     "stat_experience": "Industry Experience",
     "stat_destinations": "Destinations",
+ "destination_budva_name": "Budva, Montenegro",
+  "destination_budva_desc": "A beautiful coastal city in Montenegro known for its beaches and historic old town.",
 
-    "weather_title": "Real-Time Weather",
-    "weather_desc": "Powered by OpenWeatherMap API\nfor live weather updates during your trip."
+  "destination_zermatt_name": "Zermatt, Switzerland",
+  "destination_zermatt_desc": "The Alpine car-free town famous for skiing, hiking, and stunning views of the Matterhorn.",
+
+  "destination_venice_name": "Venice, Italy",
+  "destination_venice_desc": "A breathtaking view of Venice, the city of canals, colorful buildings, and iconic gondolas.",
+
+  "destination_blue_eye_name": "Blue Eye, Albania",
+  "destination_blue_eye_desc": "The “Blue Eye” in Albania is a crystal-clear spring with vibrant blue and green waters.",
+
+  "destination_aurora_name": "Aurora, Iceland",
+  "destination_aurora_desc": "The aurora borealis lights up the sky above Ion Adventure Hotel in Iceland.",
+
+  "destination_jinhae_name": "Jinhae, South Korea",
+  "destination_jinhae_desc": "Famous for its cherry blossoms, turning the city pink every spring.",
+
+  "destination_bahamas_name": "Harbor Island, Bahamas",
+  "destination_bahamas_desc": "A serene beach with soft pink sand and turquoise waters.",
+
+  "destination_rugova_name": "Rugova Canyon, Kosovo",
+  "destination_rugova_desc": "A fascinating canyon with impressive rock formations and natural beauty.",
+
+  "destination_test_name": "Test",
+  "destination_test_desc": "A fascinating canyon with impressive rock formations and natural beauty.",
+
+  "destination_test1_name": "Test1",
+  "destination_test1_desc": "A fascinating canyon with impressive rock formations and natural beauty.",
+  "weather_title": "Real-Time Weather",
+  "weather_desc": "Powered by OpenWeatherMap API\nfor live weather updates during your trip."
 }
 
 

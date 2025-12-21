@@ -173,7 +173,7 @@ export default function Details() {
           />
 
           <Text style={{ marginTop: 8, fontWeight: "bold", color: theme.text, textAlign: "center" }}>
-            {item.name}
+            {t(item.nameKey)}
           </Text>
           <Text
             style={{
@@ -184,7 +184,7 @@ export default function Details() {
             }}
             numberOfLines={3}
           >
-            {item.desc}
+            {t(item.desc)}
           </Text>
 
           <View style={{ flexDirection: "row", width: "100%", marginTop: 5 }}>
@@ -246,7 +246,7 @@ export default function Details() {
           }}
         >
           <Text style={{ color: theme.buttonText, fontWeight: "bold", textAlign: "center" }}>
-            ❤️ Add to Wishlist
+            {t("details.wishlist.add")}
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -254,16 +254,16 @@ export default function Details() {
   });
 
   const [destinations, setDestinations] = useState([
-    { id: "1", name: "Budva, Montenegro", image: require("../../assets/Explore-Destinations/budva.jpg"), desc: "A beautiful coastal city in Montenegro known for its beaches and historic old town.", lat: 42.2929, lng: 18.8403 },
-    { id: "2", name: "Zermatt, Switzerland", image: require("../../assets/Explore-Destinations/Zermatt.jpg"), desc: "The Alpine car-free town famous for skiing, hiking, and stunning views of the Matterhorn.", lat: 46.0207, lng: 7.7491 },
-    { id: "3", name: "Venice, Italy", image: require("../../assets/Explore-Destinations/Venice.jpg"), desc: "A breathtaking view of Venice, the city of canals, colorful buildings, and iconic gondolas.", lat: 45.4408, lng: 12.3155 },
-    { id: "4", name: "Blue Eye, Albania", image: require("../../assets/Explore-Destinations/blue-eye.webp"), desc: "The “Blue Eye” in Albania is a crystal-clear spring with vibrant blue and green waters.", lat: 39.9204, lng: 20.1883 },
-    { id: "5", name: "Aurora, Iceland", image: require("../../assets/Explore-Destinations/Aurora.jpg"), desc: "The aurora borealis lights up the sky above Ion Adventure Hotel in Iceland.", lat: 64.1500, lng: -21.9400 },
-    { id: "6", name: "Jinhae, South Korea", image: require("../../assets/Explore-Destinations/Jinhae.jpg"), desc: "Famous for its cherry blossoms, turning the city pink every spring.", lat: 35.1494, lng: 128.6597 },
-    { id: "7", name: "Harbor Island, Bahamas", image: require("../../assets/Explore-Destinations/Bahamas.jpg"), desc: "A serene beach with soft pink sand and turquoise waters.", lat: 25.5000, lng: -76.6310 },
-    { id: "8", name: "Rugova Canyon, Kosovo", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
-    { id: "9", name: "Test", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
-    { id: "20", name: "Test1", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "A fascinating canyon with impressive rock formations and natural beauty.", lat: 42.6761, lng: 20.2534 },
+    { id: "1", nameKey: "destination_budva_name", image: require("../../assets/Explore-Destinations/budva.jpg"), desc:"destination_budva_desc", lat: 42.2929, lng: 18.8403 },
+    { id: "2", nameKey: "destination_zermatt_name", image: require("../../assets/Explore-Destinations/Zermatt.jpg"), desc:"destination_zermatt_desc", lat: 46.0207, lng: 7.7491 },
+    { id: "3", nameKey: "destination_venice_name", image: require("../../assets/Explore-Destinations/Venice.jpg"), desc:"destination_venice_desc", lat: 45.4408, lng: 12.3155 },
+    { id: "4", nameKey: "destination_blue_eye_name", image: require("../../assets/Explore-Destinations/blue-eye.webp"), desc:"destination_blue_eye_desc", lat: 39.9204, lng: 20.1883 },
+    { id: "5", nameKey: "destination_aurora_name", image: require("../../assets/Explore-Destinations/Aurora.jpg"), desc: "destination_aurora_desc", lat: 64.1500, lng: -21.9400 },
+    { id: "6", nameKey: "destination_jinhae_name", image: require("../../assets/Explore-Destinations/Jinhae.jpg"), desc:"destination_jinhae_desc", lat: 35.1494, lng: 128.6597 },
+    { id: "7", nameKey: "destination_bahamas_name", image: require("../../assets/Explore-Destinations/Bahamas.jpg"), desc:"destination_bahamas_desc", lat: 25.5000, lng: -76.6310 },
+    { id: "8", nameKey: "destination_rugova_name", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "destination_rugova_desc", lat: 42.6761, lng: 20.2534 },
+    { id: "9", nameKey: "destination_test_name", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc: "destination_test_desc", lat: 42.6761, lng: 20.2534 },
+    { id: "20", nameKey: "destination_test1_name", image: require("../../assets/Explore-Destinations/Rugova.jpg"), desc:"destination_test1_desc", lat: 42.6761, lng: 20.2534 },
   ]);
 
   useEffect(() => {
@@ -295,7 +295,7 @@ export default function Details() {
 
   const filteredDestinations = React.useMemo(() => {
     return destinations.filter((item) =>
-      item.name.toLowerCase().includes(searchText.toLowerCase())
+       t(item.nameKey).toLowerCase().includes(searchText.toLowerCase())
     );
   }, [destinations, searchText]);
 
