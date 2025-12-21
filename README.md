@@ -18,18 +18,7 @@ cd TravelMate_Gr24
 ### Instaloni varësitë dhe modulet e nevojshme të Expo:
 ```bash
 npm install
-npx expo install expo-router react-native-gesture-handler react-native-reanimated \
-expo-status-bar expo-constants expo-linking react-native-screens \
-react-native-safe-area-context @react-native-async-storage/async-storage
 ```
-```bash
-npm install @react-native-async-storage/async-storage
-```
-
-```bash
-npm install expo@54.0.23 expo-constants@~18.0.10 expo-router@~6.0.14
-```
-
 
 ### Nisni aplikacionin:
 ```bash
