@@ -16,110 +16,115 @@ export default function TabsLayout() {
 
 
   return (
-      <Tabs
-        screenOptions={{
-          headerShown: true,
-          headerTitle:"",
-          tabBarActiveTintColor: theme.accent,
-          tabBarInactiveTintColor: theme.textSecondary,
-          tabBarStyle: {
-            backgroundColor: theme.card,
-            borderTopColor: darkMode ? "#333" : "#ddd",
-          },
-            headerRight: () => (
-          <TouchableOpacity
-    onPress={() => router.push("/notifications")}
-    style={{ marginRight: 15 }}
-  >
-    <Ionicons
-      name="notifications-outline"
-      size={24}
-      color={darkMode ? "#fff" : "#000"}
-    />
-
-    {unreadCount > 0 && (
-      <View
-        style={{
-          position: "absolute",
-          top: -4,
-          right: -6,
-          backgroundColor: "red",
-          borderRadius: 10,
-          minWidth: 16,
-          height: 16,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ color: "#fff", fontSize: 10, fontWeight: "bold" }}>
-          {unreadCount}
-        </Text>
-      </View>
-    )}
-  </TouchableOpacity>
-),
-            headerLeft: () =>
-            showLoginHeader ? (
-           <TouchableOpacity
-            onPress={() => router.push("/login")}
-            style={{ marginLeft: 15 }}
-           >
-          <Text style={{ color: theme.text, fontWeight: "600" , fontSize: 18}}>
-          Login
-         </Text>
-         </TouchableOpacity>
-          ) : null,
-             tabBarActiveTintColor: theme.accent,
-          tabBarInactiveTintColor: theme.textSecondary,
-          tabBarStyle: {
+    <Tabs
+      screenOptions={{
+        headerShown: true,
+        headerTitle: "",
+        headerStyle: {
+          backgroundColor: theme.card,
+        },
+        headerTintColor: theme.text,
+        headerShadowVisible: false,
+        tabBarActiveTintColor: theme.accent,
+        tabBarInactiveTintColor: theme.textSecondary,
+        tabBarStyle: {
           backgroundColor: theme.card,
           borderTopColor: darkMode ? "#333" : "#ddd",
-    },
-    
+        },
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => router.push("/notifications")}
+            style={{ marginRight: 15 }}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={24}
+              color={darkMode ? "#fff" : "#000"}
+            />
+
+            {unreadCount > 0 && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: -4,
+                  right: -6,
+                  backgroundColor: "red",
+                  borderRadius: 10,
+                  minWidth: 16,
+                  height: 16,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ color: "#fff", fontSize: 10, fontWeight: "bold" }}>
+                  {unreadCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        ),
+        headerLeft: () =>
+          showLoginHeader ? (
+            <TouchableOpacity
+              onPress={() => router.push("/login")}
+              style={{ marginLeft: 15 }}
+            >
+              <Text style={{ color: theme.text, fontWeight: "600", fontSize: 18 }}>
+                Login
+              </Text>
+            </TouchableOpacity>
+          ) : null,
+        tabBarActiveTintColor: theme.accent,
+        tabBarInactiveTintColor: theme.textSecondary,
+        tabBarStyle: {
+          backgroundColor: theme.card,
+          borderTopColor: darkMode ? "#333" : "#ddd",
+        },
+
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+          ),
         }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
-            ),
-          }}
-        />
+      />
 
-        <Tabs.Screen
-          name="explore"
-          options={{
-            title: "Explore",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="compass-outline" size={size} color={color} />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: "Explore",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="compass-outline" size={size} color={color} />
+          ),
+        }}
+      />
 
-        <Tabs.Screen
-          name="wishlist"
-          options={{
-            title: "Wishlist",
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="heart-outline" size={size} color={color} />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="wishlist"
+        options={{
+          title: "Wishlist",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="heart-outline" size={size} color={color} />
+          ),
+        }}
+      />
 
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: "Settings",
-            headerShown: false,
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="settings-outline" size={size} color={color} />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+        }}
+      />
 
-      </Tabs>
+    </Tabs>
   );
 }
 
@@ -133,17 +138,17 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingHorizontal: 13,
     paddingVertical: 10,
-     alignItems: "flex-end",
-     
+    alignItems: "flex-end",
+
   },
   loginButton: {
     paddingVertical: 6,
   },
   loginText: {
-    fontSize:16,
+    fontSize: 16,
     fontWeight: "600",
-     marginTop: 40,
-    
+    marginTop: 40,
+
   },
   underline: {
     height: 2,

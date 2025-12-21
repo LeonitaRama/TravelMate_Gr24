@@ -1,10 +1,9 @@
 import React, { useState, useContext, useRef, useEffect, useCallback } from "react";
-import { View, Text, TouchableOpacity, TextInput, FlatList, Animated ,Alert } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, FlatList, Animated ,Alert, Image } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { useTranslation } from "react-i18next";
 import * as Linking from "expo-linking";
-import { Image } from 'expo-image';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { scheduleLocalNotification } from "../../utils/localNotifications";
 import { onAuthStateChanged } from "firebase/auth";

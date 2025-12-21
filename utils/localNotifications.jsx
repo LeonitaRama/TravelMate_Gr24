@@ -12,6 +12,15 @@ const enabled = storedEnabled ? JSON.parse(storedEnabled) : true;
    if (!enabled) {
     return; // 🚫 OFF → mos dërgo asgjë
   }
+
+    if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'Default',
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: true,
+    });
+  }
+
     const id = await Notifications.scheduleNotificationAsync({
     content: {
       title,

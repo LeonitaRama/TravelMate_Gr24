@@ -17,15 +17,15 @@ Notifications.setNotificationHandler({
 
 export default function RootLayout() {
   useEffect(() => {
-  requestLocalNotificationPermission();
-}, []);
+    requestLocalNotificationPermission();
+  }, []);
   return (
-    <AuthProvider>
-      <ThemeProvider>
-      <NotificationProvider>
-        <Slot />
-        </NotificationProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <Slot />
+        </ThemeProvider>
+      </AuthProvider>
+    </NotificationProvider>
   );
 }

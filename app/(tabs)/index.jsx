@@ -14,12 +14,11 @@ import {
   Alert,
   Dimensions,
   Animated,
+  Modal,
   ScrollView as RNScrollView
 } from 'react-native';
 import WhyChooseUs from "../(components)/WhyChooseUs.jsx";
 import { useTranslation } from 'react-i18next';
-import { scheduleLocalNotification } from "../../utils/localNotifications";
-import { NotificationContext } from "../../context/NotificationContext";
 
 
 
@@ -32,8 +31,7 @@ export default function HomeScreen() {
   const scrollX = useRef(new Animated.Value(0)).current;
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
-  const languages = ["English", "Albanian"];
-  const { addNotification } = useContext(NotificationContext);
+    const languages = ["English", "Albanian"];
   
   
 
@@ -73,21 +71,55 @@ export default function HomeScreen() {
   const handleCategoryPress = (categoryName) => {
     setSelectedCategory(categoryName === selectedCategory ? null : categoryName);
   };
+const modalFadeAnim = useRef(new Animated.Value(0)).current;
+const modalScaleAnim = useRef(new Animated.Value(0.8)).current;
+const modalTranslateY = useRef(new Animated.Value(40)).current;
+const [modalVisible, setModalVisible] = useState(false);
+const [selectedDestination, setSelectedDestination] = useState(null);
 
-  const sendNotification = async () => {
-  await scheduleLocalNotification(
-    "New Destination ✈️",
-    "Check out our latest travel offers!"
-  );
-  addNotification(); 
+
+ const handleSeeMore = (destination) => {
+  setSelectedDestination(destination);
+  setModalVisible(true);
+
+  Animated.parallel([
+    Animated.timing(modalFadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }),
+    Animated.spring(modalScaleAnim, {
+      toValue: 1,
+      friction: 6,
+      useNativeDriver: true,
+    }),
+    Animated.timing(modalTranslateY, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }),
+  ]).start();
 };
-  const handleSeeMore = (destination) => {
-    Alert.alert(
-      destination.name,
-      `${destination.description}\n${t(HomeScreen.Category)}: ${destination.category}\nRating: ${destination.rating} ★`,
-      [{ text: "Close" }]
-    );
-  };
+
+const closeModal = () => {
+  Animated.parallel([
+    Animated.timing(modalFadeAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }),
+    Animated.timing(modalScaleAnim, {
+      toValue: 0.8,
+      duration: 200,
+      useNativeDriver: true,
+    }),
+    Animated.timing(modalTranslateY, {
+      toValue: 40,
+      duration: 200,
+      useNativeDriver: true,
+    }),
+  ]).start(() => setModalVisible(false));
+};
 
   const renderCarouselItem = ({ item, index }) => {
     const inputRange = [
@@ -112,21 +144,82 @@ export default function HomeScreen() {
         <Text style={styles.rating}>
           {'★'.repeat(Math.floor(item.rating)) + '☆'.repeat(5 - Math.floor(item.rating))}
         </Text>
-        <TouchableOpacity onPress={() => handleSeeMore(item)} style={[ { backgroundColor: theme.button }, styles.seeMoreBtn,]}>
-          <Text style={[styles.seeMoreText, { color: theme.buttonText }]}>{t("home.seeMore")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={sendNotification}>
-          <Text>Notify me</Text>
-        </TouchableOpacity>
+       <TouchableOpacity
+      activeOpacity={0.6}
+      onPress={() => handleSeeMore(item)}
+      style={[
+      styles.seeMoreBtn,
+      { backgroundColor: theme.button },
+]}
+>
+  <Text style={[styles.seeMoreText, { color: theme.buttonText }]}>
+    {t("home.seeMore")}
+  </Text>
+</TouchableOpacity>
+
       </Animated.View>
     );
   };
   
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}
+ <ScrollView contentContainerStyle={styles.scrollContent}
      style={{ backgroundColor: theme.background }}
      >
+<Modal
+  transparent
+  visible={modalVisible}
+  animationType="none"
+  onRequestClose={closeModal}
+>
+
+  <View style={styles.modalOverlay}>
+   <Animated.View
+  style={[
+    styles.modalContent,
+    {
+      backgroundColor: theme.card,
+      opacity: modalFadeAnim,
+      transform: [
+        { scale: modalScaleAnim },
+        { translateY: modalTranslateY },
+      ],
+    },
+  ]}
+>
+
+      {selectedDestination && (
+        <>
+          <Text style={[styles.modalTitle, { color: theme.text }]}>
+            {selectedDestination.name}
+          </Text>
+
+          <Text style={[styles.modalText, { color: theme.textSecondary }]}>
+            {selectedDestination.description}
+          </Text>
+
+          <Text style={[styles.modalText, { color: theme.textSecondary }]}>
+            {t("category")}: {selectedDestination.category}
+          </Text>
+
+          <Text style={styles.rating}>
+            Rating: {selectedDestination.rating} ★
+          </Text>
+
+          <TouchableOpacity
+            onPress={closeModal}
+            style={[styles.closeBtn, { backgroundColor: theme.button }]}
+          >
+            <Text style={{ color: theme.buttonText, fontWeight: '600' }}>
+              Close
+            </Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </Animated.View>
+  </View>
+</Modal>
+
       <ImageBackground
         source={require('../../assets/egypt.jpg')}
         style={styles.headerBackground}
@@ -509,5 +602,32 @@ link: {
 separator: {
   marginHorizontal: 5,
 },
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContent: {
+  width: '85%',
+  borderRadius: 15,
+  padding: 20,
+},
+modalTitle: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  marginBottom: 10,
+},
+modalText: {
+  fontSize: 14,
+  marginBottom: 6,
+},
+closeBtn: {
+  marginTop: 15,
+  paddingVertical: 10,
+  borderRadius: 8,
+  alignItems: 'center',
+},
+
 
 });
