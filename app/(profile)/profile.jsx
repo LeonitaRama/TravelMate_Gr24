@@ -11,6 +11,8 @@ import * as ImagePicker from "expo-image-picker";
 import ConfirmModal from '../(components)/ConfirmModal';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from "../../context/AuthContext";
+import * as Notifications from "expo-notifications";
+import { scheduleLocalNotification } from "../../utils/localNotifications";
 
 const Profile = () => {
     const { user, loading, logout, setUser } = useAuth();
@@ -48,9 +50,9 @@ const Profile = () => {
             const base64Img = `data:image/jpeg;base64,${results.assets[0].base64}`;
             await updatePhoto(base64Img);
         }
-        
+
     };
-    
+
 
     const takePhoto = async () => {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -78,6 +80,11 @@ const Profile = () => {
             setUser(prev => ({ ...prev, photoURL: base64Img }));
 
             setShowPhotoOptions(false);
+
+            await scheduleLocalNotification(
+                "Profile Updated",
+                "Your profile photo was updated successfully."
+            );
             showNotice("success", "Image uploaded successfully!");
         } catch (err) {
             console.log(err);
@@ -103,6 +110,11 @@ const Profile = () => {
         try {
             await updateDoc(userRef, { photoURL: "" });
             setUser(prev => ({ ...prev, photoURL: "" }));
+
+            await scheduleLocalNotification(
+                "Profile Photo Removed",
+                "Your profile photo has been removed."
+            );
             showNotice("success", "Photo removed successfully!");
         } catch (error) {
             console.log("Error removing photo:", error);
@@ -113,22 +125,22 @@ const Profile = () => {
         }
     };
 
-useEffect(() => {
-  if (!loading && !user) {
-    router.replace("/login");
-  }
-}, [user, loading]);
-if (loading) {
-  return (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" />
-    </View>
-  );
-}
+    useEffect(() => {
+        if (!loading && !user) {
+            router.replace("/login");
+        }
+    }, [user, loading]);
+    if (loading) {
+        return (
+            <View style={styles.container}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
+    }
 
-if (!user) {
-  return null; 
-}
+    if (!user) {
+        return null;
+    }
 
 
     return (

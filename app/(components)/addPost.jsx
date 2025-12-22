@@ -3,7 +3,7 @@ import { View, TextInput, Button, Image, Alert, StyleSheet, TouchableOpacity, Te
 import * as ImagePicker from "expo-image-picker";
 import { uploadCloudinary } from "../../utils/uploadCloudinary";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db3, auth3 } from "../../firebase/firebaseConfig";
+import { db1, auth1 } from "../../firebase/firebaseConfig";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { scheduleLocalNotification } from "../../utils/localNotifications";
@@ -43,18 +43,18 @@ export default function AddPost() {
     try {
       const url = await uploadCloudinary(image);
 
-      await addDoc(collection(db3, "posts"), {
-        userId: auth3.currentUser.uid,
+      await addDoc(collection(db1, "posts"), {
+        userId: auth1.currentUser.uid,
         imageUrl: url,
         text,
         createdAt: serverTimestamp(),
       });
 
-   await scheduleLocalNotification(
-  "Post published 📸",
-  "Your travel post is now live"
-);
-addNotification();
+      await scheduleLocalNotification(
+        "Post published 📸",
+        "Your travel post is now live"
+      );
+      addNotification();
 
 
       Alert.alert("Your post has been published!");
@@ -68,9 +68,11 @@ addNotification();
   };
 
   return (
-    <View style={[styles.container, {backgroundColor:theme.background}]}>
-      <TouchableOpacity style={[styles.imagePicker, {backgroundColor
-        :theme.card}]
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <TouchableOpacity style={[styles.imagePicker, {
+        backgroundColor
+          : theme.card
+      }]
       } onPress={pickImage}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
@@ -80,60 +82,84 @@ addNotification();
       </TouchableOpacity>
 
       <TextInput
-        style={[styles.textInput, {color:theme.textSecondary}]}
+        style={[styles.textInput, { color: theme.textSecondary }]}
         placeholder="Write a description..."
         placeholderTextColor={theme.placeholder}
         multiline
         value={text}
         onChangeText={setText}
       />
-       <TouchableOpacity
-              style={[styles.button, { backgroundColor: theme.button }]}
-              onPress={submitPost} 
-            >
-      <Text style={[styles.buttonText, { color: "#fff"}]}>
-        {uploading ? "Posting..." : "Publish post"}
-      </Text>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: theme.button }]}
+        onPress={submitPost}
+      >
+        <Text style={[styles.buttonText, { color: "#fff" }]}>
+          {uploading ? "Posting..." : "Publish post"}
+        </Text>
       </TouchableOpacity>
-  </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15 },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff', // ndryshohet nga theme.background
+  },
   imagePicker: {
     height: 250,
-    borderRadius: 10,
+    borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
-  },
-  imagePickerText: { fontSize: 18, color: "#888" },
-  image: { width: "100%", height: "100%", borderRadius: 10 },
-  textInput: {
-    height: 100,
+    marginBottom: 20,
+    overflow: "hidden",
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 15,
+    borderColor: "#ddd",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
+  },
+  imagePickerText: {
+    fontSize: 18,
+    color: "#888",
+    fontWeight: "500",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 15,
+  },
+  textInput: {
+    height: 120,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20,
     textAlignVertical: "top",
     fontSize: 16,
+    backgroundColor: "#f9f9f9",
   },
   button: {
-    paddingVertical: 14,       // lartësi "verticale" për butonin
-    paddingHorizontal: 25,     // pak gjerësi për brenda
-    borderRadius: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 30,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
-    minWidth: 150,             // minimale gjerësi që të mos ngushtohet shumë
+    backgroundColor: "#2196F3",
     shadowColor: "#000",
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.25,
     shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
+    marginBottom: 20,
   },
   buttonText: {
     fontSize: 18,
     fontWeight: "600",
+    color: "#fff",
   },
 });

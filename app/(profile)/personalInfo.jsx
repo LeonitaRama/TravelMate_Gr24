@@ -10,9 +10,13 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from "../../context/AuthContext";
 import { updateProfile } from 'firebase/auth';
 import ConfirmModal from '../(components)/ConfirmModal';
+import { scheduleLocalNotification } from "../../utils/localNotifications";
+import { NotificationContext } from "../../context/NotificationContext";
 
 
 const PersonalInfo = () => {
+    const { addNotification } = useContext(NotificationContext);
+
     const { user, setUser } = useAuth();
     const [fullName, setFullName] = useState(user?.displayName || '');
     const [bio, setBio] = useState(user?.bio || '');
@@ -53,6 +57,14 @@ const PersonalInfo = () => {
                 bio: bio,
                 phone: phone
             });
+
+            await scheduleLocalNotification(
+                "Profile Updated",
+                "Your personal information was updated successfully."
+            );
+
+            addNotification();
+
             setModalConfig({
                 title: "Success",
                 message: "Profile updated successfully!",
@@ -85,6 +97,12 @@ const PersonalInfo = () => {
         }
     };
 
+    const hasChanges =
+        fullName !== (user?.displayName || '') ||
+        bio !== (user?.bio || '') ||
+        phone !== (user?.phone || '');
+
+
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <ScrollView contentContainerStyle={[styles.scroll, { backgroundColor: theme.background }]}>
@@ -95,45 +113,49 @@ const PersonalInfo = () => {
 
                     <Text style={[styles.label, { color: theme.text }]}>Full Name</Text>
                     <TextInput
-                        style={[styles.input, { backgroundColor: theme.card }]}
+                        style={[styles.input, { backgroundColor: theme.card, color: theme.text }]}
                         placeholder="Your name"
-                        placeholderTextColor={darkMode ? "#999" : "#666"}
+                        placeholderTextColor={theme.placeholder}
                         value={fullName}
                         onChangeText={setFullName}
                     />
 
                     <Text style={[styles.label, { color: theme.text }]}>Bio</Text>
                     <TextInput
-                        style={[styles.input, { height: 90 }, { backgroundColor: theme.card }]}
+                        style={[styles.input, { height: 90 }, { backgroundColor: theme.card, color: theme.text }]}
                         placeholder="Write something about you..."
                         multiline
-                        placeholderTextColor={darkMode ? "#999" : "#666"}
+                        placeholderTextColor={theme.placeholder}
                         value={bio}
                         onChangeText={setBio}
                     />
 
                     <Text style={[styles.label, { color: theme.text }]}>Email</Text>
                     <TextInput
-                        style={[styles.input, { backgroundColor: theme.card, color: darkMode ? "#999" : "#666" }]}
+                        style={[styles.input, { backgroundColor: theme.card, color: theme.text }]}
                         value={email}
                         editable={true}
-                        placeholderTextColor={darkMode ? "#999" : "#666"}
+                        placeholderTextColor={theme.placeholder}
                     />
 
                     <Text style={[styles.label, { color: theme.text }]}>Phone Number</Text>
                     <TextInput
                         style={[styles.input, { backgroundColor: theme.card, color: theme.text }]}
-                        placeholderTextColor={darkMode ? "#999" : "#666"}
+                        placeholderTextColor={theme.placeholder}
                         placeholder="+383 44 000 000"
                         keyboardType="phone-pad"
                         value={phone}
                         onChangeText={setPhone} />
 
-                    <TouchableOpacity style={[styles.saveButton, loading && styles.disabledButton]}
+                    <TouchableOpacity
+                        style={[
+                            styles.saveButton,
+                            (!hasChanges || loading) && { opacity: 0.5 }
+                        ]}
                         onPress={handleSave}
-                        disabled={loading}
+                        disabled={!hasChanges || loading}
                     >
-                        <Text style={styles.saveText}> {loading ? "Saving..." : "Save Changes"}</Text>
+                        <Text style={[styles.saveText, { color: theme.text }]}> {loading ? "Saving..." : "Save Changes"}</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -154,7 +176,7 @@ export default PersonalInfo
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        
+
     },
     scroll: {
         padding: 20,
@@ -169,16 +191,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '700',
     },
-    // forsma: {
-    //     backgroundColor: '#fff',
-    //     padding: 20,
-    //     borderRadius: 20,
-    //     shadowColor: '#000',
-    //     shadowOffset: { width: 0, height: 3 },
-    //     shadowOpacity: 0.1,
-    //     shadowRadius: 5,
-    //     elevation: 5,
-    // },
+
     label: {
         fontWeight: '600',
         marginTop: 15,
@@ -188,7 +201,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         borderBottomWidth: 3,
         borderRadius: 10,
-        borderBottomColor:"#83b6f1ff",
+        borderBottomColor: "#83b6f1ff",
         paddingHorizontal: 14,
         paddingVertical: 10,
         fontSize: 15,
@@ -202,12 +215,11 @@ const styles = StyleSheet.create({
     saveButton: {
         marginTop: 30,
         paddingVertical: 15,
-        backgroundColor:"#83b6f1ff",
+        backgroundColor: "#83b6f1ff",
         borderRadius: 12,
         alignItems: 'center',
     },
     saveText: {
-        color: '#fff',
         fontWeight: '600',
         fontSize: 16,
     },

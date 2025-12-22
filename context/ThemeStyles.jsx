@@ -9,7 +9,7 @@ export const lightTheme = {
   footer: "#d3d3d376",
 
   inputBackground: "#ffffff",
-  placeholder: "#888888",
+  placeholder: "#888",
 
   border: "#dddddd",
   accent: "#a0c9f7ff",
@@ -56,7 +56,7 @@ export const darkTheme = {
   
 
   inputBackground: "#222222",
-  placeholder: "#888888",
+  placeholder: "#aaa",
   icon: "#83b6f1ff",
   input: "#1e1e1e",
   border: "#333333",

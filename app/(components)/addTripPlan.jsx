@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { View, TextInput, Button, Alert, StyleSheet, TouchableOpacity, Text, Platform } from "react-native";
 import { addDoc, collection } from "firebase/firestore";
-import { db3, auth3 } from "../../firebase/firebaseConfig";
+import { db1, auth1 } from "../../firebase/firebaseConfig";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
 import { scheduleLocalNotification } from "../../utils/localNotifications";
@@ -23,8 +23,8 @@ export default function AddTripPlan() {
     }
 
     try {
-      await addDoc(collection(db3, "tripPlans"), {
-        userId: auth3.currentUser.uid,
+      await addDoc(collection(db1, "tripPlans"), {
+        userId: auth1.currentUser.uid,
         destination,
         startDate,
         endDate,

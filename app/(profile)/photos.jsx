@@ -1,159 +1,166 @@
-import React, { useEffect, useState, useContext } from "react";
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Alert } from "react-native";
+import { useEffect, useState, useContext } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Image,
+  TouchableOpacity, Alert
+} from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
-import { auth3, db3 } from "../../firebase/firebaseConfig";
-import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc } from "firebase/firestore";
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from "expo-router";
+import { auth1, db1 } from "../../firebase/firebaseConfig";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  orderBy,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { scheduleLocalNotification } from "../../utils/localNotifications";
 
 const MyPosts = () => {
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
-
   const [posts, setPosts] = useState([]);
-  const router = useRouter();
-
-  const currentUserId = auth3.currentUser.uid;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const user = auth1.currentUser;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     const q = query(
-      collection(db3, "posts"),
-      where("userId", "==", currentUserId),
+      collection(db1, "posts"),
+      where("userId", "==", user.uid),
       orderBy("createdAt", "desc")
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setPosts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    const unsub = onSnapshot(q, snapshot => {
+      setPosts(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return unsub;
   }, []);
 
-  const handleDeletePost = (postId) => {
-    Alert.alert(
-      "Delete Post",
-      "Are you sure you want to delete this post?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteDoc(doc(db3, "posts", postId));
-            } catch (error) {
-              alert("Error deleting post: " + error.message);
-            }
-          }
-        }
-      ]
+  const handleDelete = async (id) => {
+    await deleteDoc(doc(db1, "posts", id));
+    Alert.alert("Deleted", "Your post has been deleted successfully.");
+    await scheduleLocalNotification(
+      "Post Deleted 🗑️",
+      "Your travel post has been removed successfully."
     );
   };
 
-  if (posts.length === 0) {
+  if (loading) {
     return (
-      <View style={[styles.center, { backgroundColor: theme.background }]}>
-        <Text style={[styles.text, { color: theme.textSecondary }]}>
-          You have no posts yet.
-        </Text>
-
-        {/* Add Post button when no posts */}
-        <TouchableOpacity style={[styles.addPostButton, { marginTop: 20 }, ]} onPress={() => router.push("/addPost")}>
-          <Text style={styles.addPostButtonText}>+ Add New Post</Text>
-        </TouchableOpacity>
+      <View style={[styles.emptyText, { backgroundColor: theme.background }]}>
+        <Text style={{ color: theme.text }}>Loading...</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.background }}>
-      {/* Header with title and Add Post button */}
-      <View style={styles.header}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>🧳 My Posts</Text>
-        <TouchableOpacity style={styles.addPostButton} onPress={() => router.push("/addPost")}>
-          <Text style={styles.addPostButtonText}>+ Add New Post</Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={posts}
-        keyExtractor={item => item.id}
-        contentContainerStyle={{ padding: 20 }}
-        renderItem={({ item }) => (
-          <View style={[styles.postContainer, { backgroundColor: theme.card }]}>
+    <FlatList
+      data={posts}
+      keyExtractor={item => item.id}
+      ListEmptyComponent={() => (
+        <View style={[{ marginTop: 300, flex: 1, width: '100%' }]}>
+          <Text style={[{ color: theme.text, fontSize: 16 }]}>
+            No posts yet. Go add your first post!
+          </Text>
+        </View>
+      )}
+      renderItem={({ item }) => (
+        <View style={[styles.postContainer, { backgroundColor: theme.card }]}>
+          {item.imageUrl ? (
             <Image source={{ uri: item.imageUrl }} style={styles.image} />
-            <Text style={[styles.text, { color: theme.text }]}>{item.text}</Text>
+          ) : (
+            <View style={[
+              styles.noImage,
+              { backgroundColor: darkMode ? "#444" : "#e0e0e0" },
+            ]}>
+              <Text style={{ color: theme.text }}>No Image</Text>
+            </View>
+          )}
+          <View style={styles.textContainer}>
+            <Text style={[styles.postText, { color: theme.text }]} numberOfLines={3}>
+              {item.text}
+            </Text>
             <TouchableOpacity
-              style={styles.deleteIconButton}
-              onPress={() => handleDeletePost(item.id)}
+              style={styles.deleteBtn}
+              onPress={() => handleDelete(item.id)}
             >
-              <Ionicons name="trash-outline" size={24} color="#FF3B30" />
+              <Ionicons name="trash-outline" size={20} color="red" />
             </TouchableOpacity>
           </View>
-        )}
-      />
-    </View>
+        </View>
+      )}
+    />
   );
 };
 
 export default MyPosts;
 
 const styles = StyleSheet.create({
+  postContainer: {
+    padding: 12,
+    marginBottom: 12,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  image: {
+    width: "100%",
+    height: 220,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  noImage: {
+    width: "100%",
+    height: 220,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#e0e0e0",
+    marginBottom: 10,
+  },
+  noImageText: {
+    color: "#888",
+    fontSize: 14,
+  },
+  textContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  postText: {
+    textAlign: "center",
+    flex: 1,
+    fontSize: 14,
+    fontStyle: "italic",
+    lineHeight: 20,
+  },
+  deleteBtn: {
+    padding: 8,
+    marginLeft: 10,
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: "center",
+  },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  text: {
-    fontSize: 18,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-  },
-  addPostButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 8,
-  },
-  addPostButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  postContainer: {
-    marginBottom: 20,
-    borderRadius: 12,
-    overflow: "hidden",
-    padding: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  image: {
-    width: "100%",
-    height: 250,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-  deleteIconButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 6,
-    backgroundColor: "rgba(255, 59, 48, 0.15)",
-    borderRadius: 20,
   },
 });
