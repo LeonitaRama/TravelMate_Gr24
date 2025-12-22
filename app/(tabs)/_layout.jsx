@@ -1,6 +1,7 @@
 import { Tabs, useRouter, usePathname } from "expo-router";
+import { useAuth } from "../../context/AuthContext";
 import { useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Platform, StatusBar } from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet, Platform,StatusBar} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { NotificationContext } from "../../context/NotificationContext";
 import { ThemeContext } from "../../context/ThemeContext";
@@ -9,72 +10,25 @@ import { useTranslation } from "react-i18next";
 
 
 export default function TabsLayout() {
+  const { user } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
   const { t } = useTranslation();
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
-  const showLoginHeader = pathname === "/" || pathname === "/explore";
   const { unreadCount } = useContext(NotificationContext);
   const languages = ["English", "Albanian"];
-
-  return (
-      <Tabs
-        screenOptions={{
-          headerShown: true,
-          headerTitle:"",
-          tabBarActiveTintColor: theme.accent,
-          tabBarInactiveTintColor: theme.textSecondary,
-          tabBarStyle: {
-            backgroundColor: theme.card,
-            borderTopColor: darkMode ? "#333" : "#ddd",
-          },
-            headerRight: () => (
-          <TouchableOpacity
-    onPress={() => router.push("/notifications")}
-    style={{ marginRight: 15 }}
-  >
-    <Ionicons
-      name="notifications-outline"
-      size={24}
-      color={darkMode ? "#fff" : "#000"}
-    />
-
-    {unreadCount > 0 && (
-      <View
-        style={{
-          position: "absolute",
-          top: -4,
-          right: -6,
-          backgroundColor: "red",
-          borderRadius: 10,
-          minWidth: 16,
-          height: 16,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ color: "#fff", fontSize: 10, fontWeight: "bold" }}>
-          {unreadCount}
-        </Text>
-      </View>
-    )}
-  </TouchableOpacity>
-),
-            headerLeft: () =>
-            showLoginHeader ? (
-           <TouchableOpacity
-            onPress={() => router.push("/login")}
-            style={{ marginLeft: 15 }}
-           >
-          <Text style={{ color: theme.text, fontWeight: "600" , fontSize: 18}}>
-           {t("login.title")}
-         </Text>
-         </TouchableOpacity>
-          ) : null,
-             tabBarActiveTintColor: theme.accent,
-          tabBarInactiveTintColor: theme.textSecondary,
-          tabBarStyle: {
+  
+ return (
+    <Tabs
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: theme.background,
+        },
+        headerTintColor: theme.text,
+        headerTitle: "",
+        tabBarActiveTintColor: theme.accent,
+        tabBarInactiveTintColor: theme.textSecondary,
+        tabBarStyle: {
           backgroundColor: theme.card,
           borderTopColor: darkMode ? "#333" : "#ddd",
         },
@@ -86,9 +40,8 @@ export default function TabsLayout() {
             <Ionicons
               name="notifications-outline"
               size={24}
-              color={darkMode ? "#fff" : "#000"}
+              color={theme.text}
             />
-
             {unreadCount > 0 && (
               <View
                 style={{
@@ -110,26 +63,28 @@ export default function TabsLayout() {
             )}
           </TouchableOpacity>
         ),
-        headerLeft: () =>
-          showLoginHeader ? (
-            <TouchableOpacity
-              onPress={() => router.push("/login")}
-              style={{ marginLeft: 15 }}
-            >
-              <Text style={{ color: theme.text, fontWeight: "600", fontSize: 18 }}>
-                Login
-              </Text>
-            </TouchableOpacity>
-          ) : null,
-        tabBarActiveTintColor: theme.accent,
-        tabBarInactiveTintColor: theme.textSecondary,
-        tabBarStyle: {
-          backgroundColor: theme.card,
-          borderTopColor: darkMode ? "#333" : "#ddd",
-        },
-
-      }}
-    >
+    headerLeft: () => (
+      user ? (
+        <TouchableOpacity onPress={() => router.push("/profile")} style={{ marginLeft: 15 }}>
+          <Image
+            source={{ uri: user.photoURL || 'https://via.placeholder.com/40' }}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: theme.accent,
+            }}
+          />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity onPress={() => router.push("/login")} style={{ marginLeft: 15 }}>
+          <Text style={{ color: theme.text, fontWeight: "600", fontSize: 18 }}>Login</Text>
+        </TouchableOpacity>
+      )
+    )
+  }}
+>
       <Tabs.Screen
         name="index"
         options={{

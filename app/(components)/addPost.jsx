@@ -1,11 +1,13 @@
 import React, { useState, useContext } from "react";
-import { View, TextInput, Button, Image, Alert, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, TextInput, Button, Image, Alert, StyleSheet, TouchableOpacity, Text, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { uploadCloudinary } from "../../utils/uploadCloudinary";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db3, auth3 } from "../../firebase/firebaseConfig";
 import { ThemeContext } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../context/ThemeStyles";
+import { scheduleLocalNotification } from "../../utils/localNotifications";
+import { NotificationContext } from "../../context/NotificationContext";
 
 export default function AddPost() {
   const [image, setImage] = useState(null);
@@ -13,6 +15,7 @@ export default function AddPost() {
   const [uploading, setUploading] = useState(false);
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
+  const { addNotification } = useContext(NotificationContext);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -46,6 +49,13 @@ export default function AddPost() {
         text,
         createdAt: serverTimestamp(),
       });
+
+   await scheduleLocalNotification(
+  "Post published 📸",
+  "Your travel post is now live"
+);
+addNotification();
+
 
       Alert.alert("Your post has been published!");
       setImage(null);

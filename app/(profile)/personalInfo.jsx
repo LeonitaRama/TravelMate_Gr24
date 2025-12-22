@@ -154,7 +154,7 @@ export default PersonalInfo
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f8f8ff",
+        
     },
     scroll: {
         padding: 20,
@@ -187,8 +187,8 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: "#fff",
         borderBottomWidth: 3,
-        borderBottomColor: "#6b63ff73",
         borderRadius: 10,
+        borderBottomColor:"#83b6f1ff",
         paddingHorizontal: 14,
         paddingVertical: 10,
         fontSize: 15,
@@ -201,8 +201,8 @@ const styles = StyleSheet.create({
     },
     saveButton: {
         marginTop: 30,
-        backgroundColor: "#6b63ff73",
         paddingVertical: 15,
+        backgroundColor:"#83b6f1ff",
         borderRadius: 12,
         alignItems: 'center',
     },

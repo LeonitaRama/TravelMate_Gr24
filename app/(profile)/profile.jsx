@@ -48,7 +48,9 @@ const Profile = () => {
             const base64Img = `data:image/jpeg;base64,${results.assets[0].base64}`;
             await updatePhoto(base64Img);
         }
+        
     };
+    
 
     const takePhoto = async () => {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -111,14 +113,23 @@ const Profile = () => {
         }
     };
 
-    if (!user) {
-        return (
-            <View style={[styles.container, { backgroundColor: theme.background }]}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Loading user info...</Text>
-            </View>
-        );
-    }
+useEffect(() => {
+  if (!loading && !user) {
+    router.replace("/login");
+  }
+}, [user, loading]);
+if (loading) {
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+}
+
+if (!user) {
+  return null; 
+}
+
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>

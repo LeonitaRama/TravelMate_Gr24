@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { View, TextInput, Button, Alert, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, TextInput, Button, Alert, StyleSheet, TouchableOpacity, Text, Platform } from "react-native";
 import { addDoc, collection } from "firebase/firestore";
 import { db3, auth3 } from "../../firebase/firebaseConfig";
 import { ThemeContext } from "../../context/ThemeContext";
@@ -14,6 +14,7 @@ export default function AddTripPlan() {
   const { darkMode } = useContext(ThemeContext);
   const theme = darkMode ? darkTheme : lightTheme;
   const { addNotification } = useContext(NotificationContext);
+  
 
   const submitPlan = async () => {
     if (!destination || !startDate || !endDate) {
@@ -30,8 +31,8 @@ export default function AddTripPlan() {
 
       });
       await scheduleLocalNotification(
-      "Trip Reminder",
-      "Mos harro udhëtimin tënd nesër ✈️"
+  "Trip plan saved ✈️",
+  `Your trip to ${destination} has been saved`
 );
 addNotification();
 
@@ -43,6 +44,7 @@ addNotification();
       Alert.alert("Error saving trip plan.", error.message);
     }
   };
+  
 
   return (
     <View style={[styles.container, {backgroundColor:theme.background}]}>
